@@ -1,0 +1,17 @@
+{
+  "section_key": "home_blog",
+  "section_name": "Blog Section",
+  "title": "Blog",
+  "subtitle": "",
+  "description": "",
+  "background_image": "",
+  "background_color": "",
+  "layout_type": "blog",
+  "sort_order": 9,
+  "is_active": true,
+  "section_settings": {
+    "title_color": "#000000",
+    "title_align": "center"
+  },
+  "items": []
+}

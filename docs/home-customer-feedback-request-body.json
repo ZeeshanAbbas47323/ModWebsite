@@ -1,0 +1,106 @@
+{
+  "section_key": "home_customer_feedback",
+  "section_name": "Customer Feedback Section",
+  "title": "Our Customer Feedback",
+  "subtitle": "",
+  "description": "",
+  "background_image": "",
+  "background_color": "",
+  "layout_type": "customer_feedback",
+  "sort_order": 7,
+  "is_active": true,
+  "section_settings": {
+    "title_color": "#000000",
+    "card_background_color": "#F8F9FA",
+    "platform_ratings": [
+      {
+        "platform": "google",
+        "icon_url": "/images/icons/google.svg",
+        "rating": 4.2,
+        "stars": 5,
+        "label": "4.2 rating on google"
+      },
+      {
+        "platform": "facebook",
+        "icon_url": "/images/icons/facebook-blue.svg",
+        "rating": 4.8,
+        "stars": 5,
+        "label": "4.8 rating on facebook"
+      }
+    ]
+  },
+  "items": [
+    {
+      "title": "Maryam Nafees",
+      "subtitle": "",
+      "description": "This place is the best! Jamie and his team go above and beyond always!! Will never go anywhere else!",
+      "image_url": "/images/avatars/avatar-5.jpg",
+      "mobile_image_url": "",
+      "button_text": "",
+      "button_url": "",
+      "badge": "4",
+      "sort_order": 1,
+      "is_active": true,
+      "value": "4",
+      "extra_data": {
+        "role": "review",
+        "rating": 4,
+        "alt": "Maryam Nafees"
+      }
+    },
+    {
+      "title": "Sarah Ali",
+      "subtitle": "",
+      "description": "I'm never let done always on time for pick up . Always the best quality of your not sure just ask you come out more of a professional",
+      "image_url": "/images/avatars/avatar-6.jpg",
+      "mobile_image_url": "",
+      "button_text": "",
+      "button_url": "",
+      "badge": "4",
+      "sort_order": 2,
+      "is_active": true,
+      "value": "4",
+      "extra_data": {
+        "role": "review",
+        "rating": 4,
+        "alt": "Sarah Ali"
+      }
+    },
+    {
+      "title": "Ahmed Ashraf",
+      "subtitle": "",
+      "description": "I have order 3-4 gang sheets. It's a challenge for me to get the perfect size since I design the piece myself. I have not been disappointed.",
+      "image_url": "/images/avatars/avatar-7.jpg",
+      "mobile_image_url": "",
+      "button_text": "",
+      "button_url": "",
+      "badge": "4",
+      "sort_order": 3,
+      "is_active": true,
+      "value": "4",
+      "extra_data": {
+        "role": "review",
+        "rating": 4,
+        "alt": "Ahmed Ashraf"
+      }
+    },
+    {
+      "title": "John Doe",
+      "subtitle": "",
+      "description": "Fantastic experience from start to finish! The quality is top-notch and the customer service is incredibly responsive.",
+      "image_url": "/images/avatars/avatar-3.jpg",
+      "mobile_image_url": "",
+      "button_text": "",
+      "button_url": "",
+      "badge": "5",
+      "sort_order": 4,
+      "is_active": true,
+      "value": "5",
+      "extra_data": {
+        "role": "review",
+        "rating": 5,
+        "alt": "John Doe"
+      }
+    }
+  ]
+}

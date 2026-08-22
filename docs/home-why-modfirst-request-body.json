@@ -1,0 +1,75 @@
+{
+  "section_key": "home_why_modfirst",
+  "section_name": "Why Modfirst Section",
+  "title": "Why Modfirst ?",
+  "subtitle": "",
+  "description": "We deliver premium custom products at prices everyone can afford. From T-shirts, hoodies, banners, yard signs, and business cards to embroidery and transfers, each item is made with care and precision to meet your needs without breaking your budget.",
+  "background_image": "/images/branding/element-1.svg",
+  "background_color": "",
+  "layout_type": "why_modfirst",
+  "sort_order": 5,
+  "is_active": true,
+  "section_settings": {
+    "title_color": "#000000",
+    "description_color": "#666666",
+    "feature_text_color": "#000000",
+    "bullet_color": "#D3F52E",
+    "features": [
+      "Affordable Custom Quality",
+      "Reliable and Fast Shipping",
+      "Superior Print and Finish",
+      "Exceptional Customer Care"
+    ]
+  },
+  "items": [
+    {
+      "title": "Modfirst Building",
+      "subtitle": "",
+      "description": "",
+      "image_url": "https://command.modfirst.com/uploads/why_modfirst/banner-1786894556805-998585409.jpg",
+      "mobile_image_url": "",
+      "button_text": "",
+      "button_url": "",
+      "badge": "",
+      "sort_order": 1,
+      "is_active": true,
+      "extra_data": {
+        "role": "image_wide",
+        "alt": "Modfirst Building",
+        "span": "col-span-2"
+      }
+    },
+    {
+      "title": "Delivery Rider",
+      "subtitle": "",
+      "description": "",
+      "image_url": "/images/branding/rider.png",
+      "mobile_image_url": "",
+      "button_text": "",
+      "button_url": "",
+      "badge": "",
+      "sort_order": 2,
+      "is_active": true,
+      "extra_data": {
+        "role": "image_left",
+        "alt": "Delivery Rider"
+      }
+    },
+    {
+      "title": "Merchandise",
+      "subtitle": "",
+      "description": "",
+      "image_url": "/images/branding/coffee-mugs.png",
+      "mobile_image_url": "",
+      "button_text": "",
+      "button_url": "",
+      "badge": "",
+      "sort_order": 3,
+      "is_active": true,
+      "extra_data": {
+        "role": "image_right",
+        "alt": "Merchandise"
+      }
+    }
+  ]
+}

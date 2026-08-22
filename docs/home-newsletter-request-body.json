@@ -1,0 +1,21 @@
+{
+  "section_key": "home_newsletter",
+  "section_name": "Newsletter Section",
+  "title": "Ready To Elevate Your Print Brand?",
+  "subtitle": "",
+  "description": "Join the Modfirst newsletter to receive exclusive discounts, design templates, and professional DTF printing guides directly in your inbox.",
+  "background_image": "",
+  "background_color": "",
+  "layout_type": "newsletter",
+  "sort_order": 8,
+  "is_active": true,
+  "section_settings": {
+    "title_color": "#000000",
+    "description_color": "#464545",
+    "gradient": "linear-gradient(to bottom, #D3F52E 0%, #e8fa85 50%, rgba(255,255,255,0.9) 100%)",
+    "input_placeholder": "Email",
+    "submit_icon_url": "/images/icons/send.svg",
+    "subscribe_endpoint": "/newsletters/subscribe"
+  },
+  "items": []
+}

@@ -1,0 +1,66 @@
+{
+  "section_key": "home_promo_banners",
+  "section_name": "Promotional Banners Section",
+  "title": "Promotional Banners",
+  "subtitle": "",
+  "description": "",
+  "background_image": "",
+  "background_color": "",
+  "layout_type": "promo_banners",
+  "sort_order": 2,
+  "is_active": true,
+  "section_settings": {
+    "bottom_banner": {
+      "text": "Over 1.5 million items shipped every month! Modfirst makes them a reality.",
+      "background_color": "#F8FFD9",
+      "border_color": "#C8E100",
+      "text_color": "#000000"
+    }
+  },
+  "items": [
+    {
+      "title": "Festival Collection",
+      "subtitle": "Sale up to",
+      "description": "We print promotional gifts for every budget.",
+      "image_url": "/images/banners-compositions/booklet.png",
+      "mobile_image_url": "",
+      "button_text": "",
+      "button_url": "",
+      "badge": "25% off",
+      "sort_order": 1,
+      "is_active": true,
+      "extra_data": {
+        "role": "left_card",
+        "alt": "Festival Collection Booklets",
+        "background_color": "#F8D5F0",
+        "accent_color": "#E92B2B",
+        "text_color": "#000000",
+        "description_color": "#464545",
+        "eyebrow": "Sale up to",
+        "highlight": "25% off"
+      }
+    },
+    {
+      "title": "Custom Packaging your Customers",
+      "subtitle": "Only Price",
+      "description": "Professionally printed or embroidered",
+      "image_url": "/images/banners-compositions/launch-box.png",
+      "mobile_image_url": "",
+      "button_text": "",
+      "button_url": "",
+      "badge": "$24.00",
+      "sort_order": 2,
+      "is_active": true,
+      "extra_data": {
+        "role": "right_card",
+        "alt": "Custom Packaging Launch Box",
+        "background_color": "#F9DAD2",
+        "accent_color": "#000000",
+        "text_color": "#000000",
+        "description_color": "#464545",
+        "price_label": "Only Price",
+        "price_value": "$24.00"
+      }
+    }
+  ]
+}

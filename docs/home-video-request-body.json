@@ -1,0 +1,46 @@
+{
+  "section_key": "home_video",
+  "section_name": "Video Section",
+  "title": "Watch How Your Custom Prints Come To Life",
+  "subtitle": "",
+  "description": "See how we print, pack, and deliver custom products with unmatched precision using ModFirst's signature technology.",
+  "background_image": "",
+  "background_color": "#18181b",
+  "layout_type": "video",
+  "sort_order": 4,
+  "is_active": true,
+  "section_settings": {
+    "overlay_color": "#000000",
+    "overlay_opacity": 0.5,
+    "title_color": "#FFFFFF",
+    "description_color": "#FFFFFF",
+    "cta": {
+      "button_text": "Start your Order",
+      "button_url": "/products"
+    }
+  },
+  "items": [
+    {
+      "title": "Watch How Your Custom Prints Come To Life",
+      "subtitle": "",
+      "description": "See how we print, pack, and deliver custom products with unmatched precision using ModFirst's signature technology.",
+      "image_url": "",
+      "mobile_image_url": "",
+      "button_text": "Start your Order",
+      "button_url": "/products",
+      "badge": "",
+      "sort_order": 1,
+      "is_active": true,
+      "extra_data": {
+        "role": "video",
+        "video_url": "/videos/awarness.mp4",
+        "video_type": "video/mp4",
+        "poster_url": "",
+        "autoplay": true,
+        "loop": true,
+        "muted": true,
+        "plays_inline": true
+      }
+    }
+  ]
+}

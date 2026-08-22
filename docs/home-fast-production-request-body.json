@@ -1,0 +1,75 @@
+{
+  "section_key": "home_fast_production",
+  "section_name": "Fast Production Section",
+  "title": "Fast Production & Reliable Delivery",
+  "subtitle": "",
+  "description": "Speed matters in the apparel industry and ModFirst understands it. Whether you're restocking your bestsellers, preparing for a pop-up event, or fulfilling last-minute customer requests, ModFirst delivers your DTF transfers fast and ready to press.",
+  "background_image": "/images/branding/element-2.svg",
+  "background_color": "",
+  "layout_type": "fast_production",
+  "sort_order": 6,
+  "is_active": true,
+  "section_settings": {
+    "title_color": "#000000",
+    "description_color": "#666666",
+    "feature_text_color": "#000000",
+    "bullet_color": "#D3F52E",
+    "features": [
+      "Quick Production Times",
+      "Reliable Shipping",
+      "Fast Turnaround on all Orders",
+      "Just Heat Press and Ship to your Customers"
+    ]
+  },
+  "items": [
+    {
+      "title": "Printer printing tiger",
+      "subtitle": "",
+      "description": "",
+      "image_url": "/images/branding/tiger-laser-print.jpg",
+      "mobile_image_url": "",
+      "button_text": "",
+      "button_url": "",
+      "badge": "",
+      "sort_order": 1,
+      "is_active": true,
+      "extra_data": {
+        "role": "image_wide",
+        "alt": "Printer printing tiger",
+        "span": "col-span-2"
+      }
+    },
+    {
+      "title": "Orange stacks",
+      "subtitle": "",
+      "description": "",
+      "image_url": "/images/branding/t-shirts.png",
+      "mobile_image_url": "",
+      "button_text": "",
+      "button_url": "",
+      "badge": "",
+      "sort_order": 2,
+      "is_active": true,
+      "extra_data": {
+        "role": "image_left",
+        "alt": "Orange stacks"
+      }
+    },
+    {
+      "title": "Girl on phone",
+      "subtitle": "",
+      "description": "",
+      "image_url": "/images/branding/girl-with-phone.jpg",
+      "mobile_image_url": "",
+      "button_text": "",
+      "button_url": "",
+      "badge": "",
+      "sort_order": 3,
+      "is_active": true,
+      "extra_data": {
+        "role": "image_right",
+        "alt": "Girl on phone"
+      }
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "section_key": "home_hero",
+  "section_name": "Hero Banner Section",
+  "title": "Large-Format Printing for Every Event",
+  "subtitle": "",
+  "description": "From small business advertising to big event displays, Modfirst delivers bold, durable, and vibrant large-format prints that demand attention.",
+  "background_image": "",
+  "background_color": "#030303",
+  "layout_type": "hero",
+  "sort_order": 1,
+  "is_active": true,
+  "section_settings": {
+    "cta": {
+      "button_url": "/products",
+      "button_text": "Shop Now"
+    },
+    "stats": [
+      { "label": "Daily Customer", "value": "1k+" },
+      { "label": "Printing Media", "value": "27M+" },
+      { "label": "Projects Done", "value": "50k+" }
+    ],
+    "gradient": "linear-gradient(to bottom, #C8E100 0%, #262e01 50%, #000000 100%)",
+    "overlay_image": "/images/backgrounds/hero-half-frame.svg",
+    "overlay_opacity": 0.05,
+    "customer_feedback": {
+      "text": "Satisfied Customer",
+      "rating": 4,
+      "avatars_count": 4,
+      "avatars": [
+        {
+          "fallback": "CN",
+          "image_url": "https://command.modfirst.com/uploads/avatars/avatar-1.jpg"
+        },
+        {
+          "fallback": "LR",
+          "image_url": "https://command.modfirst.com/uploads/avatars/avatar-2.jpg"
+        },
+        {
+          "fallback": "ER",
+          "image_url": "https://command.modfirst.com/uploads/avatars/avatar-3.jpg"
+        },
+        {
+          "fallback": "ER",
+          "image_url": "https://command.modfirst.com/uploads/avatars/avatar-4.jpg"
+        }
+      ]
+    }
+  },
+  "items": [
+    {
+      "title": "Large-Format Printing for Every Event",
+      "subtitle": "",
+      "description": "From small business advertising to big event displays, Modfirst delivers bold, durable, and vibrant large-format prints that demand attention.",
+      "image_url": "https://command.modfirst.com/banners/hero-products-collage.png",
+      "mobile_image_url": "",
+      "button_text": "Shop Now",
+      "button_url": "/products",
+      "badge": "",
+      "sort_order": 1,
+      "is_active": true
+    }
+  ]
+}

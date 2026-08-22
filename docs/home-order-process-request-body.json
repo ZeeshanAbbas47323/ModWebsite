@@ -1,0 +1,85 @@
+{
+  "section_key": "home_order_process",
+  "section_name": "Our Order Process Section",
+  "title": "Our Order Process",
+  "subtitle": "",
+  "description": "From small business advertising to big event displays, Modfirst delivers bold.",
+  "background_image": "",
+  "background_color": "#000000",
+  "layout_type": "order_process",
+  "sort_order": 3,
+  "is_active": true,
+  "section_settings": {
+    "card_background_color": "#191717",
+    "title_color": "#FFFFFF",
+    "description_color": "#E3D9D9",
+    "glow_color": "#C8E100",
+    "glow_opacity": 0.4
+  },
+  "items": [
+    {
+      "title": "Choose Your Perfect Product",
+      "subtitle": "",
+      "description": "Browse our wide range of custom T-shirts, hoodies, banners, yard signs, business cards, embroidery, and DTF UV DTF transfers. Select the product type, size, and style that matches your vision. Every option is designed to give you creative freedom and professional results.",
+      "image_url": "/images/icons/gallery.svg",
+      "mobile_image_url": "",
+      "button_text": "",
+      "button_url": "",
+      "badge": "1",
+      "sort_order": 1,
+      "is_active": true,
+      "extra_data": {
+        "role": "step",
+        "alt": "Choose Your Perfect Product"
+      }
+    },
+    {
+      "title": "Upload or Create Your Design",
+      "subtitle": "",
+      "description": "Browse our wide range of custom T-shirts, hoodies, banners, yard signs, business cards, embroidery, and DTF UV DTF transfers. Select the product type, size, and style that matches your vision. Every option is designed to give you creative freedom and professional results.",
+      "image_url": "/images/icons/upload.svg",
+      "mobile_image_url": "",
+      "button_text": "",
+      "button_url": "",
+      "badge": "2",
+      "sort_order": 2,
+      "is_active": true,
+      "extra_data": {
+        "role": "step",
+        "alt": "Upload or Create Your Design"
+      }
+    },
+    {
+      "title": "Confirm and Place Your Order",
+      "subtitle": "",
+      "description": "Browse our wide range of custom T-shirts, hoodies, banners, yard signs, business cards, embroidery, and DTF UV DTF transfers. Select the product type, size, and style that matches your vision. Every option is designed to give you creative freedom and professional results.",
+      "image_url": "/images/icons/cloud.svg",
+      "mobile_image_url": "",
+      "button_text": "",
+      "button_url": "",
+      "badge": "3",
+      "sort_order": 3,
+      "is_active": true,
+      "extra_data": {
+        "role": "step",
+        "alt": "Confirm and Place Your Order"
+      }
+    },
+    {
+      "title": "Receive and Enjoy Your Items",
+      "subtitle": "",
+      "description": "Browse our wide range of custom T-shirts, hoodies, banners, yard signs, business cards, embroidery, and DTF UV DTF transfers. Select the product type, size, and style that matches your vision. Every option is designed to give you creative freedom and professional results.",
+      "image_url": "/images/icons/package.svg",
+      "mobile_image_url": "",
+      "button_text": "",
+      "button_url": "",
+      "badge": "4",
+      "sort_order": 4,
+      "is_active": true,
+      "extra_data": {
+        "role": "step",
+        "alt": "Receive and Enjoy Your Items"
+      }
+    }
+  ]
+}
