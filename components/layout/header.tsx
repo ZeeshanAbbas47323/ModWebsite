@@ -7,10 +7,14 @@ import Link from "next/link";
 import { useState } from "react";
 import { Sidebar } from "./sidebar";
 import { useWebsiteSettings } from "@/hooks/use-website-settings";
+import { useCart } from "@/contexts/cart-context";
+import { useAuth } from "@/contexts/auth-context";
 
 export function Header() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { data: settings } = useWebsiteSettings();
+  const { itemCount } = useCart();
+  const { isAuthenticated } = useAuth();
 
   const phone = settings?.contact_phone ?? "+92 3123456789";
   const logoUrl = settings?.logo_black_url || settings?.logo_url || "/images/branding/logo-dark.svg";
@@ -47,13 +51,20 @@ export function Header() {
               <span className="text-sm font-medium whitespace-nowrap">{phone}</span>
             </a>
 
-            <Button size="icon-lg" variant="ghost">
-              <Image src="/images/icons/user.svg" alt="User" width={24} height={24} />
+            <Button size="icon-lg" variant="ghost" asChild>
+              <Link href={isAuthenticated ? "/account" : "/login"} aria-label={isAuthenticated ? "My account" : "Sign in"}>
+                <Image src="/images/icons/user.svg" alt="" width={24} height={24} />
+              </Link>
             </Button>
 
-            <Button size="icon-lg" variant="ghost">
-              <Link href="/cart">
-                <Image src="/images/icons/cart.svg" alt="Cart" width={24} height={24} />
+            <Button size="icon-lg" variant="ghost" asChild className="relative">
+              <Link href="/cart" aria-label={`Cart, ${itemCount} item${itemCount === 1 ? "" : "s"}`}>
+                <Image src="/images/icons/cart.svg" alt="" width={24} height={24} />
+                {itemCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-black text-[11px] font-bold flex items-center justify-center leading-none">
+                    {itemCount > 99 ? "99+" : itemCount}
+                  </span>
+                )}
               </Link>
             </Button>
           </div>

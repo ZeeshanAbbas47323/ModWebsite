@@ -144,3 +144,50 @@
     @apply font-sans;
   }
 }
+
+/* Rendering for CMS-authored HTML (policy pages, FAQ answers). */
+.cms-prose {
+  color: #464545;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+.cms-prose p { margin-bottom: 0.75rem; }
+.cms-prose p:last-child { margin-bottom: 0; }
+.cms-prose strong { color: #000; font-weight: 700; }
+.cms-prose a { color: #0056b3; text-decoration: underline; }
+.cms-prose a:hover { color: #003d82; }
+.cms-prose ul,
+.cms-prose ol { margin: 0.5rem 0 0.75rem; padding-left: 1.25rem; }
+.cms-prose ul { list-style: disc; }
+.cms-prose ol { list-style: decimal; }
+/* CMS exports wrap a whole document in a list. A list item holding headings is
+   structural, not a bullet, so strip the marker and indent from it. */
+.cms-prose ul:has(> li > h2),
+.cms-prose ul:has(> li > h3),
+.cms-prose ol:has(> li > h2),
+.cms-prose ol:has(> li > h3) { list-style: none; padding-left: 0; margin: 0; }
+.cms-prose li:has(> h2),
+.cms-prose li:has(> h3) { list-style: none; }
+/* The same exports nest each bullet in its own single-item list; flatten those
+   so answers do not render as a ladder of indents. Genuine nested lists (which
+   sit alongside other content) keep their markers. */
+.cms-prose li:has(> ul:only-child),
+.cms-prose li:has(> ol:only-child) { list-style: none; }
+.cms-prose li > ul:only-child,
+.cms-prose li > ol:only-child { margin: 0; padding-left: 0; }
+.cms-prose li { margin-bottom: 0.25rem; }
+.cms-prose h2,
+.cms-prose h3 { color: #000; font-weight: 700; margin: 1rem 0 0.5rem; }
+.cms-prose img { max-width: 100%; height: auto; border-radius: 0.75rem; }
+/* Icon fonts are not loaded, so decorative <i> tags would render as blanks. */
+.cms-prose i[class^="fa"],
+.cms-prose i[class*=" fa"] { display: none; }
+.cms-prose h2 { font-size: 1.5rem; scroll-margin-top: 6rem; }
+.cms-prose h3 { font-size: 1.25rem; scroll-margin-top: 6rem; }
+/* Shopify exports wrap policy bodies in these; they carry no styling here. */
+.cms-prose .shopify-policy__body,
+.cms-prose .rte { display: contents; }
+.cms-prose table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+.cms-prose th,
+.cms-prose td { border: 1px solid #e5e5e5; padding: 0.5rem 0.75rem; text-align: left; }
+.cms-prose th { background: #f4f4f5; color: #000; font-weight: 700; }

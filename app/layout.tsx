@@ -6,6 +6,8 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { PopupBanner } from "@/components/shared/popup-banner";
+import { AuthProvider } from "@/contexts/auth-context";
+import { CartProvider } from "@/contexts/cart-context";
 
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -36,12 +38,16 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <QueryProvider>
-          <Header />
-          <div className="relative z-10 bg-white">
-            {children}
-          </div>
-          <Footer />
-          <PopupBanner />
+          <AuthProvider>
+            <CartProvider>
+              <Header />
+              <div className="relative z-10 bg-white">
+                {children}
+              </div>
+              <Footer />
+              <PopupBanner />
+            </CartProvider>
+          </AuthProvider>
         </QueryProvider>
       </body>
     </html>

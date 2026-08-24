@@ -49,14 +49,28 @@ export interface ProductVariant {
   id: number;
   product_id: number;
   sku: string;
-  price: number;
-  sale_price: number | null;
-  stock: number;
+  /** Money fields arrive as decimal strings. */
+  price: string | number;
+  sale_price: string | number | null;
+  discount_percent?: number | null;
+  /** Legacy flat stock count; current responses nest it under `inventory`. */
+  stock?: number;
+  inventory?: { quantity: number } | null;
   status: string;
+  image_url?: string | null;
   color_id: number | null;
   size_id: number | null;
-  color?: { id: number; name: string; hex_code: string };
-  size?: { id: number; name: string };
+  color?: { id: number; name: string; hex_code: string } | null;
+  size?: { id: number; name: string; display_name?: string } | null;
+}
+
+/** Units on hand for a variant, across both response shapes. */
+export function variantStock(variant: ProductVariant): number {
+  return variant.inventory?.quantity ?? variant.stock ?? 0;
+}
+
+export function isVariantAvailable(variant: ProductVariant): boolean {
+  return variant.status === "active" && variantStock(variant) > 0;
 }
 
 export interface ProductDescription {

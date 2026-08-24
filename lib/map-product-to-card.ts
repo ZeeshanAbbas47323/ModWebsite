@@ -16,5 +16,6 @@ export function mapProductToCard(product: Product): ProductCardData {
     count,
     img_path: imgPath,
     slug: product.slug,
+    product,
   };
 }

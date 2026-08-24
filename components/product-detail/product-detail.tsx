@@ -11,16 +11,17 @@ import {
     Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
 import {
-    Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
-import {
     Carousel, CarouselContent, CarouselItem, type CarouselApi,
 } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
-import { useProductImages, useProductDescriptions, useProductFaqs, useProductVariants, useIncreaseView } from '@/hooks/use-products';
+import { useProductImages, useProductDescriptions, useProductFaqs, useProductVariants, useIncreaseView, useProduct } from '@/hooks/use-products';
+import { useCart } from '@/contexts/cart-context';
 import { useReviews } from '@/hooks/use-reviews';
 import type { Product } from '@/services/product.service';
 import { resolveImageUrl } from '@/lib/image-url';
+import { VariantSelector } from '@/components/product-detail/variant-selector';
+import { isVariantAvailable } from '@/services/product.service';
+import type { ProductVariant } from '@/services/product.service';
 
 interface ProductDetailProps {
     product?: Product | null;
@@ -34,11 +35,23 @@ const fallbackImages = [
     "/images/products/dtf-gang-sheet.svg",
 ];
 
-const ProductDetail = ({ product, productId }: ProductDetailProps) => {
-    const id = product?.id ?? productId ?? 0;
+const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) => {
+    const id = productProp?.id ?? productId ?? 0;
     const [activeThumb, setActiveThumb] = useState(0);
     const [api, setApi] = useState<CarouselApi>();
     const increaseView = useIncreaseView();
+    const { addItem } = useCart();
+
+    // The /product-detail?id= route passes only an id, so fetch the record the
+    // cart needs (name, price, images) when the parent did not supply it.
+    const { data: fetchedProduct } = useProduct(productProp ? 0 : id);
+    const product = productProp ?? fetchedProduct ?? null;
+
+    const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
+    const [quantity, setQuantity] = useState(1);
+    const [adding, setAdding] = useState(false);
+    const [addError, setAddError] = useState<string | null>(null);
+    const [added, setAdded] = useState(false);
 
     const { data: apiImages } = useProductImages(id);
     const { data: descriptions } = useProductDescriptions(id);
@@ -46,16 +59,72 @@ const ProductDetail = ({ product, productId }: ProductDetailProps) => {
     const { data: variants } = useProductVariants(id);
     const { data: reviewsData } = useReviews({ filters: { product_id: id } });
 
+    // `sort` mutates, so copy first — apiImages is the React Query cache.
+    // The same photo can be attached to a product more than once, so collapse
+    // duplicates rather than showing the gallery twice.
     const images = apiImages?.length
-        ? apiImages.sort((a, b) => a.sort_order - b.sort_order).map((img) => resolveImageUrl(img.image_url, fallbackImages[0]))
+        ? [...new Set(
+            [...apiImages]
+                .sort((a, b) => a.sort_order - b.sort_order)
+                .map((img) => resolveImageUrl(img.image_url, fallbackImages[0]))
+          )]
         : product?.images?.map((img) => resolveImageUrl(img.image_url, fallbackImages[0])) ?? fallbackImages;
 
     const sortedDescriptions = descriptions?.sort((a, b) => a.sort_order - b.sort_order) ?? [];
     const sortedFaqs = faqs?.sort((a, b) => a.sort_order - b.sort_order) ?? [];
     const reviewCount = reviewsData?.pagination?.total ?? 0;
 
-    const price = product?.sale_price != null ? Number(product.sale_price) : product?.base_price != null ? Number(product.base_price) : null;
-    const originalPrice = product?.sale_price ? Number(product.base_price) : null;
+    // A chosen variant overrides the product's headline price.
+    const listPrice = selectedVariant?.price ?? product?.base_price;
+    const salePrice = selectedVariant ? selectedVariant.sale_price : product?.sale_price;
+    const price = salePrice != null ? Number(salePrice) : listPrice != null ? Number(listPrice) : null;
+    const originalPrice = salePrice != null && listPrice != null ? Number(listPrice) : null;
+
+    // Variants can carry their own photo; show it as soon as one is picked.
+    const variantImage = selectedVariant?.image_url
+        ? resolveImageUrl(selectedVariant.image_url, images[0])
+        : null;
+    const variantImageIndex = variantImage ? images.indexOf(variantImage) : -1;
+    const galleryImages = variantImage && variantImageIndex === -1
+        ? [variantImage, ...images]
+        : images;
+
+    // A product with variants cannot be added until one is chosen, otherwise
+    // the order would be missing its SKU.
+    const needsVariant = !!variants?.length && !selectedVariant;
+    const variantOutOfStock = !!selectedVariant && !isVariantAvailable(selectedVariant);
+
+    const handleAddToCart = async () => {
+        if (!product) return;
+        if (needsVariant) {
+            setAddError(
+                variants?.some((v) => v.color) && variants?.some((v) => v.size)
+                    ? "Please choose a colour and size first."
+                    : "Please choose an option first."
+            );
+            return;
+        }
+        if (variantOutOfStock) {
+            setAddError("That combination is out of stock.");
+            return;
+        }
+        setAddError(null);
+        setAdding(true);
+        try {
+            await addItem({
+                product,
+                variant: selectedVariant,
+                quantity,
+                image: variantImage ?? images[0],
+            });
+            setAdded(true);
+            setTimeout(() => setAdded(false), 2500);
+        } catch (err) {
+            setAddError(err instanceof Error ? err.message : "Could not add to cart");
+        } finally {
+            setAdding(false);
+        }
+    };
 
     useEffect(() => {
         if (id) increaseView.mutate(id);
@@ -65,6 +134,13 @@ const ProductDetail = ({ product, productId }: ProductDetailProps) => {
         if (!api) return;
         api.on("select", () => setActiveThumb(api.selectedScrollSnap()));
     }, [api]);
+
+    // Jump the gallery to the picked variant's photo. Prepended images sit at
+    // index 0; otherwise scroll to wherever the photo already lives.
+    useEffect(() => {
+        if (!api || !variantImage) return;
+        api.scrollTo(variantImageIndex === -1 ? 0 : variantImageIndex);
+    }, [api, variantImage, variantImageIndex]);
 
     const onThumbClick = (index: number) => {
         setActiveThumb(index);
@@ -109,7 +185,7 @@ const ProductDetail = ({ product, productId }: ProductDetailProps) => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
                 <div className="lg:col-span-7 flex flex-col sm:flex-row gap-4">
                     <div className="order-2 sm:order-1 sm:w-[100px] shrink-0 flex flex-row sm:flex-col gap-4 overflow-x-auto sm:overflow-visible no-scrollbar">
-                        {images.map((img, index) => (
+                        {galleryImages.map((img, index) => (
                             <button
                                 key={index}
                                 onClick={() => onThumbClick(index)}
@@ -126,7 +202,7 @@ const ProductDetail = ({ product, productId }: ProductDetailProps) => {
                     <div className="order-1 sm:order-2 flex-1 rounded-3xl relative overflow-hidden aspect-square sm:aspect-auto sm:h-[500px] lg:h-[600px] flex items-center justify-center bg-gray-100">
                         <Carousel setApi={setApi} opts={{ loop: true }} className="w-full h-full">
                             <CarouselContent className="ml-0">
-                                {images.map((img, idx) => (
+                                {galleryImages.map((img, idx) => (
                                     <CarouselItem key={idx} className="relative w-full pl-0 aspect-square sm:aspect-auto sm:h-[500px] lg:h-[600px]">
                                         <div className="relative w-full h-full">
                                             <Image src={img} alt={`Product Image ${idx + 1}`} fill className="object-cover" priority={idx === 0} unoptimized />
@@ -179,26 +255,46 @@ const ProductDetail = ({ product, productId }: ProductDetailProps) => {
                     </div>
 
                     {variants && variants.length > 0 && (
-                        <div className="mb-6 max-w-xs">
-                            <Select>
-                                <SelectTrigger className="w-full h-12 rounded-xl text-base border-gray-300">
-                                    <SelectValue placeholder="Select variant" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {variants.map((v) => (
-                                        <SelectItem key={v.id} value={String(v.id)}>
-                                            {[v.size?.name, v.color?.name].filter(Boolean).join(" - ") || v.sku}
-                                            {v.price ? ` ($${Number(v.price).toFixed(2)})` : ""}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
+                        <VariantSelector
+                            variants={variants}
+                            selected={selectedVariant}
+                            onSelect={setSelectedVariant}
+                        />
                     )}
 
-                    <Button size="xxl" className='mb-6'>
-                        {product?.is_customizable ? "Build your own Gang Sheet" : "Add to Cart"}
-                    </Button>
+                    <div className="flex flex-wrap items-center gap-4 mb-6">
+                        <div className="flex items-center gap-4 bg-[#F4F4F5] rounded-xl px-4 h-14">
+                            <button
+                                aria-label="Decrease quantity"
+                                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                                disabled={quantity <= 1}
+                                className="text-2xl leading-none text-black disabled:opacity-40"
+                            >
+                                &minus;
+                            </button>
+                            <span className="font-bold text-lg min-w-[24px] text-center">{quantity}</span>
+                            <button
+                                aria-label="Increase quantity"
+                                onClick={() => setQuantity((q) => q + 1)}
+                                className="text-2xl leading-none text-black"
+                            >
+                                +
+                            </button>
+                        </div>
+
+                        <Button size="xxl" className="flex-1 min-w-[200px]" onClick={handleAddToCart} disabled={adding || !product || variantOutOfStock}>
+                            {adding
+                                ? "Adding\u2026"
+                                : added
+                                    ? "Added to Cart"
+                                    : product?.is_customizable
+                                        ? "Build your own Gang Sheet"
+                                        : "Add to Cart"}
+                        </Button>
+                    </div>
+
+
+                    {addError && <p className="text-sm text-red-600 -mt-3 mb-6">{addError}</p>}
 
                     {(sortedDescriptions.length > 0 || sortedFaqs.length > 0) && (
                         <Accordion type="single" collapsible className="w-full">
