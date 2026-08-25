@@ -28,6 +28,57 @@ export interface CreateOrderInput {
   notes?: string;
 }
 
+/** A design file attached to an order line. */
+export interface OrderItemDesign {
+  id?: number;
+  design_upload_id?: number;
+  designUpload?: {
+    id: number;
+    file_url: string;
+    file_name?: string | null;
+    edit_url?: string | null;
+  } | null;
+}
+
+export interface OrderItem {
+  id: number;
+  order_id?: number;
+  product_id: number;
+  variant_id?: number | null;
+  quantity: number;
+  /** Money fields arrive as decimal strings. */
+  unit_price?: string | number;
+  total_price?: string | number;
+  print_method?: PrintMethod | null;
+  custom_text?: string | null;
+  product?: {
+    id: number;
+    name: string;
+    slug?: string;
+    images?: { image_url: string; is_primary?: boolean }[];
+  } | null;
+  variant?: {
+    id: number;
+    sku?: string;
+    color?: { name: string } | null;
+    size?: { name: string } | null;
+  } | null;
+  designs?: OrderItemDesign[] | null;
+}
+
+export interface OrderAddress {
+  id?: number;
+  full_name?: string;
+  phone?: string;
+  email?: string;
+  address_line1?: string;
+  address_line2?: string | null;
+  city?: string;
+  state?: string | null;
+  postal_code?: string | null;
+  country?: string | null;
+}
+
 export interface Order {
   id: number;
   /** The customer-facing reference, e.g. "MF-1787438010028-KQV99". */
@@ -44,9 +95,36 @@ export interface Order {
   tax_amount?: string | number;
   paid_amount?: string | number;
   delivery_type?: DeliveryType;
+  shipping_status?: string | null;
+  channel?: string | null;
+  notes?: string | null;
+  estimated_delivery_date?: string | null;
+  cancelled_at?: string | null;
   order_date?: string;
   created_at?: string;
-  items?: unknown[];
+  items?: OrderItem[] | null;
+  orderItems?: OrderItem[] | null;
+  shippingAddress?: OrderAddress | null;
+  billingAddress?: OrderAddress | null;
+  pickupLocation?: {
+    id: number;
+    name: string;
+    address_line1?: string;
+    city?: string;
+    phone?: string;
+  } | null;
+}
+
+/** The API has used both keys for the lines; accept either. */
+export function orderItemsOf(order: Order): OrderItem[] {
+  return order.items ?? order.orderItems ?? [];
+}
+
+/** Design files attached to a line, flattened for rendering. */
+export function orderItemDesigns(item: OrderItem) {
+  return (item.designs ?? [])
+    .map((d) => d.designUpload)
+    .filter((u): u is NonNullable<typeof u> => !!u?.file_url);
 }
 
 /** The reference used for payment sessions and order lookups. */

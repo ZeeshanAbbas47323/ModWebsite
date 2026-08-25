@@ -11,7 +11,7 @@
   "is_active": true,
   "section_settings": {
     "cta": {
-      "button_url": "/products",
+      "button_url": "/collections",
       "button_text": "Shop Now"
     },
     "stats": [

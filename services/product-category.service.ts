@@ -3,11 +3,14 @@ import apiClient from "@/lib/axios";
 export interface ProductCategory {
   id: number;
   name: string;
-  description: string;
-  image_url: string;
+  slug: string;
+  description: string | null;
+  image_url: string | null;
   parent_id: number | null;
-  sort_order: number;
-  is_active: boolean;
+  sort_order?: number;
+  is_active?: boolean;
+  parent?: ProductCategory | null;
+  children?: ProductCategory[];
   _count?: { products: number };
 }
 
@@ -22,5 +25,15 @@ export const productCategoryService = {
       },
     });
     return data.payload ?? data.data ?? [];
+  },
+
+  bySlug: async (slug: string): Promise<ProductCategory | null> => {
+    const { data } = await apiClient.post("/product-categories", {
+      page: 1,
+      limit: 1,
+      filters: { is_active: true, slug },
+    });
+    const categories: ProductCategory[] = data.payload ?? data.data ?? [];
+    return categories[0] ?? null;
   },
 };

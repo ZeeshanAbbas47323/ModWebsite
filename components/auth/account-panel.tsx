@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/auth-context";
 import { orderService, orderReference } from "@/services/order.service";
+import { OrderStatusBadge } from "@/components/account/order-status-badge";
 
 export function AccountPanel() {
   const router = useRouter();
@@ -58,9 +59,10 @@ export function AccountPanel() {
       ) : (
         <div className="flex flex-col gap-3">
           {orders.map((order) => (
-            <div
+            <Link
               key={order.id}
-              className="flex flex-wrap items-center justify-between gap-4 bg-[#F4F4F5] rounded-2xl px-6 py-5"
+              href={`/account/orders/${encodeURIComponent(orderReference(order))}`}
+              className="flex flex-wrap items-center justify-between gap-4 bg-[#F4F4F5] rounded-2xl px-6 py-5 hover:bg-black/5 transition-colors"
             >
               <div>
                 <p className="font-bold text-black">{orderReference(order)}</p>
@@ -70,13 +72,12 @@ export function AccountPanel() {
                   </p>
                 )}
               </div>
-              <span className="text-sm font-medium capitalize bg-white px-3 py-1 rounded-full">
-                {order.status?.replace(/_/g, " ")}
-              </span>
+              <OrderStatusBadge status={order.status} />
               <span className="font-bold text-black">
                 ${Number(order.total_amount ?? 0).toFixed(2)}
               </span>
-            </div>
+              <span aria-hidden className="text-gray-400">→</span>
+            </Link>
           ))}
         </div>
       )}

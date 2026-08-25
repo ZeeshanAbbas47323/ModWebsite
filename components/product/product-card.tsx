@@ -12,6 +12,8 @@ export interface ProductCardData {
     count: string;
     img_path: string;
     slug?: string;
+    /** Overrides the product link — used by collection cards. */
+    href?: string;
     /** Present for real products; category cards leave it undefined. */
     product?: Product;
 }
@@ -21,7 +23,7 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ data }) => {
-    const href = data.slug ? `/products/${data.slug}` : data.id ? `/product-detail?id=${data.id}` : "/product-detail";
+    const href = data.href ?? (data.slug ? `/products/${data.slug}` : data.id ? `/product-detail?id=${data.id}` : "/product-detail");
     const isExternal = data.img_path.startsWith("http");
     const { addItem } = useCart();
     const [adding, setAdding] = useState(false);

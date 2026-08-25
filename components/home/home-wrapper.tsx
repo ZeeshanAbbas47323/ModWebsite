@@ -41,6 +41,8 @@ const HomeWrapper = () => {
         title: cat.name,
         count: cat._count?.products ? `${cat._count.products} Products` : "",
         img_path: resolveImageUrl(cat.image_url, "/images/banners-compositions/booklet.png"),
+        // Categories are collections, not products — link them accordingly.
+        href: `/collections/${cat.slug}`,
     })) ?? fallbackProducts;
 
     const productCards = bestSellers?.map(mapProductToCard) ??

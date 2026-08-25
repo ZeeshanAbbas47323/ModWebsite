@@ -5,6 +5,7 @@ import { useProducts } from '@/hooks/use-products';
 import { useProductCategories } from '@/hooks/use-product-categories';
 import { mapProductToCard } from '@/lib/map-product-to-card';
 import { useState } from 'react';
+import Link from 'next/link';
 
 const fallbackProducts = [
     { title: "DTF Transfer", count: "50 Products", img_path: "/images/banners-compositions/booklet.png" },
@@ -15,42 +16,31 @@ const fallbackProducts = [
 ];
 
 const ProductWrapper = () => {
-    const [selectedCategory, setSelectedCategory] = useState<number | undefined>(undefined);
     const [page, setPage] = useState(1);
 
     const { data: categories } = useProductCategories(null);
-    const { data: productsData, isLoading } = useProducts({
-        page,
-        limit: 24,
-        filters: selectedCategory ? { category_id: selectedCategory } : {},
-    });
+    const { data: productsData, isLoading } = useProducts({ page, limit: 24 });
 
     const productCards = productsData?.payload?.map(mapProductToCard) ?? fallbackProducts;
     const pagination = productsData?.pagination;
 
     return (
         <>
+            {/* Filtering lives on the collection pages, so these are links now. */}
             {categories && categories.length > 0 && (
                 <div className="container pt-8">
                     <div className="flex flex-wrap gap-3">
-                        <button
-                            onClick={() => { setSelectedCategory(undefined); setPage(1); }}
-                            className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
-                                !selectedCategory ? 'bg-black text-white' : 'bg-[#F4F4F5] text-black hover:bg-black/10'
-                            }`}
-                        >
+                        <span className="px-5 py-2 rounded-full text-sm font-medium bg-black text-white">
                             All
-                        </button>
+                        </span>
                         {categories.map((cat) => (
-                            <button
+                            <Link
                                 key={cat.id}
-                                onClick={() => { setSelectedCategory(cat.id); setPage(1); }}
-                                className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
-                                    selectedCategory === cat.id ? 'bg-black text-white' : 'bg-[#F4F4F5] text-black hover:bg-black/10'
-                                }`}
+                                href={`/collections/${cat.slug}`}
+                                className="px-5 py-2 rounded-full text-sm font-medium transition-colors bg-[#F4F4F5] text-black hover:bg-black/10"
                             >
                                 {cat.name}
-                            </button>
+                            </Link>
                         ))}
                     </div>
                 </div>
