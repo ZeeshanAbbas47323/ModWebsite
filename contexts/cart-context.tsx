@@ -10,7 +10,13 @@ import {
   useState,
 } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { cartService, type PrintMethod, type ServerCartItem } from "@/services/cart.service";
+import {
+  cartService,
+  designUploadsOf,
+  type DesignUploadInput,
+  type PrintMethod,
+  type ServerCartItem,
+} from "@/services/cart.service";
 import { couponService } from "@/services/coupon.service";
 import type { Product, ProductVariant } from "@/services/product.service";
 import { resolveImageUrl } from "@/lib/image-url";
@@ -44,6 +50,8 @@ export interface AddToCartInput {
   custom_text?: string | null;
   /** Explicit image, when the caller already resolved one. */
   image?: string;
+  /** Print files produced by the gang sheet builder. */
+  design_uploads?: DesignUploadInput[];
 }
 
 interface CartContextValue {
@@ -104,6 +112,10 @@ function mapServerItem(item: ServerCartItem, snapshot?: CartLine): CartLine {
     ? unitPrice(product, variant)
     : snapshot?.price ?? 0;
 
+  // Files stored against the row win over the snapshot: the snapshot holds the
+  // pre-signed URL captured at add time, which expires.
+  const serverUploads = designUploadsOf(item);
+
   return {
     key: `server-${item.id}`,
     serverId: item.id,
@@ -117,6 +129,7 @@ function mapServerItem(item: ServerCartItem, snapshot?: CartLine): CartLine {
     image: product ? productImage(product) : snapshot?.image ?? PLACEHOLDER_IMAGE,
     price,
     variant_label: variantLabel(variant) ?? snapshot?.variant_label,
+    design_uploads: serverUploads.length ? serverUploads : snapshot?.design_uploads,
   };
 }
 
@@ -199,6 +212,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             quantity: line.quantity,
             print_method: line.print_method,
             custom_text: line.custom_text,
+            design_uploads: line.design_uploads,
           });
         }
         clearLocalCart();
@@ -249,6 +263,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         image: input.image ?? productImage(input.product),
         price: unitPrice(input.product, variant),
         variant_label: variantLabel(variant),
+        design_uploads: input.design_uploads,
       };
       setSnapshots((prev) => {
         const next = { ...prev, [key]: snapshot };
@@ -281,6 +296,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             quantity,
             print_method,
             custom_text,
+            design_uploads: input.design_uploads,
           });
         }
         await refetchServer();

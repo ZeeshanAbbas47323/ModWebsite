@@ -29,6 +29,7 @@ export const CartItem: React.FC<CartItemProps> = ({ line }) => {
   };
 
   const isExternal = line.image.startsWith('http');
+  const isGangSheet = !!line.design_uploads?.length;
   const lineTotal = line.price * line.quantity;
 
   return (
@@ -62,9 +63,38 @@ export const CartItem: React.FC<CartItemProps> = ({ line }) => {
           </p>
         )}
         {line.custom_text && (
-          <p className="text-gray-500 text-xs mt-0.5 italic">&ldquo;{line.custom_text}&rdquo;</p>
+          <p className="text-gray-500 text-xs mt-0.5">
+            {isGangSheet ? (
+              <>Order <span className="font-medium text-black">{line.custom_text}</span></>
+            ) : (
+              <span className="italic">&ldquo;{line.custom_text}&rdquo;</span>
+            )}
+          </p>
         )}
         <p className="text-gray-500 text-sm mt-1">${line.price.toFixed(2)} each</p>
+
+        {/* Print files the gang sheet builder produced for this line. */}
+        {!!line.design_uploads?.length && (
+          <ul className="flex flex-col gap-1 mt-2 items-center sm:items-start">
+            {line.design_uploads.map((file) => (
+              <li key={file.file_url}>
+                <a
+                  href={file.file_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs text-[#0056b3] hover:text-[#003d82] underline break-all"
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <path d="M14 2v6h6" />
+                  </svg>
+                  {file.file_name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+
         {error && <p className="text-red-600 text-xs mt-1">{error}</p>}
       </div>
 

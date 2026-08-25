@@ -1,6 +1,6 @@
 "use client";
 
-import type { PrintMethod } from "@/services/cart.service";
+import type { DesignUploadInput, PrintMethod } from "@/services/cart.service";
 
 const CART_KEY = "modfirst_cart";
 
@@ -24,6 +24,8 @@ export interface CartLine {
   image: string;
   price: number;
   variant_label?: string;
+  /** Print files produced by the gang sheet builder, if any. */
+  design_uploads?: DesignUploadInput[];
 }
 
 /** Two rows are the same line when product, variant and customisation match. */

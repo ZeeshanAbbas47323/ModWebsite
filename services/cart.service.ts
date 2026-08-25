@@ -18,6 +18,24 @@ export interface DesignUploadInput {
   print_method?: PrintMethod;
 }
 
+/** A stored design file, as returned nested inside a cart row. */
+export interface DesignUpload {
+  id: number;
+  user_id?: number;
+  file_url: string;
+  file_name?: string | null;
+  edit_url?: string | null;
+  print_method?: PrintMethod | null;
+}
+
+/** Join row between a cart item and its design uploads. */
+export interface CartItemDesign {
+  id: number;
+  cart_item_id: number;
+  design_upload_id: number;
+  designUpload?: DesignUpload | null;
+}
+
 /** A cart row as returned by the API for a logged-in customer. */
 export interface ServerCartItem {
   id: number;
@@ -29,6 +47,30 @@ export interface ServerCartItem {
   is_active: boolean;
   product?: Product;
   variant?: ProductVariant;
+  designs?: CartItemDesign[] | null;
+}
+
+/** Last path segment of a URL, used when the API stores no file name. */
+function fileNameFromUrl(url: string): string {
+  try {
+    const path = new URL(url, "https://placeholder.invalid").pathname;
+    return decodeURIComponent(path.split("/").pop() || "") || "Design file";
+  } catch {
+    return "Design file";
+  }
+}
+
+/** Flatten the nested join rows into the shape the cart UI renders. */
+export function designUploadsOf(item: ServerCartItem): DesignUploadInput[] {
+  return (item.designs ?? [])
+    .map((design) => design.designUpload)
+    .filter((upload): upload is DesignUpload => !!upload?.file_url)
+    .map((upload) => ({
+      file_url: upload.file_url,
+      file_name: upload.file_name || fileNameFromUrl(upload.file_url),
+      ...(upload.edit_url ? { edit_url: upload.edit_url } : {}),
+      ...(upload.print_method ? { print_method: upload.print_method } : {}),
+    }));
 }
 
 export interface CreateCartItemInput {

@@ -20,6 +20,13 @@ import { useReviews } from '@/hooks/use-reviews';
 import type { Product } from '@/services/product.service';
 import { resolveImageUrl } from '@/lib/image-url';
 import { VariantSelector } from '@/components/product-detail/variant-selector';
+import { GangSheetBuilder } from '@/components/product-detail/gang-sheet-builder';
+import {
+    gangSheetDesignUploads,
+    gangSheetPrintMethod,
+    isGangSheetProduct,
+    type GangSheetCartItem,
+} from '@/lib/gang-sheet';
 import { isVariantAvailable } from '@/services/product.service';
 import type { ProductVariant } from '@/services/product.service';
 
@@ -52,6 +59,7 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
     const [adding, setAdding] = useState(false);
     const [addError, setAddError] = useState<string | null>(null);
     const [added, setAdded] = useState(false);
+    const [builderOpen, setBuilderOpen] = useState(false);
 
     const { data: apiImages } = useProductImages(id);
     const { data: descriptions } = useProductDescriptions(id);
@@ -94,8 +102,28 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
     const needsVariant = !!variants?.length && !selectedVariant;
     const variantOutOfStock = !!selectedVariant && !isVariantAvailable(selectedVariant);
 
+    // Products in the gang sheet category are configured in the builder rather
+    // than bought straight off the shelf.
+    const usesGangSheetBuilder = isGangSheetProduct(product?.category_id);
+
+    const handleGangSheetAdd = async (item: GangSheetCartItem) => {
+        if (!product) return;
+        await addItem({
+            product,
+            quantity: item.quantity,
+            image: images[0],
+            custom_text: item.orderId,
+            print_method: gangSheetPrintMethod(item),
+            design_uploads: gangSheetDesignUploads(item),
+        });
+    };
+
     const handleAddToCart = async () => {
         if (!product) return;
+        if (usesGangSheetBuilder) {
+            setBuilderOpen(true);
+            return;
+        }
         if (needsVariant) {
             setAddError(
                 variants?.some((v) => v.color) && variants?.some((v) => v.size)
@@ -254,7 +282,7 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                         <span className="underline cursor-pointer decoration-gray-400 underline-offset-4">Shipping</span> calculated at checkout.
                     </div>
 
-                    {variants && variants.length > 0 && (
+                    {!usesGangSheetBuilder && variants && variants.length > 0 && (
                         <VariantSelector
                             variants={variants}
                             selected={selectedVariant}
@@ -263,6 +291,7 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                     )}
 
                     <div className="flex flex-wrap items-center gap-4 mb-6">
+                        {!usesGangSheetBuilder && (
                         <div className="flex items-center gap-4 bg-[#F4F4F5] rounded-xl px-4 h-14">
                             <button
                                 aria-label="Decrease quantity"
@@ -281,13 +310,14 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                                 +
                             </button>
                         </div>
+                        )}
 
-                        <Button size="xxl" className="flex-1 min-w-[200px]" onClick={handleAddToCart} disabled={adding || !product || variantOutOfStock}>
+                        <Button size="xxl" className="flex-1 min-w-[200px]" onClick={handleAddToCart} disabled={adding || !product || (!usesGangSheetBuilder && variantOutOfStock)}>
                             {adding
                                 ? "Adding\u2026"
                                 : added
                                     ? "Added to Cart"
-                                    : product?.is_customizable
+                                    : usesGangSheetBuilder
                                         ? "Build your own Gang Sheet"
                                         : "Add to Cart"}
                         </Button>
@@ -320,6 +350,15 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                     )}
                 </div>
             </div>
+
+            {usesGangSheetBuilder && (
+                <GangSheetBuilder
+                    open={builderOpen}
+                    onClose={() => setBuilderOpen(false)}
+                    productName={product?.name ?? "Gang sheet"}
+                    onAddToCart={handleGangSheetAdd}
+                />
+            )}
         </section>
     );
 }

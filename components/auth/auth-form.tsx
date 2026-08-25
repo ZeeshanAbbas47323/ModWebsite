@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/auth-context";
 import { OtpForm } from "@/components/auth/otp-form";
+import { PASSWORD_RULES, digitCount, isStrongPassword } from "@/lib/password-rules";
 
 interface AuthFormProps {
   mode: "login" | "register";
@@ -30,12 +31,25 @@ export function AuthForm({ mode }: AuthFormProps) {
 
   const isRegister = mode === "register";
 
+  /** Client-side mirror of the API's rules, so errors show before the request. */
+  const validate = (): string | null => {
+    if (!isRegister) return null;
+    if (fullName.trim().length < 2) return "Please enter your full name.";
+    if (digitCount(phone) < 10) return "Phone number must have at least 10 digits.";
+    if (!isStrongPassword(password)) {
+      return "Your password does not meet all the requirements below.";
+    }
+    if (password !== confirmPassword) return "Passwords do not match.";
+    return null;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    if (isRegister && password !== confirmPassword) {
-      setError("Passwords do not match.");
+    const problem = validate();
+    if (problem) {
+      setError(problem);
       return;
     }
 
@@ -83,6 +97,7 @@ export function AuthForm({ mode }: AuthFormProps) {
                 <Label htmlFor="full_name">Full name</Label>
                 <Input
                   id="full_name"
+                  autoComplete="name"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required
@@ -110,6 +125,7 @@ export function AuthForm({ mode }: AuthFormProps) {
             <Input
               id="email"
               type="email"
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -125,8 +141,27 @@ export function AuthForm({ mode }: AuthFormProps) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              autoComplete={isRegister ? "new-password" : "current-password"}
               className="h-12 rounded-xl"
             />
+            {isRegister && password.length > 0 && (
+              <ul className="flex flex-col gap-1 mt-1">
+                {PASSWORD_RULES.map((rule) => {
+                  const met = rule.test(password);
+                  return (
+                    <li
+                      key={rule.label}
+                      className={`flex items-center gap-2 text-xs ${
+                        met ? "text-green-700" : "text-gray-500"
+                      }`}
+                    >
+                      <span aria-hidden className="w-3.5 shrink-0">{met ? "✓" : "•"}</span>
+                      {rule.label}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </div>
 
           {isRegister && (
@@ -135,14 +170,15 @@ export function AuthForm({ mode }: AuthFormProps) {
               <Input
                 id="confirm"
                 type="password"
+                autoComplete="new-password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 className="h-12 rounded-xl"
               />
-              <p className="text-xs text-gray-500">
-                Use an uppercase and lowercase letter, a number and a special character.
-              </p>
+              {confirmPassword && password !== confirmPassword && (
+                <p className="text-xs text-red-600">Passwords do not match.</p>
+              )}
             </div>
           )}
 
