@@ -8,12 +8,14 @@ import { useState } from "react";
 import { Sidebar } from "./sidebar";
 import { useWebsiteSettings } from "@/hooks/use-website-settings";
 import { useCart } from "@/contexts/cart-context";
+import { useWishlist } from "@/contexts/wishlist-context";
 import { useAuth } from "@/contexts/auth-context";
 
 export function Header() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { data: settings } = useWebsiteSettings();
   const { itemCount } = useCart();
+  const { count: wishlistCount } = useWishlist();
   const { isAuthenticated } = useAuth();
 
   const phone = settings?.contact_phone ?? "+92 3123456789";
@@ -54,6 +56,19 @@ export function Header() {
             <Button size="icon-lg" variant="ghost" asChild>
               <Link href={isAuthenticated ? "/account" : "/login"} aria-label={isAuthenticated ? "My account" : "Sign in"}>
                 <Image src="/images/icons/user.svg" alt="" width={24} height={24} />
+              </Link>
+            </Button>
+
+            <Button size="icon-lg" variant="ghost" asChild className="relative">
+              <Link href="/wishlist" aria-label={`Wishlist, ${wishlistCount} item${wishlistCount === 1 ? "" : "s"}`}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                </svg>
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-black text-[11px] font-bold flex items-center justify-center leading-none">
+                    {wishlistCount > 99 ? "99+" : wishlistCount}
+                  </span>
+                )}
               </Link>
             </Button>
 

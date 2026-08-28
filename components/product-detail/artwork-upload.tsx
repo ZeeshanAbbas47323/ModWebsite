@@ -64,7 +64,7 @@ export function ArtworkUpload({ files, onChange }: ArtworkUploadProps) {
       usable.map(async (file, index) => {
         const id = added[index].id;
         try {
-          const stored = await uploadService.toS3(file, "artwork");
+          const stored = await uploadService.toStorage(file, "artwork");
           working = working.map((f) => (f.id === id ? { ...f, stored } : f));
         } catch (err) {
           working = working.map((f) =>

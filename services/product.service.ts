@@ -34,6 +34,8 @@ export interface Product {
   images?: ProductImage[];
   variants?: ProductVariant[];
   category?: { id: number; name: string };
+  /** One row per variant, plus a variant_id:null row for the product itself. */
+  inventory?: { id?: number; variant_id: number | null; quantity: number }[] | null;
 }
 
 export interface ProductImage {
@@ -69,8 +71,35 @@ export function variantStock(variant: ProductVariant): number {
   return variant.inventory?.quantity ?? variant.stock ?? 0;
 }
 
-export function isVariantAvailable(variant: ProductVariant): boolean {
-  return variant.status === "active" && variantStock(variant) > 0;
+/** Stock held against the product itself rather than a variant. */
+export function productStock(product?: Product | null): number {
+  const row = product?.inventory?.find((entry) => entry.variant_id == null);
+  return row?.quantity ?? 0;
+}
+
+/**
+ * Whether stock is actually tracked per variant.
+ *
+ * Some products carry their whole stock on the product row and leave every
+ * variant at zero. Reading those literally marks every size out of stock, so
+ * they fall back to the product's own count.
+ */
+export function tracksVariantStock(variants: ProductVariant[] | undefined): boolean {
+  return !!variants?.some((variant) => variantStock(variant) > 0);
+}
+
+/**
+ * @param pooledStock stock to fall back on when variants are not tracked
+ *                    individually — pass `productStock(product)`.
+ */
+export function isVariantAvailable(
+  variant: ProductVariant,
+  options?: { pooledStock?: number; perVariantTracking?: boolean }
+): boolean {
+  if (variant.status !== "active") return false;
+  if (variantStock(variant) > 0) return true;
+  // Only trust a zero when this product really counts stock per variant.
+  return options?.perVariantTracking === false && (options.pooledStock ?? 0) > 0;
 }
 
 export interface ProductDescription {

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import React, { useState } from 'react'
 import type { Product } from '@/services/product.service';
 import { useCart } from '@/contexts/cart-context';
+import { WishlistButton } from '@/components/wishlist/wishlist-button';
 
 export interface ProductCardData {
     id?: number;
@@ -52,6 +53,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ data }) => {
     return (
         <Link href={href} className="flex flex-col items-center group cursor-pointer">
             <div className="w-full bg-[#F4F4F5] h-[350px] rounded-[24px] aspect-square flex items-center justify-center p-8 mb-6 relative overflow-hidden">
+                {data.product && (
+                    <WishlistButton
+                        product={data.product}
+                        image={data.img_path}
+                        className="absolute top-4 right-4 z-10"
+                    />
+                )}
                 <Image
                     src={data.img_path}
                     alt={data.title}

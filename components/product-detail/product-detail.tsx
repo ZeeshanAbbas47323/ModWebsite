@@ -26,6 +26,7 @@ import { type TransferSelection } from '@/components/product-detail/transfers-by
 import { isTransfersBySizeProduct } from '@/lib/transfers-by-size';
 import { needsArtworkUpload } from '@/lib/artwork-upload';
 import { ArtworkUpload, type ArtworkFile } from '@/components/product-detail/artwork-upload';
+import { WishlistButton } from '@/components/wishlist/wishlist-button';
 import { uploadService } from '@/services/upload.service';
 import {
     gangSheetDesignUploads,
@@ -35,7 +36,7 @@ import {
     type GangSheetCartItem,
 } from '@/lib/gang-sheet';
 import { useGangSheetProducts } from '@/hooks/use-gang-sheet-products';
-import { isVariantAvailable } from '@/services/product.service';
+import { isVariantAvailable, productStock, tracksVariantStock } from '@/services/product.service';
 import type { ProductVariant } from '@/services/product.service';
 
 interface ProductDetailProps {
@@ -111,7 +112,13 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
     // A product with variants cannot be added until one is chosen, otherwise
     // the order would be missing its SKU.
     const needsVariant = !!variants?.length && !selectedVariant;
-    const variantOutOfStock = !!selectedVariant && !isVariantAvailable(selectedVariant);
+    // Stock can live on the product instead of each variant; the selector and
+    // this guard have to read it the same way.
+    const pooledStock = productStock(product);
+    const perVariantTracking = tracksVariantStock(variants);
+    const variantOutOfStock =
+        !!selectedVariant &&
+        !isVariantAvailable(selectedVariant, { pooledStock, perVariantTracking });
 
     // A storefront product opens the builder when the builder has a product of
     // the same slug. The category rule stays as a fallback for the products
@@ -133,7 +140,7 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
         // nothing left to upload here.
         const uploaded =
             selection.stored ??
-            (await uploadService.toS3(selection.file, "transfers-by-size"));
+            (await uploadService.toStorage(selection.file, "transfers-by-size"));
 
         const details = [
             `${selection.widthIn.toFixed(2)}in x ${selection.heightIn.toFixed(2)}in`,
@@ -367,6 +374,7 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                             variants={variants}
                             selected={selectedVariant}
                             onSelect={setSelectedVariant}
+                            pooledStock={pooledStock}
                         />
                     )}
 
@@ -407,6 +415,15 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                                             ? "Build your Transfer"
                                             : "Add to Cart"}
                         </Button>
+
+                        {product && (
+                            <WishlistButton
+                                variantStyle="inline"
+                                product={product}
+                                variant={selectedVariant}
+                                image={variantImage ?? images[0]}
+                            />
+                        )}
                     </div>
 
                     {addError && <p className="text-sm text-red-600 -mt-3 mb-6">{addError}</p>}

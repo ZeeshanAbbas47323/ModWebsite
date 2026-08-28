@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import {
   isVariantAvailable,
+  tracksVariantStock,
   variantStock,
   type ProductVariant,
 } from "@/services/product.service";
@@ -12,6 +13,8 @@ interface VariantSelectorProps {
   variants: ProductVariant[];
   selected: ProductVariant | null;
   onSelect: (variant: ProductVariant | null) => void;
+  /** Product-level stock, used when variants are not tracked individually. */
+  pooledStock?: number;
 }
 
 /** Smallest-to-largest, so pills read the way a size chart does. */
@@ -37,7 +40,17 @@ function isLightHex(hex?: string) {
   return (r * 299 + g * 587 + b * 114) / 1000 > 165;
 }
 
-export function VariantSelector({ variants, selected, onSelect }: VariantSelectorProps) {
+export function VariantSelector({
+  variants,
+  selected,
+  onSelect,
+  pooledStock = 0,
+}: VariantSelectorProps) {
+  // Worked out once for the whole product, not per option.
+  const perVariantTracking = tracksVariantStock(variants);
+  const isAvailable = (variant: ProductVariant) =>
+    isVariantAvailable(variant, { pooledStock, perVariantTracking });
+
   const [colorIdInput, setColorIdInput] = useState<number | null>(null);
   const [sizeIdInput, setSizeIdInput] = useState<number | null>(null);
   const [skuId, setSkuId] = useState<number | null>(null);
@@ -75,7 +88,7 @@ export function VariantSelector({ variants, selected, onSelect }: VariantSelecto
       (v) =>
         v.color?.id === cId &&
         (!hasSizes || sizeId == null || v.size?.id === sizeId) &&
-        isVariantAvailable(v)
+        isAvailable(v)
     );
 
   const sizeAvailable = (sId: number) =>
@@ -83,7 +96,7 @@ export function VariantSelector({ variants, selected, onSelect }: VariantSelecto
       (v) =>
         v.size?.id === sId &&
         (!hasColors || colorId == null || v.color?.id === colorId) &&
-        isVariantAvailable(v)
+        isAvailable(v)
     );
 
   const commit = (cId: number | null, sId: number | null) => {
@@ -103,7 +116,7 @@ export function VariantSelector({ variants, selected, onSelect }: VariantSelecto
     const keepSize =
       sizeId != null &&
       variants.some(
-        (v) => v.color?.id === cId && v.size?.id === sizeId && isVariantAvailable(v)
+        (v) => v.color?.id === cId && v.size?.id === sizeId && isAvailable(v)
       );
     commit(cId, keepSize ? sizeId : null);
   };
@@ -116,7 +129,7 @@ export function VariantSelector({ variants, selected, onSelect }: VariantSelecto
     const keepColor =
       colorId != null &&
       variants.some(
-        (v) => v.size?.id === sId && v.color?.id === colorId && isVariantAvailable(v)
+        (v) => v.size?.id === sId && v.color?.id === colorId && isAvailable(v)
       );
     commit(keepColor ? colorId : null, sId);
   };
@@ -130,13 +143,13 @@ export function VariantSelector({ variants, selected, onSelect }: VariantSelecto
         <p className="text-sm font-bold text-black mb-3">Options</p>
         <div className="flex flex-wrap gap-2">
           {variants.map((v) => {
-            const available = isVariantAvailable(v);
+            const isOn = isAvailable(v);
             const active = (selected?.id ?? skuId) === v.id;
             return (
               <button
                 key={v.id}
                 type="button"
-                disabled={!available}
+                disabled={!isOn}
                 onClick={() => {
                   const next = active ? null : v;
                   setSkuId(next?.id ?? null);
@@ -147,7 +160,7 @@ export function VariantSelector({ variants, selected, onSelect }: VariantSelecto
                   active
                     ? "bg-black text-white border-black"
                     : "bg-white text-black border-gray-300 hover:border-black",
-                  !available && "opacity-40 cursor-not-allowed line-through"
+                  !isOn && "opacity-40 cursor-not-allowed line-through"
                 )}
               >
                 {v.sku}
@@ -161,7 +174,13 @@ export function VariantSelector({ variants, selected, onSelect }: VariantSelecto
 
   const selectedColor = colors.find((c) => c.id === colorId);
   const selectedSize = sizes.find((s) => s.id === sizeId);
-  const stock = selected ? variantStock(selected) : 0;
+  // Show the count that actually governs this variant, so a product-level
+  // pool is not reported as "out of stock".
+  const stock = selected
+    ? perVariantTracking
+      ? variantStock(selected)
+      : Math.max(variantStock(selected), pooledStock)
+    : 0;
 
   return (
     <div className="flex flex-col gap-6 mb-6">

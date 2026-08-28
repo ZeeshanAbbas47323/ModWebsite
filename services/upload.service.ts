@@ -14,21 +14,23 @@ export const ACCEPTED_IMAGE_TYPES =
 
 export interface StoredUpload {
   key: string;
+  provider: string;
   /** Durable link — safe to store on an order. */
   url: string;
-  s3Url: string;
+  /** Where the object lives in the bucket. */
+  storageUrl: string;
   contentType: string;
   size: number;
   originalName: string;
 }
 
 export const uploadService = {
-  /** Put a file in the project's S3 bucket. */
-  toS3: async (file: File, prefix: string): Promise<StoredUpload> => {
+  /** Put a file in the project's object storage (Cloudflare R2 or S3). */
+  toStorage: async (file: File, prefix: string): Promise<StoredUpload> => {
     const form = new FormData();
     form.append("file", file);
     form.append("prefix", prefix);
-    const res = await fetch("/api/upload/s3", { method: "POST", body: form });
+    const res = await fetch("/api/upload/storage", { method: "POST", body: form });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data.success) {
       throw new Error(data.message ?? "Could not upload that file.");

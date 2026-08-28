@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { GetObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { PRESIGN_TTL, S3_BUCKET, isS3Configured, s3Client } from "@/lib/s3";
+import {
+  LEGACY_BUCKET,
+  PRESIGN_TTL,
+  PUBLIC_BASE_URL,
+  STORAGE_BUCKET,
+  isStorageConfigured,
+  legacyClient,
+  storageClient,
+} from "@/lib/storage";
 
 /** Only artwork prefixes are reachable through this route. */
 const ALLOWED_PREFIXES = [
@@ -22,7 +30,7 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ key: string[] }> }
 ) {
-  if (!isS3Configured()) {
+  if (!isStorageConfigured()) {
     return NextResponse.json(
       { success: false, message: "Storage is not configured." },
       { status: 501 }
@@ -41,10 +49,33 @@ export async function GET(
     );
   }
 
+  // A public bucket needs no signature; send the caller straight there.
+  if (PUBLIC_BASE_URL) {
+    const target = `${PUBLIC_BASE_URL}/${key.split("/").map(encodeURIComponent).join("/")}`;
+    return NextResponse.redirect(target, { status: 307 });
+  }
+
   try {
+    // Artwork uploaded before the move to R2 lives in the old AWS bucket, so
+    // fall back to it when the object is not in the current one.
+    let bucket = STORAGE_BUCKET;
+    let client = storageClient();
+
+    const legacy = legacyClient();
+    if (legacy) {
+      const inCurrent = await client
+        .send(new HeadObjectCommand({ Bucket: STORAGE_BUCKET, Key: key }))
+        .then(() => true)
+        .catch(() => false);
+      if (!inCurrent) {
+        bucket = LEGACY_BUCKET;
+        client = legacy;
+      }
+    }
+
     const signed = await getSignedUrl(
-      s3Client(),
-      new GetObjectCommand({ Bucket: S3_BUCKET, Key: key }),
+      client,
+      new GetObjectCommand({ Bucket: bucket, Key: key }),
       { expiresIn: PRESIGN_TTL }
     );
     return NextResponse.redirect(signed, {

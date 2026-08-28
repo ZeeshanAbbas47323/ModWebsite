@@ -8,6 +8,7 @@ import { QueryProvider } from "@/components/providers/query-provider";
 import { PopupBanner } from "@/components/shared/popup-banner";
 import { AuthProvider } from "@/contexts/auth-context";
 import { CartProvider } from "@/contexts/cart-context";
+import { WishlistProvider } from "@/contexts/wishlist-context";
 
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -40,12 +41,14 @@ export default function RootLayout({
         <QueryProvider>
           <AuthProvider>
             <CartProvider>
+              <WishlistProvider>
               <Header />
               <div className="relative z-10 bg-white">
                 {children}
               </div>
               <Footer />
               <PopupBanner />
+              </WishlistProvider>
             </CartProvider>
           </AuthProvider>
         </QueryProvider>

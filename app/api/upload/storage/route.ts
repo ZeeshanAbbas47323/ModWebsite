@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isS3Configured, putObject } from "@/lib/s3";
+import { isStorageConfigured, putObject } from "@/lib/storage";
 
 /** Where artwork for this tool lives in the bucket. */
 const DEFAULT_PREFIX = "storefront-uploads";
 const MAX_BYTES = 100 * 1024 * 1024;
 
 export async function POST(req: NextRequest) {
-  if (!isS3Configured()) {
+  if (!isStorageConfigured()) {
     return NextResponse.json(
       { success: false, message: "Storage is not configured." },
       { status: 501 }
