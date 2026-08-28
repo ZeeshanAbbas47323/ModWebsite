@@ -93,6 +93,46 @@ export interface GangSheetCartItem {
   };
 }
 
+/** One product the builder can open a session on. */
+export interface BuilderProduct {
+  id: string;
+  slug: string;
+  name: string;
+  widthIn: number;
+  dpi: number;
+  currency: string;
+}
+
+/** Loose key for comparing catalogue names across the two systems. */
+function nameKey(value: string | null | undefined): string {
+  return (value ?? "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+/**
+ * Find the builder product a storefront product should open.
+ *
+ * Slugs line up for most products, but not all — the sublimation sheet is
+ * `build-your-own-sublimation-gang-sheets` here and
+ * `custom-sublimation-gang-sheets-maryland` in the builder — so the name is
+ * used as a second pass. Both are data, so a new product needs no code change.
+ */
+export function matchBuilderProduct(
+  product: { slug?: string | null; name?: string | null } | null | undefined,
+  builderProducts: BuilderProduct[] | undefined
+): BuilderProduct | undefined {
+  if (!product || !builderProducts?.length) return undefined;
+
+  const bySlug = builderProducts.find((candidate) => candidate.slug === product.slug);
+  if (bySlug) return bySlug;
+
+  const key = nameKey(product.name);
+  if (!key) return undefined;
+  return builderProducts.find((candidate) => nameKey(candidate.name) === key);
+}
+
 export interface GangSheetSession {
   sessionId: string;
   token: string;

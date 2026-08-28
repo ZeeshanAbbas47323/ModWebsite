@@ -21,12 +21,20 @@ import type { Product } from '@/services/product.service';
 import { resolveImageUrl } from '@/lib/image-url';
 import { VariantSelector } from '@/components/product-detail/variant-selector';
 import { GangSheetBuilder } from '@/components/product-detail/gang-sheet-builder';
+import { TransfersBySizeModal } from '@/components/product-detail/transfers-by-size-modal';
+import { type TransferSelection } from '@/components/product-detail/transfers-by-size';
+import { isTransfersBySizeProduct } from '@/lib/transfers-by-size';
+import { needsArtworkUpload } from '@/lib/artwork-upload';
+import { ArtworkUpload, type ArtworkFile } from '@/components/product-detail/artwork-upload';
+import { uploadService } from '@/services/upload.service';
 import {
     gangSheetDesignUploads,
     gangSheetPrintMethod,
     isGangSheetProduct,
+    matchBuilderProduct,
     type GangSheetCartItem,
 } from '@/lib/gang-sheet';
+import { useGangSheetProducts } from '@/hooks/use-gang-sheet-products';
 import { isVariantAvailable } from '@/services/product.service';
 import type { ProductVariant } from '@/services/product.service';
 
@@ -60,12 +68,15 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
     const [addError, setAddError] = useState<string | null>(null);
     const [added, setAdded] = useState(false);
     const [builderOpen, setBuilderOpen] = useState(false);
+    const [transferToolOpen, setTransferToolOpen] = useState(false);
+    const [artwork, setArtwork] = useState<ArtworkFile[]>([]);
 
     const { data: apiImages } = useProductImages(id);
     const { data: descriptions } = useProductDescriptions(id);
     const { data: faqs } = useProductFaqs(id);
     const { data: variants } = useProductVariants(id);
     const { data: reviewsData } = useReviews({ filters: { product_id: id } });
+    const { data: builderProducts } = useGangSheetProducts();
 
     // `sort` mutates, so copy first — apiImages is the React Query cache.
     // The same photo can be attached to a product more than once, so collapse
@@ -102,9 +113,51 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
     const needsVariant = !!variants?.length && !selectedVariant;
     const variantOutOfStock = !!selectedVariant && !isVariantAvailable(selectedVariant);
 
-    // Products in the gang sheet category are configured in the builder rather
-    // than bought straight off the shelf.
-    const usesGangSheetBuilder = isGangSheetProduct(product?.category_id);
+    // A storefront product opens the builder when the builder has a product of
+    // the same slug. The category rule stays as a fallback for the products
+    // that predate that convention.
+    const builderProductSlug = matchBuilderProduct(product, builderProducts)?.slug;
+    const usesGangSheetBuilder =
+        !!builderProductSlug || isGangSheetProduct(product?.category_id);
+    // This vendor's products are sold through the transfers-by-size tool.
+    const usesTransfersBySize = isTransfersBySizeProduct(product?.vendor_id);
+    // Ready-to-print products need the customer's own file attached.
+    const wantsArtwork =
+        !usesTransfersBySize && !usesGangSheetBuilder && needsArtworkUpload(product);
+    const artworkUploading = artwork.some((f) => !f.stored && !f.error);
+
+    const handleTransferAdd = async (selection: TransferSelection) => {
+        if (!product || !selection.file) return;
+
+        // The tool stores each version as it is made, so normally there is
+        // nothing left to upload here.
+        const uploaded =
+            selection.stored ??
+            (await uploadService.toS3(selection.file, "transfers-by-size"));
+
+        const details = [
+            `${selection.widthIn.toFixed(2)}in x ${selection.heightIn.toFixed(2)}in`,
+            selection.rushOrder ? "Rush order" : null,
+            selection.notes || null,
+        ].filter(Boolean).join(" | ");
+
+        await addItem({
+            product,
+            quantity: selection.quantity,
+            image: images[0],
+            print_method: "dtf",
+            custom_text: details,
+            design_uploads: [{
+                // Permanent link. A raw S3 URL cannot be used: the bucket is
+                // private, ACLs are disabled, and a presigned URL dies after
+                // 7 days — long before some orders are printed. This route
+                // re-signs on every request, so it never expires.
+                file_url: uploaded.url,
+                file_name: uploaded.originalName || selection.file.name,
+                print_method: "dtf",
+            }],
+        });
+    };
 
     const handleGangSheetAdd = async (item: GangSheetCartItem) => {
         if (!product) return;
@@ -124,6 +177,10 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
             setBuilderOpen(true);
             return;
         }
+        if (usesTransfersBySize) {
+            setTransferToolOpen(true);
+            return;
+        }
         if (needsVariant) {
             setAddError(
                 variants?.some((v) => v.color) && variants?.some((v) => v.size)
@@ -136,6 +193,20 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
             setAddError("That combination is out of stock.");
             return;
         }
+        if (wantsArtwork) {
+            if (artwork.length === 0) {
+                setAddError("Please upload your artwork first.");
+                return;
+            }
+            if (artworkUploading) {
+                setAddError("Still uploading your artwork — one moment.");
+                return;
+            }
+            if (artwork.some((f) => !f.stored)) {
+                setAddError("Some files did not upload. Remove them and try again.");
+                return;
+            }
+        }
         setAddError(null);
         setAdding(true);
         try {
@@ -144,7 +215,16 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                 variant: selectedVariant,
                 quantity,
                 image: variantImage ?? images[0],
+                design_uploads: wantsArtwork
+                    ? artwork
+                        .filter((file) => file.stored)
+                        .map((file) => ({
+                            file_url: file.stored!.url,
+                            file_name: file.stored!.originalName || file.name,
+                        }))
+                    : undefined,
             });
+            setArtwork([]);
             setAdded(true);
             setTimeout(() => setAdded(false), 2500);
         } catch (err) {
@@ -282,7 +362,7 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                         <span className="underline cursor-pointer decoration-gray-400 underline-offset-4">Shipping</span> calculated at checkout.
                     </div>
 
-                    {!usesGangSheetBuilder && variants && variants.length > 0 && (
+                    {!usesGangSheetBuilder && !usesTransfersBySize && variants && variants.length > 0 && (
                         <VariantSelector
                             variants={variants}
                             selected={selectedVariant}
@@ -290,8 +370,12 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                         />
                     )}
 
+                    {wantsArtwork && (
+                        <ArtworkUpload files={artwork} onChange={setArtwork} />
+                    )}
+
                     <div className="flex flex-wrap items-center gap-4 mb-6">
-                        {!usesGangSheetBuilder && (
+                        {!usesGangSheetBuilder && !usesTransfersBySize && (
                         <div className="flex items-center gap-4 bg-[#F4F4F5] rounded-xl px-4 h-14">
                             <button
                                 aria-label="Decrease quantity"
@@ -312,17 +396,18 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                         </div>
                         )}
 
-                        <Button size="xxl" className="flex-1 min-w-[200px]" onClick={handleAddToCart} disabled={adding || !product || (!usesGangSheetBuilder && variantOutOfStock)}>
+                        <Button size="xxl" className="flex-1 min-w-[200px]" onClick={handleAddToCart} disabled={adding || !product || (!usesGangSheetBuilder && variantOutOfStock) || artworkUploading}>
                             {adding
                                 ? "Adding\u2026"
                                 : added
                                     ? "Added to Cart"
                                     : usesGangSheetBuilder
                                         ? "Build your own Gang Sheet"
-                                        : "Add to Cart"}
+                                        : usesTransfersBySize
+                                            ? "Build your Transfer"
+                                            : "Add to Cart"}
                         </Button>
                     </div>
-
 
                     {addError && <p className="text-sm text-red-600 -mt-3 mb-6">{addError}</p>}
 
@@ -351,11 +436,21 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                 </div>
             </div>
 
+            {usesTransfersBySize && (
+                <TransfersBySizeModal
+                    open={transferToolOpen}
+                    onClose={() => setTransferToolOpen(false)}
+                    productName={product?.name ?? "Transfer"}
+                    onAddToCart={handleTransferAdd}
+                />
+            )}
+
             {usesGangSheetBuilder && (
                 <GangSheetBuilder
                     open={builderOpen}
                     onClose={() => setBuilderOpen(false)}
                     productName={product?.name ?? "Gang sheet"}
+                    builderProductSlug={builderProductSlug}
                     onAddToCart={handleGangSheetAdd}
                 />
             )}
