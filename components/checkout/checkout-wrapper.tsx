@@ -16,7 +16,13 @@ import { useAddresses } from "@/hooks/use-addresses";
 import { usePickupLocations } from "@/hooks/use-pickup-locations";
 import { orderService, orderReference, type CreateOrderInput, type DeliveryType } from "@/services/order.service";
 import { addressService } from "@/services/address.service";
-import { paymentService, type PaymentMethod } from "@/services/payment.service";
+import {
+  checkoutRedirectUrl,
+  isOfflineMethod,
+  isSplitMethod,
+  paymentService,
+  type PaymentMethod,
+} from "@/services/payment.service";
 import type { CreateAddressInput } from "@/services/address.service";
 import { omitEmpty } from "@/lib/utils";
 
@@ -50,6 +56,9 @@ export function CheckoutWrapper() {
   const [address, setAddress] = useState<CreateAddressInput>(emptyAddress);
   const [pickupLocationIdInput, setPickupLocationIdInput] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("stripe");
+  // Split payments settle part online now and the rest on collection.
+  const [splitPayment, setSplitPayment] = useState(false);
+  const [onlineAmountInput, setOnlineAmountInput] = useState("");
   const [notes, setNotes] = useState("");
   const [billingSameAsShipping, setBillingSameAsShipping] = useState(true);
   const [billing, setBilling] = useState<CreateAddressInput>({ ...emptyAddress, type: "billing" });
@@ -84,6 +93,15 @@ export function CheckoutWrapper() {
 
   const usingNewAddress = addressId === NEW_ADDRESS;
 
+  // Splitting turns the chosen gateway into its "…_and_cash" variant.
+  const canSplit = paymentMethod === "stripe" || paymentMethod === "paypal";
+  const effectiveMethod: PaymentMethod =
+    splitPayment && canSplit
+      ? paymentMethod === "stripe"
+        ? "stripe_and_cash"
+        : "paypal_and_cash"
+      : paymentMethod;
+
   /**
    * Optional address fields are validated by type, so blank strings are
    * rejected the same way nulls are. Send only what was filled in.
@@ -110,6 +128,14 @@ export function CheckoutWrapper() {
       if (!address.phone.trim()) return "Shipping phone is required.";
       if (!address.address_line1.trim()) return "Street address is required.";
       if (!address.city.trim()) return "City is required.";
+    }
+    if (isSplitMethod(effectiveMethod)) {
+      // The exact split is checked against the order total once it exists, but
+      // an empty or nonsense amount can be caught before anything is created.
+      const online = Number(onlineAmountInput);
+      if (!Number.isFinite(online) || online <= 0) {
+        return "Enter how much you want to pay now.";
+      }
     }
     if (!billingSameAsShipping) {
       if (!billing.full_name.trim()) return "Billing name is required.";
@@ -175,31 +201,51 @@ export function CheckoutWrapper() {
 
       if (!orderCode) throw new Error("Order was created but no order number was returned.");
 
-      // Cash / pay-later orders never leave the site.
-      if (paymentMethod === "cash" || paymentMethod === "without_payment") {
+      // Offline methods never leave the site — there is no gateway to visit.
+      if (isOfflineMethod(effectiveMethod)) {
         await clearCart();
         router.push(`/payment/success?order=${encodeURIComponent(orderCode)}`);
+        return;
+      }
+
+      // The order's own total is authoritative: the API adds shipping and tax,
+      // so splitting against the cart estimate would not add up.
+      const orderTotal = Number(order.total_amount ?? 0) || total;
+      const online = Number(onlineAmountInput);
+      if (isSplitMethod(effectiveMethod) && !(online > 0 && online < orderTotal)) {
+        setError(
+          `Enter how much to pay now — more than $0 and less than $${orderTotal.toFixed(2)}.`
+        );
+        setPlacing(false);
         return;
       }
 
       const origin = window.location.origin;
       const session = await paymentService.createCheckoutSession({
         order_code: orderCode,
-        payment_method: paymentMethod,
+        payment_method: effectiveMethod,
         success_url: `${origin}/payment/success?order=${encodeURIComponent(orderCode)}`,
         cancel_url: `${origin}/payment/cancel?order=${encodeURIComponent(orderCode)}`,
+        ...(isSplitMethod(effectiveMethod)
+          ? { online_amount: online, cash_amount: orderTotal - online }
+          : {}),
+        metadata: { source: "web" },
       });
 
-      const redirectUrl = session.url ?? session.checkout_url;
+      const redirectUrl = checkoutRedirectUrl(session);
       if (!redirectUrl) {
-        // The order exists, so send the customer to confirmation rather than
-        // losing it behind an error screen.
-        await clearCart();
-        router.push(`/payment/success?order=${encodeURIComponent(orderCode)}`);
-        return;
+        // Never fall through to the confirmation page here: the customer has
+        // not paid, and telling them the order is done would be a lie. The
+        // order exists, so point them at retrying it.
+        throw new Error(
+          `Your order ${orderCode} was placed, but the payment page could not be opened. ` +
+            "Nothing has been charged — please try again or contact us."
+        );
       }
 
-      await clearCart();
+      // The cart is deliberately left alone here — it is cleared on the success
+      // page. Clearing before the gateway would leave a shopper who cancels
+      // with an empty cart and nothing to retry.
       window.location.href = redirectUrl;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not place your order.");
@@ -424,29 +470,73 @@ export function CheckoutWrapper() {
           {/* Payment */}
           <div className="bg-[#F4F4F5] rounded-[24px] p-6 md:p-8">
             <h2 className="text-xl font-bold text-black mb-5">Payment</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {([
-                { value: "stripe", label: "Card (Stripe)", icon: "/images/payment-gateways/shop.png" },
+                { value: "stripe", label: "Card", icon: "/images/payment-gateways/shop.png" },
                 { value: "paypal", label: "PayPal", icon: "/images/payment-gateways/pay-pal.png" },
+                { value: "bank_transfer", label: "Bank transfer", icon: null },
                 { value: "cash", label: "Pay on collection", icon: null },
               ] as const).map((option) => (
                 <button
                   key={option.value}
                   type="button"
                   onClick={() => setPaymentMethod(option.value)}
-                  className={`h-16 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 ${
+                  className={`h-16 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 px-2 ${
                     paymentMethod === option.value
                       ? "bg-black text-white"
                       : "bg-white text-black hover:bg-black/5"
                   }`}
                 >
                   {option.icon && (
-                    <Image src={option.icon} alt="" width={48} height={18} className="object-contain" />
+                    <Image src={option.icon} alt="" width={44} height={16} className="object-contain" />
                   )}
-                  <span className="text-sm">{option.label}</span>
+                  <span className="text-sm text-center leading-tight">{option.label}</span>
                 </button>
               ))}
             </div>
+
+            {/* Split payment: part online now, the rest on collection. */}
+            {canSplit && (
+              <div className="mt-5">
+                <label className="flex items-center gap-3 text-sm text-gray-700 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={splitPayment}
+                    onChange={(e) => setSplitPayment(e.target.checked)}
+                    className="w-4 h-4 accent-black"
+                  />
+                  Pay part now, the rest on collection
+                </label>
+
+                {splitPayment && (
+                  <div className="flex flex-col gap-2 mt-3 max-w-xs">
+                    <Label htmlFor="online_amount">Amount to pay now (USD)</Label>
+                    <Input
+                      id="online_amount"
+                      type="number"
+                      min={1}
+                      step={1}
+                      value={onlineAmountInput}
+                      onChange={(e) => setOnlineAmountInput(e.target.value)}
+                      placeholder={total > 0 ? (total / 2).toFixed(2) : "50"}
+                      className="bg-white h-12 rounded-xl"
+                    />
+                    <p className="text-xs text-gray-500">
+                      The balance is collected when you pick the order up. Shipping and
+                      tax are added to your order, so the exact split is worked out
+                      against the final total.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {paymentMethod === "bank_transfer" && (
+              <p className="text-sm text-gray-600 mt-4">
+                We will email you our bank details once the order is placed. Production
+                starts when the transfer clears.
+              </p>
+            )}
 
             <div className="flex flex-col gap-2 mt-6">
               <Label htmlFor="notes">Order notes (optional)</Label>
