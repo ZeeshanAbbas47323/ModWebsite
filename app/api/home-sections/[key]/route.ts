@@ -14,6 +14,7 @@ export async function GET(
       headers: API_HEADERS,
       next: { revalidate: 60 },
     });
+    console.log(url);
 
     const text = await res.text();
 

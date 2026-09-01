@@ -1,3 +1,8 @@
+/**
+ * Currently unused: the home hero is a static slider (lib/home-hero-slides.ts).
+ * Kept because the `home_hero` section still exists in the CMS, so switching
+ * back to content-managed copy is a one-line change in components/home/hero.tsx.
+ */
 import type {
   HomeSection,
   HomeSectionItem,
