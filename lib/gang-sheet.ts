@@ -5,21 +5,24 @@ export const BUILDER_ORIGIN = (
   process.env.NEXT_PUBLIC_GANG_SHEET_BUILDER_URL ?? "https://builder.modfirst.com"
 ).replace(/\/$/, "");
 
-/**
- * Products in this category open the gang sheet builder instead of the normal
- * buy box.
- */
-export const GANG_SHEET_CATEGORY_ID = Number(
-  process.env.NEXT_PUBLIC_GANG_SHEET_CATEGORY_ID ?? 1
-);
-
 /** Builder-side product a session opens on when the storefront has no mapping. */
 export const DEFAULT_BUILDER_PRODUCT_SLUG =
   process.env.NEXT_PUBLIC_GANG_SHEET_PRODUCT_SLUG ?? "build-your-own-gangsheet";
 
-export function isGangSheetProduct(categoryId: number | null | undefined) {
-  return categoryId === GANG_SHEET_CATEGORY_ID;
-}
+/**
+ * Storefront slug → builder slug, for pairs whose slugs and names do not line
+ * up. Comma-separated `storefront:builder` entries, so adding a pair is a
+ * config change rather than a deploy.
+ */
+const EXPLICIT_MAP: Record<string, string> = Object.fromEntries(
+  (
+    process.env.NEXT_PUBLIC_GANG_SHEET_PRODUCT_MAP ??
+    "build-your-dtf-gang-sheets-online:build-your-own-gangsheet"
+  )
+    .split(",")
+    .map((pair) => pair.split(":").map((part) => part.trim()))
+    .filter((pair) => pair.length === 2 && pair[0] && pair[1])
+);
 
 /**
  * Which print process a finished sheet belongs to. The builder does not send
@@ -124,6 +127,13 @@ export function matchBuilderProduct(
   builderProducts: BuilderProduct[] | undefined
 ): BuilderProduct | undefined {
   if (!product || !builderProducts?.length) return undefined;
+
+  // An explicit pairing wins, for products whose names differ from the builder.
+  const mapped = product.slug ? EXPLICIT_MAP[product.slug] : undefined;
+  if (mapped) {
+    const byMap = builderProducts.find((candidate) => candidate.slug === mapped);
+    if (byMap) return byMap;
+  }
 
   const bySlug = builderProducts.find((candidate) => candidate.slug === product.slug);
   if (bySlug) return bySlug;

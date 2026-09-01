@@ -31,7 +31,6 @@ import { uploadService } from '@/services/upload.service';
 import {
     gangSheetDesignUploads,
     gangSheetPrintMethod,
-    isGangSheetProduct,
     matchBuilderProduct,
     type GangSheetCartItem,
 } from '@/lib/gang-sheet';
@@ -120,12 +119,11 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
         !!selectedVariant &&
         !isVariantAvailable(selectedVariant, { pooledStock, perVariantTracking });
 
-    // A storefront product opens the builder when the builder has a product of
-    // the same slug. The category rule stays as a fallback for the products
-    // that predate that convention.
+    // A product opens the builder only when the builder actually has a matching
+    // product. The old category-wide rule is gone: it put a gang sheet builder
+    // on things like adhesive powder just because they shared a category.
     const builderProductSlug = matchBuilderProduct(product, builderProducts)?.slug;
-    const usesGangSheetBuilder =
-        !!builderProductSlug || isGangSheetProduct(product?.category_id);
+    const usesGangSheetBuilder = !!builderProductSlug;
     // This vendor's products are sold through the transfers-by-size tool.
     const usesTransfersBySize = isTransfersBySizeProduct(product?.vendor_id);
     // Ready-to-print products need the customer's own file attached.
