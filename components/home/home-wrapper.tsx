@@ -4,6 +4,7 @@ import { Hero } from "@/components/home/hero";
 import { PromotionalBanners } from "@/components/home/promotional-banners";
 import { OurOrderProcess } from "@/components/home/our-order-process";
 import ProductCarousel from "../product/product-carousel";
+import { CategoryCarousel } from "@/components/home/category-carousel";
 import { VideoSection } from "@/components/home/video-section";
 import { NewsletterSection } from "@/components/home/newsletter-section";
 import { CustomerFeedback } from "@/components/home/customer-feedback";
@@ -11,9 +12,7 @@ import { BlogSection } from "@/components/home/blog-section";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { WhyModfirst } from "@/components/home/why-modfirst";
 import { FastProduction } from "@/components/home/fast-production";
-import { useProductCollection } from "@/hooks/use-products";
 import { useProductCategories } from "@/hooks/use-product-categories";
-import { mapProductToCard } from "@/lib/map-product-to-card";
 import { resolveImageUrl } from "@/lib/image-url";
 
 const fallbackProducts = [
@@ -24,17 +23,8 @@ const fallbackProducts = [
     { title: "Custom Patches", count: "50 Products", img_path: "/images/banners-compositions/stamp.svg" },
 ];
 
-const fallbackSupplyProducts = [
-    { title: "DTF Gang Sheets", count: "$25.00", img_path: "/images/products/dtf-gang-sheet.svg" },
-    { title: "DTF Printing Services", count: "$25.00", img_path: "/images/products/dtf-printing-service.png" },
-    { title: "DTF Ink (CYMK)", count: "$25.00", img_path: "/images/products/dtf-ink-cymk.png" },
-    { title: "Adhesive Powder", count: "$25.00", img_path: "/images/products/adhesive-powder.png" },
-];
-
 const HomeWrapper = () => {
     const { data: categories } = useProductCategories(null);
-    const { data: bestSellers } = useProductCollection("BEST_SELLERS", 8);
-    const { data: newest } = useProductCollection("NEWEST", 8);
 
     const categoryCards = categories?.map((cat) => ({
         id: cat.id,
@@ -45,23 +35,25 @@ const HomeWrapper = () => {
         href: `/collections/${cat.slug}`,
     })) ?? fallbackProducts;
 
-    const productCards = bestSellers?.map(mapProductToCard) ??
-        newest?.map(mapProductToCard) ??
-        fallbackSupplyProducts;
-
     return (
         <>
             <Hero />
-            <PromotionalBanners />
             <ScrollReveal>
-                <ProductCarousel data={categoryCards} title="Our Products" description="From small business advertising to big event displays, Modfirst delivers bold." />
+                <ProductCarousel data={categoryCards} title="Our Categories" description="From small business advertising to big event displays, Modfirst delivers bold." />
+            </ScrollReveal>
+            <PromotionalBanners />
+             <ScrollReveal>
+                <CategoryCarousel categoryId={59} title="DTF Transfer Products" description="From small business advertising to big event displays, Modfirst delivers bold." />
             </ScrollReveal>
             <OurOrderProcess />
             <ScrollReveal>
-                <ProductCarousel data={productCards} title="DTF Supplies Products" description="From small business advertising to big event displays, Modfirst delivers bold." />
+                <CategoryCarousel categoryId={1} title="DTF Supplies Products" description="From small business advertising to big event displays, Modfirst delivers bold." />
             </ScrollReveal>
             <ScrollReveal>
                 <VideoSection />
+            </ScrollReveal>
+            <ScrollReveal>
+                <CategoryCarousel categoryId={3} title="Blank Tshirts" description="From small business advertising to big event displays, Modfirst delivers bold." />
             </ScrollReveal>
             <ScrollReveal>
                 <WhyModfirst />
@@ -70,7 +62,13 @@ const HomeWrapper = () => {
                 <FastProduction />
             </ScrollReveal>
             <ScrollReveal>
+                <CategoryCarousel categoryId={60} title="Sign & Displays" description="From small business advertising to big event displays, Modfirst delivers bold." />
+            </ScrollReveal>
+            <ScrollReveal>
                 <CustomerFeedback />
+            </ScrollReveal>
+            <ScrollReveal>
+                <CategoryCarousel categoryId={61} title="NEED A HEAT PRESS FOR YOUR DTF TRANSFERS? WE GOT YOUR BACK!" description="From small business advertising to big event displays, Modfirst delivers bold." />
             </ScrollReveal>
             <ScrollReveal>
                 <BlogSection />
