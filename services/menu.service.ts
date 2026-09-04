@@ -50,15 +50,7 @@ function buildTree(items: MenuNode[]): MenuNode[] {
 
 export const menuService = {
   getTree: async (): Promise<MenuNode[]> => {
-    const { data } = await apiClient.post("/menus/tree", {
-      page: 1,
-      limit: 200,
-      filters: {
-        menu_type: "frontend",
-        is_active: true,
-        visibility: true,
-      },
-    });
+    const { data } = await apiClient.get("/menus/tree");
     const items: MenuNode[] = data.payload ?? data.data ?? [];
     return buildTree(items);
   },

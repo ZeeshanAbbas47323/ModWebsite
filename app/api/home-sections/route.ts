@@ -1,5 +1,7 @@
-import { proxyGet } from "@/lib/api-proxy";
+import { proxyGet, SHARED_CONTENT_TTL } from "@/lib/api-proxy";
 
 export async function GET() {
-  return proxyGet("home-sections/frontend", { revalidate: 300 });
+  return proxyGet("home-sections/frontend", {
+    cacheSeconds: SHARED_CONTENT_TTL,
+  });
 }

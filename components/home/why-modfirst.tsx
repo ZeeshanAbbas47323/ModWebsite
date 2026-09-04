@@ -1,6 +1,8 @@
 "use client";
 
 import Image from "next/image";
+import { ShowcaseMosaic } from "@/components/home/showcase-mosaic";
+import { WHY_MODFIRST_IMAGES } from "@/lib/home-showcase-images";
 import { useHomeSection } from "@/hooks/use-home-section";
 import { mapHomeWhyModfirst } from "@/lib/map-home-why-modfirst";
 
@@ -30,13 +32,6 @@ export const WhyModfirst = () => {
   }
 
   if (!why) return null;
-
-  const wideImage =
-    why.images.find((img) => img.role === "image_wide") ?? why.images[0];
-  const leftImage =
-    why.images.find((img) => img.role === "image_left") ?? why.images[1];
-  const rightImage =
-    why.images.find((img) => img.role === "image_right") ?? why.images[2];
 
   return (
     <section className="relative w-full pt-10 md:pt-12 lg:pt-16 overflow-hidden">
@@ -90,43 +85,9 @@ export const WhyModfirst = () => {
           ) : null}
         </div>
 
-        <div className="w-full lg:w-1/2 grid grid-cols-2 gap-4 md:gap-6">
-          {wideImage ? (
-            <div className="col-span-2 relative h-40 md:h-64 rounded-[20px] md:rounded-[24px] overflow-hidden shadow-md">
-              <Image
-                src={wideImage.imageUrl}
-                alt={wideImage.alt}
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-              />
-            </div>
-          ) : null}
-
-          {leftImage ? (
-            <div className="relative h-40 md:h-64 rounded-[20px] md:rounded-[24px] overflow-hidden shadow-md">
-              <Image
-                src={leftImage.imageUrl}
-                alt={leftImage.alt}
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 50vw, 25vw"
-              />
-            </div>
-          ) : null}
-
-          {rightImage ? (
-            <div className="relative h-40 md:h-64 rounded-[20px] md:rounded-[24px] overflow-hidden shadow-md">
-              <Image
-                src={rightImage.imageUrl}
-                alt={rightImage.alt}
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 50vw, 25vw"
-              />
-            </div>
-          ) : null}
-        </div>
+        <div className="w-full lg:w-1/2">
+            <ShowcaseMosaic images={WHY_MODFIRST_IMAGES} />
+          </div>
       </div>
     </section>
   );

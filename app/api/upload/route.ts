@@ -22,7 +22,8 @@ export async function POST(req: NextRequest) {
         },
         body: form,
         cache: "no-store",
-        signal: AbortSignal.timeout(30_000),
+        // Artwork files can be large, so allow a slow upstream write.
+        signal: AbortSignal.timeout(180_000),
       }
     );
     const data = await res.json().catch(() => ({}));

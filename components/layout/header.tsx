@@ -6,6 +6,7 @@ import SearchBar from "../shared/search-bar";
 import Link from "next/link";
 import { useState } from "react";
 import { Sidebar } from "./sidebar";
+import { MegaMenu } from "./mega-menu";
 import { useWebsiteSettings } from "@/hooks/use-website-settings";
 import { useCart } from "@/contexts/cart-context";
 import { useWishlist } from "@/contexts/wishlist-context";
@@ -26,8 +27,14 @@ export function Header() {
       <header className="sticky top-0 z-50 w-full border-b bg-white">
         <div className="container h-20 flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <Button size="icon-lg" variant="ghost" onClick={() => setIsSidebarOpen(true)}>
-              <Image src="/images/icons/3-bars.svg" alt="3-bars" width={24} height={24} />
+            <Button
+              size="icon-lg"
+              variant="ghost"
+              className="lg:hidden"
+              aria-label="Open menu"
+              onClick={() => setIsSidebarOpen(true)}
+            >
+              <Image src="/images/icons/3-bars.svg" alt="" width={24} height={24} />
             </Button>
             <div className="relative w-32 h-8 lg:w-48 lg:h-11">
               <Link href="/">
@@ -88,6 +95,8 @@ export function Header() {
         <div className="md:hidden px-4 pb-4">
           <SearchBar />
         </div>
+
+        <MegaMenu />
       </header>
 
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />

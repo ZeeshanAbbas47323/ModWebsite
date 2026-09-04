@@ -4,9 +4,27 @@ import { API_BASE, upstreamHeaders } from "@/lib/upstream";
 interface ProxyOptions {
   method?: string;
   revalidate?: number;
+  /**
+   * Seconds this response may be reused. Site-wide content (menus, settings,
+   * footer) is the same for every visitor and changes rarely, so letting the
+   * browser and CDN hold it avoids a round trip on every page load.
+   */
+  cacheSeconds?: number;
 }
 
-function respond(text: string, status: number) {
+/** Site-wide content that only changes when someone edits the CMS. */
+export const SHARED_CONTENT_TTL = 2 * 60 * 60;
+
+function cacheHeaders(seconds?: number) {
+  if (!seconds) return undefined;
+  return {
+    // Serve stale for a day while revalidating, so a slow upstream never
+    // blocks a page render.
+    "Cache-Control": `public, max-age=${seconds}, stale-while-revalidate=86400`,
+  };
+}
+
+function respond(text: string, status: number, cacheSeconds?: number) {
   let data;
   try {
     data = JSON.parse(text);
@@ -16,7 +34,9 @@ function respond(text: string, status: number) {
       { status: 502 }
     );
   }
-  return NextResponse.json(data, { status });
+  // Only a good response is worth caching.
+  const headers = status === 200 ? cacheHeaders(cacheSeconds) : undefined;
+  return NextResponse.json(data, { status, headers });
 }
 
 function fail(err: unknown) {
@@ -26,12 +46,13 @@ function fail(err: unknown) {
 
 export async function proxyGet(path: string, opts?: ProxyOptions) {
   try {
+    const revalidate = opts?.revalidate ?? opts?.cacheSeconds;
     const res = await fetch(`${API_BASE}/${path}`, {
       method: "GET",
       headers: upstreamHeaders(),
-      next: opts?.revalidate ? { revalidate: opts.revalidate } : undefined,
+      next: revalidate ? { revalidate } : undefined,
     });
-    return respond(await res.text(), res.status);
+    return respond(await res.text(), res.status, opts?.cacheSeconds);
   } catch (err) {
     return fail(err);
   }
@@ -89,4 +110,28 @@ export async function proxyPatch(req: NextRequest, path: string) {
 
 export async function proxyDelete(req: NextRequest, path: string) {
   return proxyWithBody(req, path, "DELETE");
+}
+
+/**
+ * A cacheable GET for an upstream endpoint that only accepts POST.
+ *
+ * The body is fixed here rather than taken from the caller, so the result is
+ * the same for everyone and can be cached by URL.
+ */
+export async function proxyCachedQuery(
+  path: string,
+  body: unknown,
+  cacheSeconds: number = SHARED_CONTENT_TTL
+) {
+  try {
+    const res = await fetch(`${API_BASE}/${path}`, {
+      method: "POST",
+      headers: upstreamHeaders(),
+      body: JSON.stringify(body),
+      next: { revalidate: cacheSeconds },
+    });
+    return respond(await res.text(), res.status, cacheSeconds);
+  } catch (err) {
+    return fail(err);
+  }
 }

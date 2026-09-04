@@ -22,6 +22,20 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "command.modfirst.com",
       },
+      {
+        // Primary media CDN (NEXT_PUBLIC_IMAGE_URL).
+        protocol: "https",
+        hostname: "storage.modfirst.com",
+      },
+      {
+        // Older CMS media bucket, still holding some files.
+        protocol: "https",
+        hostname: "*.r2.dev",
+      },
+      {
+        protocol: "https",
+        hostname: "*.r2.cloudflarestorage.com",
+      },
     ],
   },
 };

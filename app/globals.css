@@ -191,3 +191,51 @@
 .cms-prose th,
 .cms-prose td { border: 1px solid #e5e5e5; padding: 0.5rem 0.75rem; text-align: left; }
 .cms-prose th { background: #f4f4f5; color: #000; font-weight: 700; }
+
+/* The mega menu panel. Only the position is animated, never the opacity: a
+   throttled animation frame then leaves the panel readable rather than
+   stranded half-transparent. */
+@keyframes mega-panel-in {
+  from {
+    transform: translateY(-6px);
+  }
+}
+
+.mega-panel {
+  animation: mega-panel-in 0.16s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mega-panel {
+    animation: none;
+  }
+}
+
+/* The small-screen menu drawer. CSS rather than JS animation for the same
+   reason as the mega menu panel: it must never be left part-way open. */
+@keyframes drawer-scrim-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes drawer-panel-in {
+  from {
+    transform: translateX(-100%);
+  }
+}
+
+.drawer-scrim {
+  animation: drawer-scrim-in 0.2s ease-out;
+}
+
+.drawer-panel {
+  animation: drawer-panel-in 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer-scrim,
+  .drawer-panel {
+    animation: none;
+  }
+}

@@ -138,7 +138,7 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
         // nothing left to upload here.
         const uploaded =
             selection.stored ??
-            (await uploadService.toStorage(selection.file, "transfers-by-size"));
+            (await uploadService.toStorage(selection.file));
 
         const details = [
             `${selection.widthIn.toFixed(2)}in x ${selection.heightIn.toFixed(2)}in`,
@@ -153,10 +153,8 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
             print_method: "dtf",
             custom_text: details,
             design_uploads: [{
-                // Permanent link. A raw S3 URL cannot be used: the bucket is
-                // private, ACLs are disabled, and a presigned URL dies after
-                // 7 days — long before some orders are printed. This route
-                // re-signs on every request, so it never expires.
+                // Permanent CDN link from the upload endpoint — it never
+                // expires, so it is still valid whenever the order is printed.
                 file_url: uploaded.url,
                 file_name: uploaded.originalName || selection.file.name,
                 print_method: "dtf",

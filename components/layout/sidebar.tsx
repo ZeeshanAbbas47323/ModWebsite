@@ -1,269 +1,229 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { menuData } from '@/lib/menu-data';
-import { useMenuTree } from '@/hooks/use-menus';
-import { useWebsiteSettings } from '@/hooks/use-website-settings';
-import type { MenuNode } from '@/services/menu.service';
-import Link from 'next/link';
-import Image from 'next/image';
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { useMenuTree } from "@/hooks/use-menus";
+import { useNavItems, type NavItem } from "@/lib/menu-nav";
+import { useWebsiteSettings } from "@/hooks/use-website-settings";
 
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-/** CMS text arrives with stray CRLF and padding; strip it before use. */
-function clean(value: string | null | undefined): string {
-  return (value ?? "").replace(/[\r\n]+/g, " ").trim();
-}
-
 /**
- * Turn a CMS slug into a usable path.
+ * Small-screen navigation.
  *
- * Slugs are authored by hand, so they arrive as anything from "shop/test/" to
- * "UV DTF Transfers" to "Net 30". Each segment is encoded so spaces and
- * brackets survive as a valid URL instead of silently breaking the link.
+ * An accordion rather than a drill-down: a branch expands in place, so the
+ * level above stays visible and a third-level product is one tap away instead
+ * of three. Everything here is CSS-driven — a stalled animation frame can no
+ * longer strand the menu between levels.
  */
-function pathFromSlug(slug: string | null | undefined): string | undefined {
-  const raw = clean(slug);
-  if (!raw) return undefined;
-  if (/^https?:\/\//i.test(raw)) return raw;
-
-  const segments = raw
-    .split("/")
-    .map((segment) => clean(segment))
-    .filter(Boolean)
-    .map((segment) => encodeURIComponent(segment));
-
-  if (segments.length === 0) return undefined;
-  // "home" is the storefront root, not a /home page.
-  if (segments.length === 1 && segments[0].toLowerCase() === "home") return "/";
-  return `/${segments.join("/")}`;
-}
-
-function getMenuHref(node: MenuNode): string | undefined {
-  if (node.link_type === "external" && node.external_url) return node.external_url;
-  if (node.link_type === "category" && node.target_category_id) return `/products?category=${node.target_category_id}`;
-  if (node.link_type === "product" && node.target_product_id) return `/product-detail?id=${node.target_product_id}`;
-  if (node.link_type === "page" && node.target_page_id) return `/pages/${clean(node.slug)}`;
-  if (node.link_value) return clean(node.link_value) || undefined;
-  // Nothing else is configured on these menus, so the slug is the only
-  // routing information available.
-  return pathFromSlug(node.slug);
-}
-
-interface NavItem {
-  id: number | string;
-  label: string;
-  href?: string;
-  openInNewTab?: boolean;
-  children?: NavItem[];
-}
-
-function mapMenuNodes(nodes: MenuNode[]): NavItem[] {
-  return nodes.map((n) => ({
-    id: n.id,
-    label: clean(n.name),
-    // A node with children opens the next level instead of navigating, so only
-    // leaves ever get a link.
-    href: n.children?.length ? undefined : getMenuHref(n),
-    openInNewTab: n.open_in_new_tab,
-    children: n.children?.length ? mapMenuNodes(n.children) : undefined,
-  }));
-}
-
 export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
-  const [history, setHistory] = useState<NavItem[]>([]);
   const { data: menuNodes } = useMenuTree();
   const { data: settings } = useWebsiteSettings();
+  const items = useNavItems(menuNodes);
+  const [expanded, setExpanded] = useState<Set<NavItem["id"]>>(new Set());
 
-  const dynamicItems = menuNodes?.length ? mapMenuNodes(menuNodes) : null;
-  const fallbackItems: NavItem[] = menuData.map((m) => ({
-    id: m.id,
-    label: m.label,
-    href: m.href,
-    children: m.children?.map((c) => ({
-      id: c.id,
-      label: c.label,
-      href: c.href,
-      children: c.children?.map((gc) => ({ id: gc.id, label: gc.label, href: gc.href })),
-    })),
-  }));
-  const rootItems = dynamicItems ?? fallbackItems;
+  const phone = settings?.contact_phone ?? "";
+  const email = settings?.contact_email ?? "";
+  const address = settings?.address ?? "";
 
-  const phone = settings?.contact_phone ?? "(021) 12345678";
-  const email = settings?.contact_email ?? "hello@modfirst.com";
-  const address = settings?.address ?? "Suite#4, Airport Commercial Zone, Jinnah International Airport, Karachi, Pakistan";
-  const facebook = settings?.facebook_url ?? "#";
-  const instagram = settings?.instagram_url ?? "#";
-  const linkedin = settings?.linkedin_url ?? "#";
-  const twitter = settings?.twitter_url ?? "#";
+  const socials = [
+    { href: settings?.facebook_url, icon: "/images/icons/facebook.svg", label: "Facebook", size: 14 },
+    { href: settings?.instagram_url, icon: "/images/icons/instagram.svg", label: "Instagram", size: 18 },
+    { href: settings?.linkedin_url, icon: "/images/icons/linkedin.svg", label: "LinkedIn", size: 18 },
+    { href: settings?.twitter_url, icon: "/images/icons/twittex-x.svg", label: "X", size: 18 },
+  ].filter((s): s is typeof s & { href: string } => !!s.href);
 
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'auto';
-    }
-    return () => {
-      document.body.style.overflow = 'auto';
+    if (!isOpen) return;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
     };
-  }, [isOpen]);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = "";
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [isOpen, onClose]);
 
-  useEffect(() => {
-    if (!isOpen) setHistory([]);
-  }, [isOpen]);
-
-  const currentItems = history.length > 0
-    ? history[history.length - 1].children || []
-    : rootItems;
-
-  const handleItemClick = (item: NavItem) => {
-    if (item.children) {
-      setHistory([...history, item]);
-    } else if (item.href) {
-      onClose();
-    }
+  const close = () => {
+    setExpanded(new Set());
+    onClose();
   };
 
-  const handleBack = () => {
-    setHistory(history.slice(0, -1));
+  const toggle = (id: NavItem["id"]) => {
+    setExpanded((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   };
 
-  const getBreadcrumbs = () => {
-    if (history.length === 0) return "Our Products";
-    return ["Our Products", ...history.map(item => item.label)].join(" / ");
-  };
+  if (!isOpen) return null;
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 bg-black/60 z-100 cursor-pointer"
-          />
+    <>
+      <div
+        onClick={close}
+        className="drawer-scrim fixed inset-0 z-100 bg-black/60"
+        aria-hidden
+      />
 
-          <motion.div
-            initial={{ x: "-100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "-100%" }}
-            transition={{ type: "tween", duration: 0.3 }}
-            className="fixed top-0 left-0 h-full w-full bg-[#111] z-101 flex flex-col md:flex-row overflow-y-auto"
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menu"
+        className="drawer-panel fixed inset-y-0 left-0 z-101 flex w-full max-w-sm flex-col bg-[#111] text-white"
+      >
+        <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/50">
+            Menu
+          </span>
+          <button
+            onClick={close}
+            aria-label="Close menu"
+            className="rounded-full p-2 transition-colors hover:bg-white/10"
           >
-            <div className="shrink-0 w-full md:w-1/2 p-8 md:px-16 lg:px-24 flex flex-col border-b md:border-b-0 md:border-r border-white/10 min-h-[60vh] md:min-h-full relative">
-              <div className="absolute top-8 left-8 md:top-10 md:left-14 lg:top-12 lg:left-22">
-                {history.length > 0 ? (
-                  <button onClick={handleBack} className="hover:opacity-80 transition-opacity p-2 -ml-2 flex items-center justify-center">
-                    <Image src="/images/icons/arrow-left-white.svg" alt="Back" width={20} height={20} />
-                  </button>
-                ) : (
-                  <button onClick={onClose} className="hover:opacity-80 transition-opacity p-2 -ml-2 flex items-center justify-center">
-                    <Image src="/images/icons/x.svg" alt="Close" width={20} height={20} />
-                  </button>
-                )}
-              </div>
+            <Image src="/images/icons/x.svg" alt="" width={18} height={18} />
+          </button>
+        </div>
 
-              <div className="flex flex-col pt-16 md:pt-32 lg:pt-40 pb-12">
-                <div className="text-xs md:text-sm font-semibold text-white/50 mb-8 tracking-wider">
-                  {getBreadcrumbs()}
-                </div>
+        <nav className="flex-1 overflow-y-auto overscroll-contain px-2 py-3">
+          <ul className="flex flex-col">
+            {items.map((item) => (
+              <AccordionRow
+                key={item.id}
+                item={item}
+                depth={0}
+                expanded={expanded}
+                onToggle={toggle}
+                onNavigate={close}
+              />
+            ))}
+          </ul>
+        </nav>
 
-                <div className="flex flex-col gap-5 relative overflow-hidden">
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={history.length}
-                      initial={{ x: 50, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      exit={{ x: -50, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="flex flex-col gap-4"
-                    >
-                      {currentItems.map((item) => (
-                        <div key={item.id}>
-                          {item.href ? (
-                            <Link
-                              href={item.href}
-                              target={item.openInNewTab ? "_blank" : undefined}
-                              onClick={() => onClose()}
-                              className="group flex items-center gap-2 text-2xl lg:text-[28px] font-bold text-white hover:text-[#D3F52E] transition-colors"
-                            >
-                              {item.label}
-                            </Link>
-                          ) : (
-                            <button
-                              onClick={() => handleItemClick(item)}
-                              className="group flex items-center gap-2 text-2xl lg:text-[28px] font-bold text-white hover:text-[#D3F52E] transition-colors w-full text-left"
-                            >
-                              {item.label}
-                              {item.children && (
-                                <span className="ml-3 shrink-0 flex items-center">
-                                  <Image src="/images/icons/arrow-right-green.svg" alt="Arrow Right" width={24} height={24} />
-                                </span>
-                              )}
-                            </button>
-                          )}
-                        </div>
-                      ))}
-                    </motion.div>
-                  </AnimatePresence>
-                </div>
+        <div className="border-t border-white/10 px-5 py-5">
+          <div className="flex flex-col gap-3 text-sm text-white/70">
+            {phone && (
+              <a
+                href={`tel:${phone.replace(/[^+\d]/g, "")}`}
+                className="flex items-center gap-3 transition-colors hover:text-[#D3F52E]"
+              >
+                <Image src="/images/icons/phone-2.svg" alt="" width={16} height={16} />
+                <span>{phone}</span>
+              </a>
+            )}
+            {email && (
+              <a
+                href={`mailto:${email}`}
+                className="flex items-center gap-3 transition-colors hover:text-[#D3F52E]"
+              >
+                <Image src="/images/icons/mail.svg" alt="" width={16} height={16} />
+                <span>{email}</span>
+              </a>
+            )}
+            {address && (
+              <div className="flex items-start gap-3">
+                <Image src="/images/icons/location.svg" alt="" width={16} height={16} className="mt-0.5 shrink-0" />
+                <span className="leading-relaxed">{address}</span>
               </div>
+            )}
+          </div>
+
+          {socials.length > 0 && (
+            <div className="mt-5 flex items-center gap-5">
+              {socials.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  aria-label={social.label}
+                  className="transition-opacity hover:opacity-70"
+                >
+                  <Image src={social.icon} alt="" width={social.size} height={social.size} />
+                </a>
+              ))}
             </div>
-
-            <div className="shrink-0 w-full md:w-1/2 p-8 md:px-16 lg:px-24 flex flex-col bg-[#111]">
-              <div className="flex flex-col pt-4 md:pt-32 lg:pt-40 pb-12">
-                <h3 className="text-[13px] font-semibold text-white/50 uppercase tracking-widest mb-8 underline underline-offset-8">
-                  Contact Us
-                </h3>
-
-                <div className="flex flex-col gap-6 text-[15px] font-light text-[#E5E5E5]">
-                <a href={`tel:${phone.replace(/[^+\d]/g, "")}`} className="flex items-start gap-4 hover:text-[#D3F52E] transition-colors">
-                  <div className="relative w-5 h-5 mt-0.5 shrink-0">
-                    <Image src="/images/icons/phone-2.svg" alt="Phone" fill className="object-contain" />
-                  </div>
-                  <span>{phone}</span>
-                </a>
-
-                <a href={`mailto:${email}`} className="flex items-start gap-4 hover:text-[#D3F52E] transition-colors">
-                  <div className="relative w-5 h-5 mt-0.5 shrink-0">
-                    <Image src="/images/icons/mail.svg" alt="Mail" fill className="object-contain" />
-                  </div>
-                  <span>{email}</span>
-                </a>
-
-                <div className="flex items-start gap-4 pr-10">
-                  <div className="relative w-5 h-5 mt-0.5 shrink-0">
-                    <Image src="/images/icons/location.svg" alt="Location" fill className="object-contain" />
-                  </div>
-                  <span className="leading-relaxed">{address}</span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-6 mt-12">
-                <a href={facebook} className="hover:opacity-75 transition-opacity">
-                  <Image src="/images/icons/facebook.svg" alt="Facebook" width={14} height={14} />
-                </a>
-                <a href={instagram} className="hover:opacity-75 transition-opacity">
-                  <Image src="/images/icons/instagram.svg" alt="Instagram" width={18} height={18} />
-                </a>
-                <a href={linkedin} className="hover:opacity-75 transition-opacity">
-                  <Image src="/images/icons/linkedin.svg" alt="LinkedIn" width={18} height={18} />
-                </a>
-                <a href={twitter} className="hover:opacity-75 transition-opacity">
-                  <Image src="/images/icons/twittex-x.svg" alt="X/Twitter" width={18} height={18} />
-                </a>
-              </div>
-              </div>
-            </div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+          )}
+        </div>
+      </div>
+    </>
   );
 };
+
+interface AccordionRowProps {
+  item: NavItem;
+  depth: number;
+  expanded: Set<NavItem["id"]>;
+  onToggle: (id: NavItem["id"]) => void;
+  onNavigate: () => void;
+}
+
+function AccordionRow({ item, depth, expanded, onToggle, onNavigate }: AccordionRowProps) {
+  const hasChildren = !!item.children?.length;
+  const isOpen = expanded.has(item.id);
+
+  // Each level steps in a little so the shape of the tree stays readable.
+  const rowClass = [
+    "flex w-full items-center justify-between gap-3 rounded-lg py-3 pr-3 text-left transition-colors",
+    depth === 0
+      ? "text-[15px] font-semibold text-white"
+      : "text-[14px] font-normal text-white/70",
+    "hover:bg-white/5 hover:text-[#D3F52E]",
+  ].join(" ");
+
+  return (
+    <li>
+      {hasChildren ? (
+        <button
+          type="button"
+          onClick={() => onToggle(item.id)}
+          aria-expanded={isOpen}
+          className={rowClass}
+          style={{ paddingLeft: 12 + depth * 14 }}
+        >
+          <span className="leading-snug">{item.label}</span>
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 10 10"
+            aria-hidden
+            className={`shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+          >
+            <path d="M1 3.5 5 7.5 9 3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+      ) : (
+        <Link
+          href={item.href ?? "#"}
+          target={item.openInNewTab ? "_blank" : undefined}
+          onClick={onNavigate}
+          className={rowClass}
+          style={{ paddingLeft: 12 + depth * 14 }}
+        >
+          <span className="leading-snug">{item.label}</span>
+        </Link>
+      )}
+
+      {hasChildren && isOpen && (
+        <ul className="ml-[18px] flex flex-col border-l border-white/10">
+          {item.children!.map((child) => (
+            <AccordionRow
+              key={child.id}
+              item={child}
+              depth={depth + 1}
+              expanded={expanded}
+              onToggle={onToggle}
+              onNavigate={onNavigate}
+            />
+          ))}
+        </ul>
+      )}
+    </li>
+  );
+}

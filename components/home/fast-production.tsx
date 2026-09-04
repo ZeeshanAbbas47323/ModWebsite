@@ -1,6 +1,8 @@
 "use client";
 
 import Image from "next/image";
+import { ShowcaseMosaic } from "@/components/home/showcase-mosaic";
+import { FAST_PRODUCTION_IMAGES } from "@/lib/home-showcase-images";
 import { useHomeSection } from "@/hooks/use-home-section";
 import { mapHomeFastProduction } from "@/lib/map-home-fast-production";
 
@@ -30,13 +32,6 @@ export const FastProduction = () => {
 
   if (!data) return null;
 
-  const wideImage =
-    data.images.find((img) => img.role === "image_wide") ?? data.images[0];
-  const leftImage =
-    data.images.find((img) => img.role === "image_left") ?? data.images[1];
-  const rightImage =
-    data.images.find((img) => img.role === "image_right") ?? data.images[2];
-
   return (
     <section className="relative w-full pt-10 md:pt-12 lg:pt-16 overflow-hidden">
       {data.backgroundImage ? (
@@ -51,43 +46,9 @@ export const FastProduction = () => {
       ) : null}
 
       <div className="container flex flex-col-reverse lg:flex-row items-center gap-12 lg:gap-20 relative z-10">
-        <div className="w-full lg:w-1/2 grid grid-cols-2 gap-4 md:gap-6">
-          {wideImage ? (
-            <div className="col-span-2 relative h-40 md:h-64 rounded-[20px] md:rounded-[24px] overflow-hidden shadow-md">
-              <Image
-                src={wideImage.imageUrl}
-                alt={wideImage.alt}
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-              />
-            </div>
-          ) : null}
-
-          {leftImage ? (
-            <div className="relative h-40 md:h-64 rounded-[20px] md:rounded-[24px] overflow-hidden shadow-md">
-              <Image
-                src={leftImage.imageUrl}
-                alt={leftImage.alt}
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 50vw, 25vw"
-              />
-            </div>
-          ) : null}
-
-          {rightImage ? (
-            <div className="relative h-40 md:h-64 rounded-[20px] md:rounded-[24px] overflow-hidden shadow-md">
-              <Image
-                src={rightImage.imageUrl}
-                alt={rightImage.alt}
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 50vw, 25vw"
-              />
-            </div>
-          ) : null}
-        </div>
+        <div className="w-full lg:w-1/2">
+            <ShowcaseMosaic images={FAST_PRODUCTION_IMAGES} />
+          </div>
 
         <div className="w-full lg:w-1/2 flex flex-col gap-6">
           {data.title ? (

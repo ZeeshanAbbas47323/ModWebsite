@@ -145,7 +145,7 @@ export function TransfersBySize({ onAddToCart }: TransfersBySizeProps) {
 
     patchDesign(id, { uploading: true, uploadError: null });
     try {
-      const stored = await uploadService.toStorage(file, "transfers-by-size");
+      const stored = await uploadService.toStorage(file);
       patchDesign(id, { remote: stored, uploading: false });
     } catch (err) {
       patchDesign(id, {

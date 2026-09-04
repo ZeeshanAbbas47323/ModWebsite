@@ -16,23 +16,17 @@ export interface ProductCategory {
 
 export const productCategoryService = {
   list: async (parentId?: number | null): Promise<ProductCategory[]> => {
-    const { data } = await apiClient.post("/product-categories", {
-      page: 1,
-      limit: 50,
-      filters: {
-        is_active: true,
-        ...(parentId !== undefined ? { parent_id: parentId } : {}),
-      },
-    });
+    // GET so the response is cacheable by URL.
+    const query =
+      parentId !== undefined ? `?parent_id=${parentId ?? ""}` : "";
+    const { data } = await apiClient.get(`/product-categories${query}`);
     return data.payload ?? data.data ?? [];
   },
 
   bySlug: async (slug: string): Promise<ProductCategory | null> => {
-    const { data } = await apiClient.post("/product-categories", {
-      page: 1,
-      limit: 1,
-      filters: { is_active: true, slug },
-    });
+    const { data } = await apiClient.get(
+      `/product-categories?slug=${encodeURIComponent(slug)}`
+    );
     const categories: ProductCategory[] = data.payload ?? data.data ?? [];
     return categories[0] ?? null;
   },

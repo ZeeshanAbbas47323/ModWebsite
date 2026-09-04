@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { SHARED_CONTENT_STALE_TIME } from "@/lib/query-client";
 import { footerSectionService } from "@/services/footer-section.service";
 
 export const footerSectionKeys = {
@@ -9,6 +10,7 @@ export function useFooterSections() {
   return useQuery({
     queryKey: footerSectionKeys.all,
     queryFn: () => footerSectionService.list(),
-    staleTime: 60_000,
+    staleTime: SHARED_CONTENT_STALE_TIME,
+    gcTime: SHARED_CONTENT_STALE_TIME,
   });
 }

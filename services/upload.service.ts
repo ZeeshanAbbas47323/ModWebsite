@@ -13,29 +13,46 @@ export const ACCEPTED_IMAGE_TYPES =
   "image/jpeg,image/png,image/gif,image/webp,image/svg+xml";
 
 export interface StoredUpload {
+  /** Path the API reports, e.g. /product/foo-123.png */
   key: string;
-  provider: string;
-  /** Durable link — safe to store on an order. */
+  /** Permanent public link — safe to store on a cart item or order. */
   url: string;
-  /** Where the object lives in the bucket. */
-  storageUrl: string;
   contentType: string;
   size: number;
   originalName: string;
 }
 
+/** Folder the upload endpoint files product artwork under. */
+export const PRODUCT_UPLOAD_FOLDER = "product";
+
 export const uploadService = {
-  /** Put a file in the project's object storage (Cloudflare R2 or S3). */
-  toStorage: async (file: File, prefix: string): Promise<StoredUpload> => {
+  /**
+   * Upload artwork for a product. This goes to the ModFirst upload endpoint,
+   * which stores the file on the media CDN and returns a permanent URL — no
+   * presigning, no expiry.
+   */
+  toStorage: async (
+    file: File,
+    folder: string = PRODUCT_UPLOAD_FOLDER
+  ): Promise<StoredUpload> => {
     const form = new FormData();
     form.append("file", file);
-    form.append("prefix", prefix);
-    const res = await fetch("/api/upload/storage", { method: "POST", body: form });
+    const res = await fetch(`/api/upload?folder=${encodeURIComponent(folder)}`, {
+      method: "POST",
+      body: form,
+    });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok || !data.success) {
-      throw new Error(data.message ?? "Could not upload that file.");
+    const payload: Partial<UploadedFile> = data?.payload ?? data?.data ?? {};
+    if (!res.ok || !data?.success || !payload.absolute_url) {
+      throw new Error(data?.message ?? "Could not upload that file.");
     }
-    return data.payload as StoredUpload;
+    return {
+      key: payload.url ?? "",
+      url: payload.absolute_url,
+      contentType: file.type,
+      size: payload.size ?? file.size,
+      originalName: payload.originalName || file.name,
+    };
   },
 
   image: async (file: File, folder: string): Promise<UploadedFile> => {
