@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { NewsletterSection } from "../home/newsletter-section";
 import ProductCarousel from "../product/product-carousel";
 import ProductDetail from "./product-detail";
+import { Button } from "../ui/button";
 import { useProductBySlug, useProductCollection } from "@/hooks/use-products";
 import { mapProductToCard } from "@/lib/map-product-to-card";
 
@@ -36,6 +38,37 @@ const ProductDetailWrapper = ({ slug }: ProductDetailWrapperProps) => {
                     </div>
                 </div>
             </section>
+        );
+    }
+
+    // The fetch finished with nothing — the product doesn't exist, or is
+    // inactive/unpublished. Rather than a dead end (or, previously, an
+    // infinite loading skeleton — ProductDetail only has a real "not found"
+    // state when a productId was passed, which this route never does), show
+    // a friendly message plus something to actually browse instead.
+    if (!product) {
+        return (
+            <>
+                <section className="container pt-10 md:pt-16 pb-10 md:pb-16 text-center">
+                    <p className="text-sm font-semibold tracking-wide text-[#8a8a8a] uppercase">
+                        Not available
+                    </p>
+                    <h1 className="mt-3 text-3xl md:text-4xl font-bold tracking-tight text-black">
+                        This product isn&apos;t available right now
+                    </h1>
+                    <p className="mt-4 max-w-md mx-auto text-base text-gray-600">
+                        It may have been removed or is temporarily unpublished. Take a look at
+                        what&apos;s popular instead.
+                    </p>
+                    <div className="mt-8">
+                        <Button size="xl" asChild>
+                            <Link href="/products">Browse all products</Link>
+                        </Button>
+                    </div>
+                </section>
+                <ProductCarousel data={relatedCards} title="Popular right now" description="From small business advertising to big event displays, Modfirst delivers bold." />
+                <NewsletterSection />
+            </>
         );
     }
 

@@ -53,7 +53,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ data }) => {
 
     return (
         <Link href={href} className="flex flex-col items-center group cursor-pointer">
-            <div className="w-full bg-[#F4F4F5] h-[350px] rounded-[24px] aspect-square flex items-center justify-center p-8 mb-6 relative overflow-hidden">
+            <div className="w-full bg-[#F4F4F5] h-[350px] rounded-[24px] aspect-square mb-6 relative overflow-hidden">
                 {data.product && (
                     <WishlistButton
                         product={data.product}
@@ -64,9 +64,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ data }) => {
                 <Image
                     src={resolveImageUrl(data.img_path)}
                     alt={data.title}
-                    width={300}
-                    height={300}
-                    className="object-contain w-full h-full drop-shadow-sm transition-transform duration-500 ease-out group-hover:scale-110"
+                    fill
+                    sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-110"
                     {...(isExternal ? { unoptimized: true } : {})}
                 />
 

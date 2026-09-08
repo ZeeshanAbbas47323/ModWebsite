@@ -397,7 +397,7 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                         <p className="text-sm text-gray-600 mb-6">{product.short_desc}</p>
                     )}
 
-                    {!usesGangSheetBuilder && !usesTransfersBySize && variants && variants.length > 0 && (
+                    {!usesTransfersBySize && variants && variants.length > 0 && (
                         <VariantSelector
                             variants={variants}
                             selected={selectedVariant}
@@ -456,14 +456,32 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
 
                     {addError && <p className="text-sm text-red-600 -mt-3 mb-6">{addError}</p>}
 
-                    {(sortedDescriptions.length > 0 || sortedFaqs.length > 0) && (
+                    {(product?.description || sortedDescriptions.length > 0 || sortedFaqs.length > 0) && (
                         <Accordion type="single" collapsible className="w-full">
+                            {product?.description && (
+                                <AccordionItem value="main-description" className="border-b-0 mb-2">
+                                    <AccordionTrigger className="text-base font-bold hover:no-underline py-3 px-0 text-black [&>svg]:text-black">
+                                        Description
+                                    </AccordionTrigger>
+                                    <AccordionContent>
+                                        <div
+                                            className={cn("text-gray-600 text-base min-w-0", richTextClasses)}
+                                            dangerouslySetInnerHTML={{ __html: product.description }}
+                                        />
+                                    </AccordionContent>
+                                </AccordionItem>
+                            )}
                             {sortedDescriptions.map((desc, i) => (
                                 <AccordionItem key={`desc-${desc.id}`} value={`desc-${i}`} className="border-b-0 mb-2">
                                     <AccordionTrigger className="text-base font-bold hover:no-underline py-3 px-0 text-black [&>svg]:text-black">
                                         {desc.title}
                                     </AccordionTrigger>
-                                    <AccordionContent className={cn("text-gray-600 text-base min-w-0", richTextClasses)} dangerouslySetInnerHTML={{ __html: desc.content }} />
+                                    <AccordionContent>
+                                        <div
+                                            className={cn("text-gray-600 text-base min-w-0", richTextClasses)}
+                                            dangerouslySetInnerHTML={{ __html: desc.content }}
+                                        />
+                                    </AccordionContent>
                                 </AccordionItem>
                             ))}
                             {sortedFaqs.map((faq, i) => (
@@ -480,16 +498,6 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                     )}
                 </div>
             </div>
-
-            {product?.description && (
-                <div className="mt-12 max-w-3xl min-w-0">
-                    <h2 className="text-xl font-bold text-black mb-4">Description</h2>
-                    <div
-                        className={cn("text-sm sm:text-base text-gray-600 leading-relaxed min-w-0", richTextClasses)}
-                        dangerouslySetInnerHTML={{ __html: product.description }}
-                    />
-                </div>
-            )}
 
             {id ? <ProductReviews productId={id} /> : null}
 
