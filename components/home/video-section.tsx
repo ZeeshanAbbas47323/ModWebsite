@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useHomeSection } from "@/hooks/use-home-section";
 import { mapHomeVideo } from "@/lib/map-home-video";
+import { VIDEO_FALLBACK } from "@/lib/home-fallback-content";
 
 function hexToRgba(hex: string, opacity: number) {
   const cleaned = hex.replace("#", "");
@@ -23,7 +24,8 @@ function hexToRgba(hex: string, opacity: number) {
 
 export function VideoSection() {
   const { data: section, isLoading } = useHomeSection("home_video");
-  const video = mapHomeVideo(section);
+  // No `home_video` row exists yet, so this fell back to rendering nothing.
+  const video = mapHomeVideo(section) ?? VIDEO_FALLBACK;
 
   if (isLoading) {
     return (
@@ -32,8 +34,6 @@ export function VideoSection() {
       </section>
     );
   }
-
-  if (!video) return null;
 
   return (
     <section className="container pt-10 md:pt-12 lg:pt-16">

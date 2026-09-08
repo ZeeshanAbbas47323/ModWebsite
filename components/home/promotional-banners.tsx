@@ -8,6 +8,7 @@ import {
   type PromoCardViewModel,
 } from "@/lib/map-home-promo-banners";
 import { resolveImageUrl } from "@/lib/image-url";
+import { PROMO_BANNERS_FALLBACK } from "@/lib/home-fallback-content";
 
 const cardContainer: Variants = {
   hidden: { opacity: 0 },
@@ -180,7 +181,9 @@ function RightPromoCard({ card }: { card: PromoCardViewModel }) {
 
 export function PromotionalBanners() {
   const { data: section, isLoading } = useHomeSection("home_promo_banners");
-  const promo = mapHomePromoBanners(section);
+  // No `home_promo_banners` row exists yet, so this fell back to rendering
+  // nothing.
+  const promo = mapHomePromoBanners(section) ?? PROMO_BANNERS_FALLBACK;
 
   const leftCard =
     promo?.cards.find((c) => c.role === "left_card") ?? promo?.cards[0];
@@ -199,7 +202,7 @@ export function PromotionalBanners() {
     );
   }
 
-  if (!promo || (!leftCard && !rightCard && !promo.bottomBanner)) {
+  if (!leftCard && !rightCard && !promo.bottomBanner) {
     return null;
   }
 

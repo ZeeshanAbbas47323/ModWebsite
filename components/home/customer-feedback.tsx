@@ -11,10 +11,13 @@ import {
 import { useHomeSection } from "@/hooks/use-home-section";
 import { mapHomeCustomerFeedback } from "@/lib/map-home-customer-feedback";
 import { resolveImageUrl } from "@/lib/image-url";
+import { CUSTOMER_FEEDBACK_FALLBACK } from "@/lib/home-fallback-content";
 
 export function CustomerFeedback() {
   const { data: section, isLoading } = useHomeSection("home_customer_feedback");
-  const feedback = mapHomeCustomerFeedback(section);
+  // No `home_customer_feedback` row exists yet, so this fell back to
+  // rendering nothing.
+  const feedback = mapHomeCustomerFeedback(section) ?? CUSTOMER_FEEDBACK_FALLBACK;
 
   if (isLoading) {
     return (
@@ -29,7 +32,7 @@ export function CustomerFeedback() {
     );
   }
 
-  if (!feedback || (!feedback.title && feedback.reviews.length === 0)) {
+  if (!feedback.title && feedback.reviews.length === 0) {
     return null;
   }
 
