@@ -16,6 +16,10 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(__dirname),
   },
+  // Dev-only: lets the dev server's HMR socket be reached when it's opened via
+  // an IP/proxy instead of localhost (e.g. testing on another device on the
+  // LAN). Next blocks that by default; production builds ignore this entirely.
+  allowedDevOrigins: ["127.0.0.1", "localhost"],
   images: {
     remotePatterns: [
       {
