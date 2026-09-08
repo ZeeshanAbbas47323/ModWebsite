@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { HERO_SLIDES, SLIDE_DURATION } from "@/lib/home-hero-slides";
 import { useHomeSection } from "@/hooks/use-home-section";
 import { mapHomeHeroSlides } from "@/lib/map-home-hero-slides";
+import { resolveImageUrl } from "@/lib/image-url";
 
 export function Hero() {
   // Slides come from the `home_hero` CMS section. The built-in slides stand in
@@ -163,7 +164,7 @@ export function Hero() {
                     on an empty src, so render the frame without it. */}
                 {slide.image ? (
                   <Image
-                    src={slide.image}
+                    src={resolveImageUrl(slide.image)}
                     alt={slide.imageAlt}
                     fill
                     // The first slide is the LCP image on the home page.

@@ -4,6 +4,7 @@ import Image from "next/image";
 import { motion, Variants } from "framer-motion";
 import { useHomeSection } from "@/hooks/use-home-section";
 import { mapHomeOrderProcess } from "@/lib/map-home-order-process";
+import { resolveImageUrl } from "@/lib/image-url";
 
 const headerVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -128,7 +129,7 @@ export function OurOrderProcess() {
                   <motion.div variants={cardItemVariants} className="mb-8">
                     <div className="relative w-18 h-18">
                       <Image
-                        src={step.imageUrl}
+                        src={resolveImageUrl(step.imageUrl)}
                         alt={step.alt}
                         fill
                         className="w-full h-full object-contain"

@@ -4,7 +4,7 @@ import { NewsletterSection } from "@/components/home/newsletter-section";
 import { Net30Form } from "@/components/net30/net30-form";
 
 export const metadata: Metadata = {
-  title: "Net 30 Terms | Modfirst Apparel",
+  title: "Net 30 Terms",
   description:
     "Apply for a Net 30 trade account with Modfirst Apparel — order now, pay in 30 days.",
 };

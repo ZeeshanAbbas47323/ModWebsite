@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { ShowcaseImage } from "@/lib/home-showcase-images";
+import { resolveImageUrl } from "@/lib/image-url";
 
 /**
  * The image half of the two home showcase sections.
@@ -23,7 +24,7 @@ export function ShowcaseMosaic({ images }: { images: ShowcaseImage[] }) {
             }`}
           >
             <Image
-              src={image.src}
+              src={resolveImageUrl(image.src)}
               alt={image.alt}
               fill
               className="object-cover"

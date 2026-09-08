@@ -7,7 +7,7 @@ import { CollectionCard } from "@/components/collections/collection-card";
 import { getCollections } from "@/services/product-category.server";
 
 export const metadata: Metadata = {
-  title: "Collections | Modfirst Apparel",
+  title: "Collections",
   description:
     "Browse Modfirst collections — DTF transfers, glitter DTF, blank apparel and printing supplies.",
 };

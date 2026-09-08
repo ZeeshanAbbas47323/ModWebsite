@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { motion, Variants } from "framer-motion";
+import { resolveImageUrl } from "@/lib/image-url";
 
 const headerVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -84,7 +85,7 @@ export function OurValues() {
               >
                 <div className="mb-8">
                   <div className="relative w-16 h-16 flex items-center justify-center bg-primary/10 rounded-2xl">
-                    <Image src={v.img_path} alt={v.title} width={32} height={32} />
+                    <Image src={resolveImageUrl(v.img_path)} alt={v.title} width={32} height={32} />
                   </div>
                 </div>
                 <h3 className="text-xl font-bold text-white mb-4">{v.title}</h3>

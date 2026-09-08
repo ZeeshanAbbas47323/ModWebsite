@@ -6,7 +6,7 @@ const PAGE_FILTERS = { content_type: "policy", slug: "shipping-policy" } as cons
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getContentPage(PAGE_FILTERS);
-  if (!page) return { title: "Shipping Policy | Modfirst Apparel" };
+  if (!page) return { title: "Shipping Policy" };
   return {
     title: page.meta_title || page.title,
     description: page.meta_desc,

@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useMenuTree } from "@/hooks/use-menus";
 import { useNavItems, type NavItem } from "@/lib/menu-nav";
 import { useWebsiteSettings } from "@/hooks/use-website-settings";
+import { resolveImageUrl } from "@/lib/image-url";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -145,7 +146,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                   aria-label={social.label}
                   className="transition-opacity hover:opacity-70"
                 >
-                  <Image src={social.icon} alt="" width={social.size} height={social.size} />
+                  <Image src={resolveImageUrl(social.icon)} alt="" width={social.size} height={social.size} />
                 </a>
               ))}
             </div>

@@ -6,6 +6,7 @@ import { ModfirstRevealFooter } from "../home/modfirst-reveal-footer";
 import { useFooterSections } from "@/hooks/use-footer-sections";
 import { useWebsiteSettings } from "@/hooks/use-website-settings";
 import type { FooterLink, FooterSection } from "@/services/footer-section.service";
+import { resolveImageUrl } from "@/lib/image-url";
 
 const ICON_MAP: Record<string, string> = {
   "fa-phone": "/images/icons/phone-2.svg",
@@ -69,7 +70,7 @@ function ContactLink({ link }: { link: FooterLink }) {
   const content = (
     <>
       {iconSrc ? (
-        <Image src={iconSrc} alt={link.name} width={24} height={24} />
+        <Image src={resolveImageUrl(iconSrc)} alt={link.name} width={24} height={24} />
       ) : null}
       <span className="text-white text-sm md:text-base leading-snug max-w-[300px]">
         {link.name}
@@ -208,7 +209,7 @@ export function Footer() {
                   >
                     <span className="sr-only">{social.name}</span>
                     <Image
-                      src={social.icon}
+                      src={resolveImageUrl(social.icon)}
                       alt={social.name}
                       width={social.size}
                       height={social.size}

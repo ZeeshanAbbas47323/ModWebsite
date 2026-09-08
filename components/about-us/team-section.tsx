@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { motion, Variants } from "framer-motion";
+import { resolveImageUrl } from "@/lib/image-url";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -49,7 +50,7 @@ export function TeamSection() {
             className="bg-[#F8F9FA] rounded-2xl p-6 flex flex-col items-center text-center"
           >
             <div className="relative w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden mb-5 ring-4 ring-primary/30">
-              <Image src={m.avatar} alt={m.name} fill className="object-cover" />
+              <Image src={resolveImageUrl(m.avatar)} alt={m.name} fill className="object-cover" />
             </div>
             <h3 className="text-lg md:text-xl font-bold text-black">{m.name}</h3>
             <p className="text-[#666] text-sm md:text-base mt-1">{m.role}</p>

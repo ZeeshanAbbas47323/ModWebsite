@@ -19,9 +19,9 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const collection = await getCollectionBySlug(slug);
-  if (!collection) return { title: "Collection | Modfirst Apparel" };
+  if (!collection) return { title: "Collection" };
   return {
-    title: `${collection.name} | Modfirst Apparel`,
+    title: `${collection.name}`,
     description: collection.description ?? undefined,
   };
 }

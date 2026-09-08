@@ -1,7 +1,7 @@
 import { BlogListing } from "@/components/blogs/blog-listing";
 
 export const metadata = {
-  title: "Blog | Modfirst Apparel",
+  title: "Blog",
   description: "Tips, guides, and inspiration for custom printing and apparel.",
 };
 

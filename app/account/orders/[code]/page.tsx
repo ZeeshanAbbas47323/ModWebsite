@@ -1,7 +1,7 @@
 import { use } from "react";
 import { OrderDetail } from "@/components/account/order-detail";
 
-export const metadata = { title: "Order details | Modfirst Apparel" };
+export const metadata = { title: "Order details" };
 
 export default function OrderDetailPage({
   params,

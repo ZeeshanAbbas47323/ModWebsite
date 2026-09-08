@@ -9,7 +9,7 @@ const PAGE_FILTERS = {
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getContentPage(PAGE_FILTERS);
-  if (!page) return { title: "DTF Artwork Guidelines | Modfirst Apparel" };
+  if (!page) return { title: "DTF Artwork Guidelines" };
   return {
     title: page.meta_title || page.title,
     description: page.meta_desc,

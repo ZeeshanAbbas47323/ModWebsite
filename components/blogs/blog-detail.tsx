@@ -9,6 +9,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import type { Blog } from "@/services/blog.service";
+import { resolveImageUrl } from "@/lib/image-url";
 
 export function BlogDetail({ blog }: { blog: Blog }) {
   const date = new Date(blog.published_at).toLocaleDateString("en-US", {
@@ -63,7 +64,7 @@ export function BlogDetail({ blog }: { blog: Blog }) {
       {blog.featured_image && (
         <div className="relative w-full aspect-video rounded-2xl overflow-hidden mb-10 bg-gray-100">
           <Image
-            src={blog.featured_image}
+            src={resolveImageUrl(blog.featured_image)}
             alt={blog.title}
             fill
             className="object-cover"

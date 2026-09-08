@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/contexts/cart-context';
 import type { CartLine } from '@/lib/cart-storage';
+import { resolveImageUrl } from "@/lib/image-url";
 
 interface CartItemProps {
   line: CartLine;
@@ -37,7 +38,7 @@ export const CartItem: React.FC<CartItemProps> = ({ line }) => {
       {/* Product Image */}
       <div className="relative w-20 h-20 sm:w-24 sm:h-24 shrink-0 rounded-xl overflow-hidden bg-white">
         <Image
-          src={line.image}
+          src={resolveImageUrl(line.image)}
           alt={line.name}
           fill
           className="object-contain p-2"

@@ -5,6 +5,7 @@ import { ShowcaseMosaic } from "@/components/home/showcase-mosaic";
 import { WHY_MODFIRST_IMAGES } from "@/lib/home-showcase-images";
 import { useHomeSection } from "@/hooks/use-home-section";
 import { mapHomeWhyModfirst } from "@/lib/map-home-why-modfirst";
+import { resolveImageUrl } from "@/lib/image-url";
 
 export const WhyModfirst = () => {
   const { data: section, isLoading } = useHomeSection("home_why_modfirst");
@@ -38,7 +39,7 @@ export const WhyModfirst = () => {
       {why.backgroundImage ? (
         <div className="absolute left-[-5%] md:left-0 top-1/2 -translate-y-1/2 -z-10 w-[250px] md:w-[450px] h-[120%] opacity-90 pointer-events-none">
           <Image
-            src={why.backgroundImage}
+            src={resolveImageUrl(why.backgroundImage)}
             alt="Background Element"
             fill
             className="object-contain object-left"

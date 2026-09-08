@@ -1,6 +1,6 @@
 import { CheckoutWrapper } from "@/components/checkout/checkout-wrapper";
 
-export const metadata = { title: "Checkout | Modfirst Apparel" };
+export const metadata = { title: "Checkout" };
 
 export default function CheckoutPage() {
   return (

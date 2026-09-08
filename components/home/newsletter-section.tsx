@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion, Variants } from "framer-motion";
 import { useHomeSection } from "@/hooks/use-home-section";
 import { mapHomeNewsletter } from "@/lib/map-home-newsletter";
+import { resolveImageUrl } from "@/lib/image-url";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -130,7 +131,7 @@ export function NewsletterSection() {
             aria-label="Subscribe"
           >
             <Image
-              src={newsletter.submitIconUrl}
+              src={resolveImageUrl(newsletter.submitIconUrl)}
               alt="Send"
               width={24}
               height={24}

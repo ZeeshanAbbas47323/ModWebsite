@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { motion, Variants } from "framer-motion";
+import { resolveImageUrl } from "@/lib/image-url";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -55,7 +56,7 @@ export function ContactInfo() {
             className="bg-[#F8F9FA] rounded-2xl p-8 flex flex-col items-start hover:shadow-md transition-shadow"
           >
             <div className="mb-6 w-14 h-14 rounded-2xl bg-primary/20 flex items-center justify-center">
-              <Image src={c.icon} alt={c.title} width={26} height={26} />
+              <Image src={resolveImageUrl(c.icon)} alt={c.title} width={26} height={26} />
             </div>
             <h3 className="text-xl font-bold text-black mb-2">{c.title}</h3>
             <p className="text-black text-base md:text-lg font-medium">{c.detail}</p>

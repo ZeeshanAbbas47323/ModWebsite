@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/carousel";
 import { useHomeSection } from "@/hooks/use-home-section";
 import { mapHomeCustomerFeedback } from "@/lib/map-home-customer-feedback";
+import { resolveImageUrl } from "@/lib/image-url";
 
 export function CustomerFeedback() {
   const { data: section, isLoading } = useHomeSection("home_customer_feedback");
@@ -53,7 +54,7 @@ export function CustomerFeedback() {
               >
                 {platform.iconUrl ? (
                   <Image
-                    src={platform.iconUrl}
+                    src={resolveImageUrl(platform.iconUrl)}
                     alt={platform.platform || "Rating"}
                     width={24}
                     height={24}
@@ -108,7 +109,7 @@ export function CustomerFeedback() {
                     {item.avatar ? (
                       <div className="w-14 h-14 relative rounded-full overflow-hidden shrink-0">
                         <Image
-                          src={item.avatar}
+                          src={resolveImageUrl(item.avatar)}
                           alt={item.alt}
                           fill
                           className="object-cover"

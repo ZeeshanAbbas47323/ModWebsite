@@ -6,6 +6,7 @@ import React, { useState } from 'react'
 import type { Product } from '@/services/product.service';
 import { useCart } from '@/contexts/cart-context';
 import { WishlistButton } from '@/components/wishlist/wishlist-button';
+import { resolveImageUrl } from "@/lib/image-url";
 
 export interface ProductCardData {
     id?: number;
@@ -61,7 +62,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ data }) => {
                     />
                 )}
                 <Image
-                    src={data.img_path}
+                    src={resolveImageUrl(data.img_path)}
                     alt={data.title}
                     width={300}
                     height={300}

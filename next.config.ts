@@ -28,6 +28,12 @@ const nextConfig: NextConfig = {
         hostname: "storage.modfirst.com",
       },
       {
+        // Most product and variant images are still stored as absolute
+        // Shopify URLs in the database and are served straight from there.
+        protocol: "https",
+        hostname: "cdn.shopify.com",
+      },
+      {
         // Older CMS media bucket, still holding some files.
         protocol: "https",
         hostname: "*.r2.dev",

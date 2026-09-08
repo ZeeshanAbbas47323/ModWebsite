@@ -25,6 +25,7 @@ import {
 } from "@/services/payment.service";
 import type { CreateAddressInput } from "@/services/address.service";
 import { omitEmpty } from "@/lib/utils";
+import { resolveImageUrl } from "@/lib/image-url";
 
 const NEW_ADDRESS = "new";
 
@@ -488,7 +489,7 @@ export function CheckoutWrapper() {
                   }`}
                 >
                   {option.icon && (
-                    <Image src={option.icon} alt="" width={44} height={16} className="object-contain" />
+                    <Image src={resolveImageUrl(option.icon)} alt="" width={44} height={16} className="object-contain" />
                   )}
                   <span className="text-sm text-center leading-tight">{option.label}</span>
                 </button>
@@ -555,7 +556,7 @@ export function CheckoutWrapper() {
                 <div key={line.key} className="flex items-center gap-3">
                   <div className="relative w-12 h-12 rounded-lg bg-white overflow-hidden shrink-0">
                     <Image
-                      src={line.image}
+                      src={resolveImageUrl(line.image)}
                       alt={line.name}
                       fill
                       className="object-contain p-1"

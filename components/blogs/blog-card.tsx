@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import type { Blog } from "@/services/blog.service";
+import { resolveImageUrl } from "@/lib/image-url";
 
 export function BlogCard({ blog }: { blog: Blog }) {
   const date = new Date(blog.published_at).toLocaleDateString("en-US", {
@@ -15,7 +16,7 @@ export function BlogCard({ blog }: { blog: Blog }) {
       <div className="relative w-full aspect-[1.4] rounded-2xl overflow-hidden mb-5 bg-gray-100">
         {blog.featured_image ? (
           <Image
-            src={blog.featured_image}
+            src={resolveImageUrl(blog.featured_image)}
             alt={blog.title}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"

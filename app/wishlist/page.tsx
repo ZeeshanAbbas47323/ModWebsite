@@ -1,6 +1,6 @@
 import { WishlistPage } from "@/components/wishlist/wishlist-page";
 
-export const metadata = { title: "Wishlist | Modfirst Apparel" };
+export const metadata = { title: "Wishlist" };
 
 export default function Page() {
   return (

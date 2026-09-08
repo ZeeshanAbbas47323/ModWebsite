@@ -7,6 +7,7 @@ import {
   mapHomePromoBanners,
   type PromoCardViewModel,
 } from "@/lib/map-home-promo-banners";
+import { resolveImageUrl } from "@/lib/image-url";
 
 const cardContainer: Variants = {
   hidden: { opacity: 0 },
@@ -98,7 +99,7 @@ function LeftPromoCard({ card }: { card: PromoCardViewModel }) {
         <div className="absolute right-0 top-0 bottom-0 flex items-center justify-center pointer-events-none">
           <motion.div variants={imageItem}>
             <Image
-              src={card.imageUrl}
+              src={resolveImageUrl(card.imageUrl)}
               alt={card.alt}
               width={350}
               height={350}
@@ -163,7 +164,7 @@ function RightPromoCard({ card }: { card: PromoCardViewModel }) {
         <div className="absolute right-0 top-20 bottom-0 flex items-center justify-end pointer-events-none">
           <motion.div variants={imageItem}>
             <Image
-              src={card.imageUrl}
+              src={resolveImageUrl(card.imageUrl)}
               alt={card.alt}
               width={550}
               height={550}

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-export const metadata = { title: "Payment cancelled | Modfirst Apparel" };
+export const metadata = { title: "Payment cancelled" };
 
 export default async function PaymentCancelPage({
   searchParams,

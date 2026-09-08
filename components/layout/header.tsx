@@ -11,6 +11,7 @@ import { useWebsiteSettings } from "@/hooks/use-website-settings";
 import { useCart } from "@/contexts/cart-context";
 import { useWishlist } from "@/contexts/wishlist-context";
 import { useAuth } from "@/contexts/auth-context";
+import { resolveImageUrl } from "@/lib/image-url";
 
 export function Header() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -39,7 +40,7 @@ export function Header() {
             <div className="relative w-32 h-8 lg:w-48 lg:h-11">
               <Link href="/">
                 <Image
-                  src={logoUrl}
+                  src={resolveImageUrl(logoUrl)}
                   alt={settings?.site_name ?? "Modfirst Logo"}
                   fill
                   className="object-contain object-left"

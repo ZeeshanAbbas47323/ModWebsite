@@ -5,6 +5,7 @@ import { ShowcaseMosaic } from "@/components/home/showcase-mosaic";
 import { FAST_PRODUCTION_IMAGES } from "@/lib/home-showcase-images";
 import { useHomeSection } from "@/hooks/use-home-section";
 import { mapHomeFastProduction } from "@/lib/map-home-fast-production";
+import { resolveImageUrl } from "@/lib/image-url";
 
 export const FastProduction = () => {
   const { data: section, isLoading } = useHomeSection("home_fast_production");
@@ -37,7 +38,7 @@ export const FastProduction = () => {
       {data.backgroundImage ? (
         <div className="absolute right-[-5%] md:right-0 top-1/2 -translate-y-1/2 -z-10 w-[250px] md:w-[500px] h-[120%] opacity-90 pointer-events-none">
           <Image
-            src={data.backgroundImage}
+            src={resolveImageUrl(data.backgroundImage)}
             alt="Background Element"
             fill
             className="object-contain object-right"

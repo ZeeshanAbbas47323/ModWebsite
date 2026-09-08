@@ -1,6 +1,6 @@
 import { AccountPanel } from "@/components/auth/account-panel";
 
-export const metadata = { title: "My Account | Modfirst Apparel" };
+export const metadata = { title: "My Account" };
 
 export default function AccountPage() {
   return (

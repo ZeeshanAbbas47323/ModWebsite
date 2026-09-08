@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { OrderConfirmation } from "@/components/checkout/order-confirmation";
 
-export const metadata = { title: "Order confirmed | Modfirst Apparel" };
+export const metadata = { title: "Order confirmed" };
 
 export default function PaymentSuccessPage() {
   return (

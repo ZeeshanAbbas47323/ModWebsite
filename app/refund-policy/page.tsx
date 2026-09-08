@@ -6,7 +6,7 @@ const PAGE_FILTERS = { content_type: "policy", slug: "refund-policy" } as const;
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getContentPage(PAGE_FILTERS);
-  if (!page) return { title: "Refund Policy | Modfirst Apparel" };
+  if (!page) return { title: "Refund Policy" };
   return {
     title: page.meta_title || page.title,
     description: page.meta_desc,

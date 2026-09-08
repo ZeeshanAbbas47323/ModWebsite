@@ -13,7 +13,13 @@ export const MEDIA_BASE_URL = (process.env.NEXT_PUBLIC_MEDIA_BASE_URL ?? "").rep
 
 // Domains to rewrite (if they become inaccessible)
 // storage.modfirstapparel.com is a defunct domain — rewrite its paths instead.
-const DEAD_DOMAINS: string[] = ["storage.modfirstapparel.com"];
+export const DEAD_DOMAINS: string[] = ["storage.modfirstapparel.com"];
+
+/** True if `url` points at a host that is known not to resolve any more. */
+export function isDeadDomain(url: string | null | undefined): boolean {
+  if (!url) return false;
+  return DEAD_DOMAINS.some((d) => url.includes(d));
+}
 
 /**
  * Media served through this site, which resolves whichever host actually holds
@@ -47,6 +53,14 @@ export function resolveImageUrl(url: string | null | undefined, fallback = ""): 
     return url;
   }
 
-  // Relative path from the API, e.g. /uploads/products/foo.jpg
+  // Stored paths point at the upload CDN. Going straight there skips a proxy
+  // hop per image and lets next/image optimise the result; the /api/media
+  // fallback stays for deployments with no CDN configured, where the file
+  // could still be on the API origin.
+  if (IMAGE_BASE_URL) {
+    const key = url.replace(/^\/+/, "").replace(/^(uploads?\/)+/, "");
+    return `${IMAGE_BASE_URL}/${key}`;
+  }
+
   return mediaUrl(url);
 }

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useWishlist } from "@/contexts/wishlist-context";
 import { useCart } from "@/contexts/cart-context";
 import type { WishlistLine } from "@/lib/wishlist-storage";
+import { resolveImageUrl } from "@/lib/image-url";
 
 function Row({ line }: { line: WishlistLine }) {
   const { remove } = useWishlist();
@@ -29,7 +30,7 @@ function Row({ line }: { line: WishlistLine }) {
     <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 bg-[#F4F4F5] p-4 rounded-[20px]">
       <div className="relative w-20 h-20 shrink-0 rounded-xl overflow-hidden bg-white">
         <Image
-          src={line.image}
+          src={resolveImageUrl(line.image)}
           alt={line.name}
           fill
           className="object-contain p-2"
