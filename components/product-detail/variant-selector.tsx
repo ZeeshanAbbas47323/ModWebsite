@@ -72,6 +72,23 @@ export function VariantSelector({
   const hasColors = colors.length > 0;
   const hasSizes = sizes.length > 0;
 
+  // Some products (Foamboard/Posterboard, imported from Shopify) encode
+  // several real option axes as one composite Size name — e.g.
+  // "Foam Board (Indoors) / 12×12 / 3/16"" is really Board Type / Size /
+  // Thickness. There's no separate column for that in this schema, so
+  // without this every one of the 50+ combinations rendered as one giant
+  // flat, mostly-crossed-out row instead of the tiered picker the
+  // reference site actually has. Detected generically: no colour axis, and
+  // every size name splits into the same number (2+) of " / "-separated
+  // parts.
+  const compositeParts = useMemo(() => {
+    if (hasColors || !hasSizes) return null;
+    const parts = sizes.map((s) => s.name.split(" / ").map((p) => p.trim()));
+    const partsCount = parts[0]?.length ?? 0;
+    if (partsCount < 2 || !parts.every((p) => p.length === partsCount)) return null;
+    return parts;
+  }, [hasColors, hasSizes, sizes]);
+
   // A single option on an axis is not a choice — pre-select it.
   const colorId = colorIdInput ?? (colors.length === 1 ? colors[0].id : null);
   const sizeId = sizeIdInput ?? (sizes.length === 1 ? sizes[0].id : null);
@@ -148,6 +165,19 @@ export function VariantSelector({
 
   if (variants.length === 0) return null;
   if (autoSelect) return null;
+
+  if (compositeParts) {
+    return (
+      <CompositeSizeSelector
+        sizes={sizes}
+        parts={compositeParts}
+        variants={variants}
+        selected={selected}
+        onSelect={onSelect}
+        isAvailable={isAvailable}
+      />
+    );
+  }
 
   // Variants that carry neither colour nor size are listed by SKU instead.
   if (!hasColors && !hasSizes) {
@@ -292,6 +322,139 @@ export function VariantSelector({
         <p className="text-sm font-medium text-orange-600">
           Only {stock} left in stock
         </p>
+      )}
+      {selected && stock === 0 && (
+        <p className="text-sm font-medium text-red-600">This combination is out of stock</p>
+      )}
+    </div>
+  );
+}
+
+/** Friendly labels for the common 2-3 axis composite-size cases. */
+function axisLabel(index: number, count: number): string {
+  if (count === 3) return ["Board Type", "Size", "Thickness"][index];
+  if (count === 2) return ["Type", "Size"][index];
+  return `Option ${index + 1}`;
+}
+
+interface CompositeSizeSelectorProps {
+  sizes: { id: number; name: string; display_name?: string }[];
+  /** parts[i] is sizes[i].name.split(" / ") — same index, already trimmed. */
+  parts: string[][];
+  variants: ProductVariant[];
+  selected: ProductVariant | null;
+  onSelect: (variant: ProductVariant | null) => void;
+  isAvailable: (variant: ProductVariant) => boolean;
+}
+
+/**
+ * A tiered picker for products whose "Size" is really several option axes
+ * squashed into one composite string (Board Type / Size / Thickness, etc.)
+ * — see the comment where this is detected in VariantSelector above.
+ */
+function CompositeSizeSelector({
+  sizes,
+  parts,
+  variants,
+  selected,
+  onSelect,
+  isAvailable,
+}: CompositeSizeSelectorProps) {
+  const axisCount = parts[0]?.length ?? 0;
+
+  const axisValues = useMemo(
+    () =>
+      Array.from({ length: axisCount }, (_, axis) => {
+        const seen = new Set<string>();
+        const values: string[] = [];
+        for (const p of parts) {
+          if (!seen.has(p[axis])) {
+            seen.add(p[axis]);
+            values.push(p[axis]);
+          }
+        }
+        return values;
+      }),
+    [parts, axisCount]
+  );
+
+  // One selection per axis; null = not chosen yet. Pre-select an axis that
+  // only has one possible value, same rule the colour/size axes use.
+  const [chosen, setChosen] = useState<(string | null)[]>(() =>
+    axisValues.map((values) => (values.length === 1 ? values[0] : null))
+  );
+
+  const variantForParts = (candidate: (string | null)[]) => {
+    if (candidate.some((v) => v === null)) return null;
+    const index = sizes.findIndex((_, i) => parts[i].every((seg, axis) => seg === candidate[axis]));
+    if (index === -1) return null;
+    const sizeId = sizes[index].id;
+    return variants.find((v) => v.size?.id === sizeId) ?? null;
+  };
+
+  useEffect(() => {
+    onSelect(variantForParts(chosen));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chosen.join("|")]);
+
+  /** Is there any variant with this axis value that's consistent with what's
+   *  already chosen on the other axes (unconstrained axes match anything)? */
+  const valueAvailable = (axis: number, value: string) =>
+    parts.some(
+      (p, i) =>
+        p[axis] === value &&
+        chosen.every((c, j) => j === axis || c === null || p[j] === c) &&
+        isAvailable(variants.find((v) => v.size?.id === sizes[i].id) as ProductVariant)
+    );
+
+  const setAxis = (axis: number, value: string) => {
+    setChosen((prev) => {
+      const next = [...prev];
+      next[axis] = prev[axis] === value ? null : value;
+      return next;
+    });
+  };
+
+  const selectedVariant = variantForParts(chosen);
+  const stock = selectedVariant ? variantStock(selectedVariant) : 0;
+
+  return (
+    <div className="flex flex-col gap-6 mb-6">
+      {axisValues.map((values, axis) => (
+        <div key={axis}>
+          <p className="text-sm text-black mb-3">
+            <span className="font-bold">{axisLabel(axis, axisCount)}</span>
+            {chosen[axis] && <span className="text-gray-600">: {chosen[axis]}</span>}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {values.map((value) => {
+              const available = valueAvailable(axis, value);
+              const active = chosen[axis] === value;
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  aria-pressed={active}
+                  disabled={!available}
+                  onClick={() => setAxis(axis, value)}
+                  className={cn(
+                    "h-11 px-3 rounded-xl border text-sm font-bold transition-colors",
+                    active
+                      ? "bg-black text-white border-black"
+                      : "bg-white text-black border-gray-300 hover:border-black",
+                    !available && "opacity-40 cursor-not-allowed line-through"
+                  )}
+                >
+                  {value}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+
+      {selected && stock > 0 && stock <= 10 && (
+        <p className="text-sm font-medium text-orange-600">Only {stock} left in stock</p>
       )}
       {selected && stock === 0 && (
         <p className="text-sm font-medium text-red-600">This combination is out of stock</p>

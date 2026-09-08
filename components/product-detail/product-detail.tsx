@@ -11,7 +11,7 @@ import {
     Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
 import {
-    Carousel, CarouselContent, CarouselItem, type CarouselApi,
+    Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi,
 } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
 import { useProductImages, useProductDescriptions, useProductFaqs, useProductVariants, useIncreaseView, useProduct } from '@/hooks/use-products';
@@ -345,6 +345,13 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                                     </CarouselItem>
                                 ))}
                             </CarouselContent>
+
+                            {galleryImages.length > 1 && (
+                                <>
+                                    <CarouselPrevious className="left-3 lg:left-4 bg-white/90 hover:bg-white border-white h-9 w-9 lg:h-10 lg:w-10 shadow-md" />
+                                    <CarouselNext className="right-3 lg:right-4 bg-white/90 hover:bg-white border-white h-9 w-9 lg:h-10 lg:w-10 shadow-md" />
+                                </>
+                            )}
                         </Carousel>
                     </div>
                 </div>
