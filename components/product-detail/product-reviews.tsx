@@ -1,19 +1,26 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { Loader2, Play, Plus, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { resolveImageUrl } from "@/lib/image-url";
+import { ACCEPTED_IMAGE_TYPES, ACCEPTED_VIDEO_TYPES, uploadService } from "@/services/upload.service";
 import { useAuth } from "@/contexts/auth-context";
 import {
   useCreateReview,
   useMarkReviewHelpful,
   useReviews,
 } from "@/hooks/use-reviews";
+
+/** Where review photos/videos are filed on the media CDN. */
+const REVIEW_UPLOAD_FOLDER = "reviews";
+const MAX_REVIEW_IMAGES = 5;
 
 function Stars({
   rating,
@@ -90,11 +97,46 @@ export function ProductReviews({ productId }: { productId: number }) {
   const [formOpen, setFormOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Uploaded immediately on pick — createReview only ever sends the resulting
+  // URLs, same as artwork upload elsewhere in the storefront.
+  const [images, setImages] = useState<string[]>([]);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+
   const reviews = data?.data ?? [];
   const summary = data?.summary;
   const total = summary?.total_reviews ?? 0;
   const average = summary?.average_rating ?? 0;
   const distribution = summary?.rating_distribution ?? {};
+
+  const addImage = async (file: File) => {
+    setError(null);
+    setUploadingImage(true);
+    try {
+      const uploaded = await uploadService.toStorage(file, REVIEW_UPLOAD_FOLDER, "image");
+      setImages((prev) => [...prev, uploaded.url]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Couldn't upload that photo.");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const addVideo = async (file: File) => {
+    setError(null);
+    setUploadingVideo(true);
+    try {
+      const uploaded = await uploadService.toStorage(file, REVIEW_UPLOAD_FOLDER, "video");
+      setVideoUrl(uploaded.url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Couldn't upload that video.");
+    } finally {
+      setUploadingVideo(false);
+    }
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,10 +151,14 @@ export function ProductReviews({ productId }: { productId: number }) {
         rating,
         title: title.trim() || undefined,
         comment: comment.trim() || undefined,
+        images: images.length ? images : undefined,
+        video_url: videoUrl ?? undefined,
       });
       setRating(0);
       setTitle("");
       setComment("");
+      setImages([]);
+      setVideoUrl(null);
       setFormOpen(false);
     } catch (err) {
       setError(
@@ -209,10 +255,90 @@ export function ProductReviews({ productId }: { productId: number }) {
                   />
                 </div>
 
+                <div className="space-y-2">
+                  <Label>Photos (optional)</Label>
+                  <div className="flex flex-wrap gap-3">
+                    {images.map((url, i) => (
+                      <div key={url} className="relative size-16 shrink-0 overflow-hidden rounded-lg border border-gray-200">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={resolveImageUrl(url)} alt="" className="size-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => setImages((prev) => prev.filter((_, idx) => idx !== i))}
+                          aria-label="Remove photo"
+                          className="absolute top-0.5 right-0.5 flex size-4 items-center justify-center rounded-full bg-black/60 text-white"
+                        >
+                          <X className="size-2.5" />
+                        </button>
+                      </div>
+                    ))}
+                    {images.length < MAX_REVIEW_IMAGES && (
+                      <button
+                        type="button"
+                        onClick={() => imageInputRef.current?.click()}
+                        disabled={uploadingImage}
+                        className="flex size-16 shrink-0 items-center justify-center rounded-lg border border-dashed border-gray-300 text-gray-400 hover:border-black hover:text-black disabled:opacity-50"
+                      >
+                        {uploadingImage ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-5" />}
+                      </button>
+                    )}
+                  </div>
+                  <input
+                    ref={imageInputRef}
+                    type="file"
+                    accept={ACCEPTED_IMAGE_TYPES}
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      e.target.value = "";
+                      if (file) addImage(file);
+                    }}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Video (optional)</Label>
+                  {videoUrl ? (
+                    <div className="flex items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-sm">
+                      <Play className="size-4 shrink-0 text-gray-500" />
+                      <span className="flex-1 truncate text-gray-600">Video attached</span>
+                      <button
+                        type="button"
+                        onClick={() => setVideoUrl(null)}
+                        aria-label="Remove video"
+                        className="text-gray-400 hover:text-black"
+                      >
+                        <X className="size-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => videoInputRef.current?.click()}
+                      disabled={uploadingVideo}
+                      className="flex items-center gap-2 rounded-md border border-dashed border-gray-300 px-3 py-2 text-sm text-gray-500 hover:border-black hover:text-black disabled:opacity-50"
+                    >
+                      {uploadingVideo ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />}
+                      {uploadingVideo ? "Uploading…" : "Add a video"}
+                    </button>
+                  )}
+                  <input
+                    ref={videoInputRef}
+                    type="file"
+                    accept={ACCEPTED_VIDEO_TYPES}
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      e.target.value = "";
+                      if (file) addVideo(file);
+                    }}
+                  />
+                </div>
+
                 {error && <p className="text-sm text-red-600">{error}</p>}
 
                 <div className="flex gap-2">
-                  <Button type="submit" disabled={createReview.isPending}>
+                  <Button type="submit" disabled={createReview.isPending || uploadingImage || uploadingVideo}>
                     {createReview.isPending ? "Posting…" : "Post review"}
                   </Button>
                   <Button
@@ -261,6 +387,33 @@ export function ProductReviews({ productId }: { productId: number }) {
                     <p className="mt-1 text-sm text-gray-600">
                       {review.comment}
                     </p>
+                  )}
+
+                  {((review.images?.length ?? 0) > 0 || review.video_url) && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {review.images?.map((url) => (
+                        <a
+                          key={url}
+                          href={resolveImageUrl(url)}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="block size-16 shrink-0 overflow-hidden rounded-lg border border-gray-200"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={resolveImageUrl(url)} alt="" className="size-full object-cover" />
+                        </a>
+                      ))}
+                      {review.video_url && (
+                        <a
+                          href={resolveImageUrl(review.video_url)}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex size-16 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-gray-500 hover:text-black"
+                        >
+                          <Play className="size-5" />
+                        </a>
+                      )}
+                    </div>
                   )}
 
                   {isAuthenticated && (

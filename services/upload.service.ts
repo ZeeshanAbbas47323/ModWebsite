@@ -25,6 +25,9 @@ export interface StoredUpload {
 /** Folder the upload endpoint files product artwork under. */
 export const PRODUCT_UPLOAD_FOLDER = "product";
 
+/** What the upstream video endpoint accepts. */
+export const ACCEPTED_VIDEO_TYPES = "video/mp4,video/quicktime,video/webm";
+
 export const uploadService = {
   /**
    * Upload artwork for a product. This goes to the ModFirst upload endpoint,
@@ -33,14 +36,15 @@ export const uploadService = {
    */
   toStorage: async (
     file: File,
-    folder: string = PRODUCT_UPLOAD_FOLDER
+    folder: string = PRODUCT_UPLOAD_FOLDER,
+    kind: "image" | "video" = "image"
   ): Promise<StoredUpload> => {
     const form = new FormData();
     form.append("file", file);
-    const res = await fetch(`/api/upload?folder=${encodeURIComponent(folder)}`, {
-      method: "POST",
-      body: form,
-    });
+    const res = await fetch(
+      `/api/upload?folder=${encodeURIComponent(folder)}&type=${kind}`,
+      { method: "POST", body: form }
+    );
     const data = await res.json().catch(() => ({}));
     const payload: Partial<UploadedFile> = data?.payload ?? data?.data ?? {};
     if (!res.ok || !data?.success || !payload.absolute_url) {
