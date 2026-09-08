@@ -62,13 +62,13 @@ export function getMenuHref(node: MenuNode): string | undefined {
   }
 
   if (node.link_type === "product" && node.target_product_id) {
-    // Prefer the real, SEO-friendly /products/<slug> page — it also has the
-    // "You may also like" rail and page metadata that /product-detail?id=
-    // (a legacy client-only fallback) does not. The menu's own slug is set
-    // to the product's slug for every product-type link (see DB-FIXES.sql);
-    // fall back to the id-based route only for a menu row that predates that.
-    const slug = clean(node.slug);
-    if (slug && !slug.startsWith("/") && !/\s/.test(slug)) return `/products/${slug}`;
+    // Route through /product-detail?id=, which now redirects server-side to
+    // the real /products/<slug> before anything renders — so the address
+    // bar never actually shows ?id=, but this never depends on the menu's
+    // own `slug` column matching the product's real slug. It can't: Menu.slug
+    // is capped at 100 chars and some real product slugs run past that (the
+    // stored value gets silently truncated), which 404'd every one of them
+    // when this used to build /products/<menu.slug> directly.
     return `/product-detail?id=${node.target_product_id}`;
   }
   if (node.link_type === "page" && node.target_page_id) return `/pages/${clean(node.slug)}`;

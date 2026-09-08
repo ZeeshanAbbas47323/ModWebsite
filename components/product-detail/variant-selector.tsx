@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import {
   isVariantAvailable,
@@ -134,7 +134,20 @@ export function VariantSelector({
     commit(keepColor ? colorId : null, sId);
   };
 
+  // A single variant with no colour/size is not a choice at all — e.g. a
+  // one-off service (Rush Order, Resend Artwork) that only has one SKU.
+  // Rendering an "Options" heading over one unlabeled/blank button forced a
+  // click on a no-op before the item could be added to cart. Auto-select it
+  // and show nothing instead.
+  const onlyVariant = variants.length === 1 ? variants[0] : null;
+  const autoSelect = !hasColors && !hasSizes && !!onlyVariant;
+  useEffect(() => {
+    if (autoSelect && selected?.id !== onlyVariant!.id) onSelect(onlyVariant);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoSelect, onlyVariant?.id]);
+
   if (variants.length === 0) return null;
+  if (autoSelect) return null;
 
   // Variants that carry neither colour nor size are listed by SKU instead.
   if (!hasColors && !hasSizes) {
