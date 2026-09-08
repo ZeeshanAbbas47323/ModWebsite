@@ -18,6 +18,10 @@ const nextConfig: NextConfig = {
       { source: "/collections/:category/products/:slug", destination: "/products/:slug", permanent: true },
       { source: "/collections", destination: "/categories", permanent: true },
       { source: "/collections/:slug*", destination: "/categories/:slug*", permanent: true },
+      // /dtf-supplies used to be a standalone page with 4 hardcoded fake
+      // products (fake prices, no links, no real data at all). It's now a
+      // real ProductCategory — redirect the old URL to it.
+      { source: "/dtf-supplies", destination: "/categories/dtf-supplies", permanent: true },
     ];
   },
   // A lockfile in the parent directory makes Next infer the wrong workspace
@@ -45,6 +49,13 @@ const nextConfig: NextConfig = {
         // Shopify URLs in the database and are served straight from there.
         protocol: "https",
         hostname: "cdn.shopify.com",
+      },
+      {
+        // Blog post images, migrated from the business's own previous
+        // Shopify site — hotlinked the same way product images already are
+        // from cdn.shopify.com, rather than re-uploading 70+ images.
+        protocol: "https",
+        hostname: "www.modfirst.com",
       },
       {
         // Older CMS media bucket, still holding some files.

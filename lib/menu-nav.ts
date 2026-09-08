@@ -38,21 +38,7 @@ export function pathFromSlug(slug: string | null | undefined): string | undefine
 const STATIC_PAGE_SLUGS: Record<string, string> = {
   "contact us": "/contact-us",
   "net 30": "/net-30",
-  "dtf supplies": "/dtf-supplies",
-};
-
-/**
- * A few more "category" menu items name a group of products (T-Shirts,
- * Hoodies) with no real ProductCategory behind them — checked directly
- * against the database, there simply is no such category. Rather than
- * invent one, these route to a real-data-driven search listing
- * (/products?q=<name>, backed by the same search endpoint used elsewhere)
- * instead of a dead /categories/<slug> page.
- */
-const SEARCH_LISTING_SLUGS: Record<string, string> = {
-  "t-shirts": "T-Shirts",
-  "hoodies": "Hoodies",
-  "hat-heat-press": "Heat Press",
+  "embroidery-services": "/embroidery-services",
 };
 
 export function getMenuHref(node: MenuNode): string | undefined {
@@ -62,9 +48,6 @@ export function getMenuHref(node: MenuNode): string | undefined {
     const cleanedSlug = clean(node.slug).toLowerCase();
     const staticPage = STATIC_PAGE_SLUGS[cleanedSlug];
     if (staticPage) return staticPage;
-
-    const searchQuery = SEARCH_LISTING_SLUGS[cleanedSlug];
-    if (searchQuery) return `/products?q=${encodeURIComponent(searchQuery)}`;
 
     // `target_category_id` points at a legacy `Category` table with no
     // relation to the real catalog (`ProductCategory`, which
@@ -104,16 +87,25 @@ export interface NavItem {
   children?: NavItem[];
 }
 
+/**
+ * Menu names hidden from the storefront nav without touching the CMS data —
+ * a quick client-side hide when a menu item needs to come down but nobody
+ * wants a DB write to do it. Matched case-insensitively.
+ */
+const HIDDEN_MENU_NAMES = new Set(["rush order"]);
+
 export function mapMenuNodes(nodes: MenuNode[]): NavItem[] {
-  return nodes.map((n) => ({
-    id: n.id,
-    label: clean(n.name),
-    // A node with children opens the next level instead of navigating, so only
-    // leaves ever get a link.
-    href: n.children?.length ? undefined : getMenuHref(n),
-    openInNewTab: n.open_in_new_tab,
-    children: n.children?.length ? mapMenuNodes(n.children) : undefined,
-  }));
+  return nodes
+    .filter((n) => !HIDDEN_MENU_NAMES.has(clean(n.name).toLowerCase()))
+    .map((n) => ({
+      id: n.id,
+      label: clean(n.name),
+      // A node with children opens the next level instead of navigating, so only
+      // leaves ever get a link.
+      href: n.children?.length ? undefined : getMenuHref(n),
+      openInNewTab: n.open_in_new_tab,
+      children: n.children?.length ? mapMenuNodes(n.children) : undefined,
+    }));
 }
 
 /** Shipped menu, used until the CMS tree arrives (and if it comes back empty). */

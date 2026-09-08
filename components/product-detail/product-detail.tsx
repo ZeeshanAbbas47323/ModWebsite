@@ -312,7 +312,7 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
                 <div className="lg:col-span-7 min-w-0 flex flex-col lg:flex-row gap-4">
-                    <div className="order-2 lg:order-1 lg:w-[100px] shrink-0 flex flex-row lg:flex-col gap-4 overflow-x-auto lg:overflow-visible no-scrollbar">
+                    <div className="order-2 lg:order-1 lg:w-[100px] shrink-0 flex flex-row lg:flex-col gap-4 overflow-x-auto lg:overflow-x-visible lg:overflow-y-auto lg:h-[600px] lg:pr-1">
                         {galleryImages.map((img, index) => (
                             <button
                                 key={index}

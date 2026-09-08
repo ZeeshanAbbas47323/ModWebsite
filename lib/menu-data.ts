@@ -5,6 +5,13 @@ export type MenuItem = {
   children?: MenuItem[];
 };
 
+/**
+ * Fallback nav, used only if the CMS menu tree fetch fails or comes back
+ * empty (see useNavItems in lib/menu-nav.ts) — so it should never be a
+ * visitor's actual experience, but every href here still needs to go
+ * somewhere real rather than "#" in case it ever is. Matches the same
+ * real routes the CMS menu rows were corrected to point at.
+ */
 export const menuData: MenuItem[] = [
   {
     id: "dtf-transfer",
@@ -17,17 +24,17 @@ export const menuData: MenuItem[] = [
           {
             id: "create-own-gang-sheets",
             label: "Create Your Own Gang Sheets Online",
-            href: "#",
+            href: "/products/build-your-dtf-gang-sheets-online",
           },
           {
             id: "upload-own-gang-sheets",
             label: "Upload Your Own DTF Custom Ganged Sheets",
-            href: "#",
+            href: "/products/upload-your-ready-to-print-dtf-transfers",
           },
           {
             id: "transfers-by-size",
             label: "DTF Transfers - Transfers By Size",
-            href: "#",
+            href: "/products/dtf-transfers-transfers-by-size",
           },
         ],
       },
@@ -35,28 +42,28 @@ export const menuData: MenuItem[] = [
         id: "uv-dtf-transfer",
         label: "UV DTF Transfer",
         children: [
-          { id: "uv-dtf-1", label: "Custom UV DTF Gang Sheets", href: "#" },
+          { id: "uv-dtf-1", label: "Custom UV DTF Gang Sheets", href: "/categories/uv-dtf" },
         ],
       },
       {
         id: "sublimation-transfer",
         label: "Sublimation Transfer",
         children: [
-          { id: "sublimation-1", label: "Custom Sublimation Transfers", href: "#" },
+          { id: "sublimation-1", label: "Custom Sublimation Transfers", href: "/categories/sublimation" },
         ],
       },
       {
         id: "glitter-dtf-transfers",
         label: "Glitter DTF Transfers",
         children: [
-          { id: "glitter-1", label: "Custom Glitter DTF Transfers", href: "#" },
+          { id: "glitter-1", label: "Custom Glitter DTF Transfers", href: "/products/upload-custom-glitter-dtf-gang-sheet-online" },
         ],
       },
       {
         id: "reflective-dtf-transfer",
         label: "Reflective DTF Transfer",
         children: [
-          { id: "reflective-1", label: "Custom Reflective DTF Transfers", href: "#" },
+          { id: "reflective-1", label: "Custom Reflective DTF Transfers", href: "/products/upload-your-reflective-dtf-gang-sheet" },
         ],
       },
     ],
@@ -65,46 +72,36 @@ export const menuData: MenuItem[] = [
     id: "mod-blanks",
     label: "MOD Blanks",
     children: [
-      { id: "tshirts", label: "T-Shirts", href: "#" },
-      { id: "hoodies", label: "Hoodies", href: "#" },
+      { id: "tshirts", label: "T-Shirts", href: "/categories/t-shirts" },
+      { id: "hoodies", label: "Hoodies", href: "/categories/hoodies" },
     ],
   },
   {
     id: "embroidery",
     label: "Embroidery",
-    href: "#",
-  },
-  {
-    id: "dtg-printing-service",
-    label: "DTG Printing Service",
-    href: "#",
+    href: "/embroidery-services",
   },
   {
     id: "sign-and-displays",
     label: "Sign and Displays",
     children: [
-      { id: "banners", label: "Banners", href: "#" },
-      { id: "yard-signs", label: "Yard Signs", href: "#" },
+      { id: "banners", label: "Banners", href: "/products/custom-vinyl-banners-backdrops-maryland" },
+      { id: "yard-signs", label: "Yard Signs", href: "/products/yardsign" },
     ],
   },
   {
     id: "resend-artwork",
     label: "Resend Artwork",
-    href: "#",
-  },
-  {
-    id: "rush-order",
-    label: "Rush Order",
-    href: "#",
+    href: "/products/dtf-custom-ganged-sheets",
   },
   {
     id: "dtf-supplies",
     label: "DTF Supplies",
-    href: "#",
+    href: "/categories/dtf-supplies",
   },
   {
     id: "hat-heat-press",
     label: "Hat Heat Press",
-    href: "#",
+    href: "/categories/heat-press",
   },
 ];

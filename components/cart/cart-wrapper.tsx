@@ -18,8 +18,7 @@ export const CartWrapper = () => {
           Your Cart{itemCount > 0 ? ` (${itemCount})` : ''}
         </h1>
         <p className="text-gray-600 text-base md:text-lg max-w-3xl">
-          Reminder: Orders placed before 2 PM qualify for same-day pickup or shipping.<br className="hidden sm:block" />
-          For urgent needs within 2 hours, please select the rush order option. <Link href="/products/rush-order-service-get-it-fast" className="text-[#0056b3] underline hover:text-[#003d82]">Click here for Rush Order</Link>
+          Reminder: Orders placed before 2 PM qualify for same-day pickup or shipping.
         </p>
         {isSyncing && (
           <p className="text-sm text-gray-500 mt-3">Syncing your cart with your account…</p>

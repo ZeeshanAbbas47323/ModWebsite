@@ -75,7 +75,7 @@ export function BlogDetail({ blog }: { blog: Blog }) {
       )}
 
       <div
-        className="prose prose-lg max-w-none text-gray-700 leading-relaxed"
+        className="cms-prose min-w-0"
         dangerouslySetInnerHTML={{ __html: blog.content }}
       />
 
