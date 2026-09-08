@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { OrderStatusBadge } from "@/components/account/order-status-badge";
 import { useAuth } from "@/contexts/auth-context";
@@ -16,6 +16,7 @@ import {
   type OrderItem,
 } from "@/services/order.service";
 import { resolveImageUrl } from "@/lib/image-url";
+
 
 const PLACEHOLDER = "/images/products/dtf-gang-sheet.svg";
 
@@ -149,10 +150,36 @@ export function OrderDetail({ code }: { code: string }) {
     }
   }, [isReady, isAuthenticated, router, code]);
 
+  const queryClient = useQueryClient();
+  const [trackOpen, setTrackOpen] = useState(false);
+  const [reorderError, setReorderError] = useState<string | null>(null);
+
   const { data: order, isLoading, isError, error } = useQuery({
     queryKey: ["order", code],
     queryFn: () => orderService.byCode(code),
     enabled: isReady && isAuthenticated,
+    retry: false,
+  });
+
+  const reorder = useMutation({
+    mutationFn: () => orderService.reorder(code),
+    onSuccess: () => {
+      setReorderError(null);
+      // The items were added server-side, so the cart has to re-read.
+      queryClient.invalidateQueries({ queryKey: ["cart", "server"] });
+      router.push("/cart");
+    },
+    onError: (err) =>
+      setReorderError(
+        err instanceof Error ? err.message : "Couldn't add those items to your cart."
+      ),
+  });
+
+  // Only fetched when the shopper actually asks — it calls the carrier live.
+  const tracking = useQuery({
+    queryKey: ["order-tracking", code],
+    queryFn: () => orderService.track(code),
+    enabled: trackOpen,
     retry: false,
   });
 
@@ -187,6 +214,11 @@ export function OrderDetail({ code }: { code: string }) {
   const items = orderItemsOf(order);
   const placed = formatDate(order.order_date ?? order.created_at);
   const isPickup = order.delivery_type === "store_pickup";
+  // Tracking only exists once a label has been created.
+  const canTrack =
+    !isPickup &&
+    !!order.shipping_status &&
+    order.shipping_status.toUpperCase() !== "PENDING";
 
   return (
     <section className="container py-10 md:py-16">
@@ -205,14 +237,64 @@ export function OrderDetail({ code }: { code: string }) {
           </h1>
           {placed && <p className="text-gray-600 mt-2">Placed {placed}</p>}
         </div>
-        <div className="flex flex-wrap gap-2">
-          <OrderStatusBadge status={order.status} />
-          <OrderStatusBadge status={order.payment_status} label="Payment:" />
-          {order.shipping_status && (
-            <OrderStatusBadge status={order.shipping_status} label="Shipping:" />
-          )}
+        <div className="flex flex-col items-start gap-3 sm:items-end">
+          <div className="flex flex-wrap gap-2">
+            <OrderStatusBadge status={order.status} />
+            <OrderStatusBadge status={order.payment_status} label="Payment:" />
+            {order.shipping_status && (
+              <OrderStatusBadge status={order.shipping_status} label="Shipping:" />
+            )}
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              onClick={() => reorder.mutate()}
+              disabled={reorder.isPending}
+            >
+              {reorder.isPending ? "Adding…" : "Buy it again"}
+            </Button>
+            {canTrack && (
+              <Button
+                variant="outline"
+                onClick={() => setTrackOpen((v) => !v)}
+              >
+                {trackOpen ? "Hide tracking" : "Track order"}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
+
+      {reorderError && (
+        <p className="mb-6 text-sm text-red-600">{reorderError}</p>
+      )}
+
+      {trackOpen && (
+        <div className="mb-8 rounded-[20px] bg-[#F4F4F5] p-6">
+          <h2 className="mb-2 text-lg font-bold text-black">Tracking</h2>
+          {tracking.isLoading ? (
+            <p className="text-sm text-gray-600">Checking with the carrier…</p>
+          ) : tracking.data?.status ? (
+            <div className="space-y-1 text-sm text-gray-700">
+              <p>
+                <span className="text-gray-500">Status: </span>
+                {tracking.data.statusDescription || tracking.data.status}
+              </p>
+              {tracking.data.eta && (
+                <p>
+                  <span className="text-gray-500">Estimated delivery: </span>
+                  {new Date(tracking.data.eta).toLocaleDateString()}
+                </p>
+              )}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-600">
+              No tracking updates yet. They appear once the carrier scans the parcel.
+            </p>
+          )}
+        </div>
+      )}
 
       <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
         {/* Items */}

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ModfirstRevealFooter } from "../home/modfirst-reveal-footer";
 import { useFooterSections } from "@/hooks/use-footer-sections";
+import { useWebsiteSettings } from "@/hooks/use-website-settings";
 import type { FooterLink, FooterSection } from "@/services/footer-section.service";
 
 const ICON_MAP: Record<string, string> = {
@@ -17,20 +18,38 @@ function sortedLinks(links: FooterLink[] | undefined) {
   return [...(links ?? [])].sort((a, b) => a.sort_order - b.sort_order);
 }
 
+/**
+ * Whether a CMS link points off-site.
+ *
+ * The link `type` is unreliable — the CMS marks internal paths as "url" too —
+ * so this goes by the value itself. Getting it wrong sends an internal link
+ * through a full page load, or hands next/link a bare relative path that
+ * resolves against the current route and lands somewhere else entirely.
+ */
+function isExternalUrl(url: string): boolean {
+  return /^[a-z][a-z0-9+.-]*:/i.test(url) || url.startsWith("//");
+}
+
+/** Normalises a CMS path so next/link always resolves it from the site root. */
+function internalHref(url: string): string {
+  return url.startsWith("/") || url.startsWith("#") ? url : `/${url}`;
+}
+
 function FooterNavLink({ link }: { link: FooterLink }) {
   const className = "text-white text-sm md:text-base";
-  const isExternal =
-    link.type === "url" ||
-    link.url.startsWith("http") ||
-    link.url.startsWith("tel:") ||
-    link.url.startsWith("mailto:");
+  const url = link.url?.trim() ?? "";
 
-  if (isExternal || link.url === "#") {
+  // A link with nowhere to go should not look clickable.
+  if (!url || url === "#") {
+    return <span className={className}>{link.name}</span>;
+  }
+
+  if (isExternalUrl(url)) {
     return (
       <a
-        href={link.url}
+        href={url}
         target={link.target || "_self"}
-        rel={link.rel || undefined}
+        rel={link.rel || (link.target === "_blank" ? "noopener noreferrer" : undefined)}
         className={className}
       >
         {link.name}
@@ -39,7 +58,7 @@ function FooterNavLink({ link }: { link: FooterLink }) {
   }
 
   return (
-    <Link href={link.url} className={className}>
+    <Link href={internalHref(url)} className={className}>
       {link.name}
     </Link>
   );
@@ -58,9 +77,13 @@ function ContactLink({ link }: { link: FooterLink }) {
     </>
   );
 
-  if (link.url && link.url !== "#") {
+  const url = link.url?.trim() ?? "";
+  if (url && url !== "#") {
     return (
-      <a href={link.url} className="flex items-start gap-3">
+      <a
+        href={isExternalUrl(url) ? url : internalHref(url)}
+        className="flex items-start gap-3"
+      >
         {content}
       </a>
     );
@@ -98,6 +121,18 @@ function LinkColumn({
 
 export function Footer() {
   const { data: sections = [], isLoading } = useFooterSections();
+  const { data: settings } = useWebsiteSettings();
+
+  // Social handles come from Website Settings; these icons used to be
+  // hardcoded to "#" and went nowhere. A blank handle is hidden.
+  const socials = [
+    { name: "Facebook", url: settings?.facebook_url, icon: "/images/icons/facebook.svg", size: 14 },
+    { name: "Instagram", url: settings?.instagram_url, icon: "/images/icons/instagram.svg", size: 18 },
+    { name: "LinkedIn", url: settings?.linkedin_url, icon: "/images/icons/linkedin.svg", size: 18 },
+    { name: "Twitter / X", url: settings?.twitter_url, icon: "/images/icons/twittex-x.svg", size: 18 },
+  ].filter((social): social is typeof social & { url: string } =>
+    !!social.url?.trim()
+  );
 
   const byKey = Object.fromEntries(
     sections.map((section) => [section.section_key, section])
@@ -161,56 +196,27 @@ export function Footer() {
               &copy; {new Date().getFullYear()} Modfirst. All rights reserved.
             </p>
 
-            <div className="flex items-center gap-4">
-              <Link
-                href="#"
-                className="text-primary hover:text-white transition-colors"
-              >
-                <span className="sr-only">Facebook</span>
-                <Image
-                  src="/images/icons/facebook.svg"
-                  alt="Facebook"
-                  width={14}
-                  height={14}
-                />
-              </Link>
-              <Link
-                href="#"
-                className="text-primary hover:text-white transition-colors"
-              >
-                <span className="sr-only">Instagram</span>
-                <Image
-                  src="/images/icons/instagram.svg"
-                  alt="Instagram"
-                  width={18}
-                  height={18}
-                />
-              </Link>
-              <Link
-                href="#"
-                className="text-primary hover:text-white transition-colors"
-              >
-                <span className="sr-only">LinkedIn</span>
-                <Image
-                  src="/images/icons/linkedin.svg"
-                  alt="LinkedIn"
-                  width={18}
-                  height={18}
-                />
-              </Link>
-              <Link
-                href="#"
-                className="text-primary hover:text-white transition-colors"
-              >
-                <span className="sr-only">Twitter / X</span>
-                <Image
-                  src="/images/icons/twittex-x.svg"
-                  alt="twitter-x"
-                  width={18}
-                  height={18}
-                />
-              </Link>
-            </div>
+            {socials.length > 0 && (
+              <div className="flex items-center gap-4">
+                {socials.map((social) => (
+                  <a
+                    key={social.name}
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:text-white transition-colors"
+                  >
+                    <span className="sr-only">{social.name}</span>
+                    <Image
+                      src={social.icon}
+                      alt={social.name}
+                      width={social.size}
+                      height={social.size}
+                    />
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </footer>

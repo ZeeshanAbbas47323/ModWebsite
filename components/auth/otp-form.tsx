@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
+import { OtpInput } from "@/components/auth/otp-input";
 
 interface OtpFormProps {
   onVerified: () => void;
 }
+
+/** Seconds before "Resend code" becomes available again. */
+const RESEND_COOLDOWN = 30;
 
 export function OtpForm({ onVerified }: OtpFormProps) {
   const { pendingEmail, verifyOtp, resendOtp, cancelOtp } = useAuth();
@@ -18,21 +20,39 @@ export function OtpForm({ onVerified }: OtpFormProps) {
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [resending, setResending] = useState(false);
+  const [cooldown, setCooldown] = useState(RESEND_COOLDOWN);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setNotice(null);
-    setBusy(true);
-    try {
-      await verifyOtp(otp.trim());
-      onVerified();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Invalid or expired code");
-    } finally {
-      setBusy(false);
-    }
-  };
+  // Verification is fired from an effect-driven callback, so guard against a
+  // second run while the first request is still in flight.
+  const verifying = useRef(false);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const t = setTimeout(() => setCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [cooldown]);
+
+  const submit = useCallback(
+    async (code: string) => {
+      if (verifying.current) return;
+      verifying.current = true;
+      setError(null);
+      setNotice(null);
+      setBusy(true);
+      try {
+        await verifyOtp(code);
+        onVerified();
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Invalid or expired code");
+        // Clear the boxes so the next attempt starts from an empty field.
+        setOtp("");
+      } finally {
+        verifying.current = false;
+        setBusy(false);
+      }
+    },
+    [verifyOtp, onVerified]
+  );
 
   const handleResend = async () => {
     setError(null);
@@ -41,6 +61,8 @@ export function OtpForm({ onVerified }: OtpFormProps) {
     try {
       await resendOtp();
       setNotice("We sent a new code to your email.");
+      setOtp("");
+      setCooldown(RESEND_COOLDOWN);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not resend the code");
     } finally {
@@ -49,47 +71,60 @@ export function OtpForm({ onVerified }: OtpFormProps) {
   };
 
   return (
-    <section className="container py-16 md:py-24 flex justify-center">
-      <div className="w-full max-w-md">
-        <h1 className="text-3xl md:text-4xl font-bold text-black mb-2">Check your email</h1>
-        <p className="text-gray-600 mb-8">
-          We sent a 6-digit verification code to{" "}
-          <span className="font-bold text-black">{pendingEmail}</span>. Enter it below to
-          finish signing in.
+    <section className="container flex justify-center py-16 md:py-24">
+      <div className="w-full max-w-md text-center">
+        <h1 className="mb-2 text-3xl font-bold text-black md:text-4xl">
+          Enter Verification Code
+        </h1>
+        <p className="mb-8 text-gray-600">
+          A 6-digit code has been sent to{" "}
+          <span className="font-semibold text-black">{pendingEmail}</span>
         </p>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="otp">Verification code</Label>
-            <Input
-              id="otp"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              placeholder="000000"
-              required
-              className="h-14 rounded-xl text-center text-2xl tracking-[0.5em] font-bold"
-            />
+        <OtpInput
+          value={otp}
+          onChange={setOtp}
+          onComplete={submit}
+          disabled={busy}
+          invalid={!!error}
+        />
+
+        {/* Reserved height so the layout doesn't jump as messages swap. */}
+        <div className="mt-5 min-h-6 text-sm" aria-live="polite">
+          {busy && (
+            <span className="inline-flex items-center gap-2 text-gray-600">
+              <Loader2 className="size-4 animate-spin" />
+              Verifying…
+            </span>
+          )}
+          {!busy && error && <span className="text-red-600">{error}</span>}
+          {!busy && !error && notice && (
+            <span className="text-green-700">{notice}</span>
+          )}
+        </div>
+
+        <div className="mt-6 flex flex-col items-center gap-3 text-sm">
+          <div className="text-gray-600">
+            Didn&apos;t get the code?{" "}
+            {cooldown > 0 ? (
+              <span className="text-gray-400">Resend in {cooldown}s</span>
+            ) : (
+              <button
+                type="button"
+                onClick={handleResend}
+                disabled={resending || busy}
+                className="font-bold text-black underline disabled:opacity-50"
+              >
+                {resending ? "Sending…" : "Resend code"}
+              </button>
+            )}
           </div>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          {notice && <p className="text-sm text-green-700">{notice}</p>}
-
-          <Button type="submit" size="xl" disabled={busy || otp.length !== 6} className="mt-2">
-            {busy ? "Verifying…" : "Verify and sign in"}
-          </Button>
-        </form>
-
-        <div className="flex items-center justify-between mt-6 text-sm">
           <button
-            onClick={handleResend}
-            disabled={resending}
-            className="text-black font-bold underline disabled:opacity-50"
+            type="button"
+            onClick={cancelOtp}
+            className="text-gray-500 underline"
           >
-            {resending ? "Sending…" : "Resend code"}
-          </button>
-          <button onClick={cancelOtp} className="text-gray-600 underline">
             Use a different account
           </button>
         </div>

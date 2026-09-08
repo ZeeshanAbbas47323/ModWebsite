@@ -87,4 +87,28 @@ export const authService = {
   logout: async (): Promise<void> => {
     await apiClient.post("/auth/logout", {});
   },
+
+  // ── Password reset ───────────────────────────────────────────────────────
+  // Three steps: request a code, confirm the code is valid, then set the new
+  // password. The confirm step exists so the form can reject a bad code before
+  // asking someone to type a password twice.
+
+  forgotPassword: async (email: string): Promise<string> => {
+    const { data } = await apiClient.post("/auth/forgot-password", { email });
+    return (data?.message as string) ?? "Check your email for the reset code.";
+  },
+
+  verifyResetOtp: async (email: string, otp: string): Promise<void> => {
+    await apiClient.post("/auth/verify-reset-otp", { email, otp });
+  },
+
+  resetPassword: async (input: {
+    email: string;
+    otp: string;
+    newPassword: string;
+    confirmPassword: string;
+  }): Promise<string> => {
+    const { data } = await apiClient.post("/auth/reset-password", input);
+    return (data?.message as string) ?? "Password updated. You can sign in now.";
+  },
 };

@@ -147,4 +147,28 @@ export const orderService = {
     const { data } = await apiClient.get(`/orders/${encodeURIComponent(code)}`);
     return data.payload ?? data.data ?? data;
   },
+
+  /** Re-adds a past order's items to the cart and returns what was added. */
+  reorder: async (code: string): Promise<unknown> => {
+    const { data } = await apiClient.post(
+      `/orders/${encodeURIComponent(code)}/reorder`,
+      {}
+    );
+    return data.payload ?? data.data ?? data;
+  },
+
+  /** Carrier tracking events for an order, when a label has been created. */
+  track: async (code: string): Promise<OrderTracking | null> => {
+    const { data } = await apiClient.get(
+      `/orders/${encodeURIComponent(code)}/track`
+    );
+    return (data.payload ?? data.data ?? null) as OrderTracking | null;
+  },
 };
+
+/** What the carrier reports right now. Shipment identifiers live on the order. */
+export interface OrderTracking {
+  status?: string;
+  statusDescription?: string;
+  eta?: string | null;
+}

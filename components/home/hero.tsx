@@ -1,22 +1,35 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { HERO_SLIDES, SLIDE_DURATION } from "@/lib/home-hero-slides";
+import { useHomeSection } from "@/hooks/use-home-section";
+import { mapHomeHeroSlides } from "@/lib/map-home-hero-slides";
 
 export function Hero() {
+  // Slides come from the `home_hero` CMS section. The built-in slides stand in
+  // while that loads and if the section has no items, so the hero is never
+  // empty on a fresh install or a failed request.
+  const { data: heroSection } = useHomeSection("home_hero");
+  const cmsSlides = useMemo(
+    () => mapHomeHeroSlides(heroSection),
+    [heroSection]
+  );
+  const slides = cmsSlides.length > 0 ? cmsSlides : HERO_SLIDES;
+
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   /** Which way the last move went, so slides enter from the right side. */
   const [direction, setDirection] = useState(1);
   const reduceMotion = useReducedMotion();
 
-  const slide = HERO_SLIDES[index];
-  const count = HERO_SLIDES.length;
+  const count = slides.length;
+  // Swapping in a shorter CMS set can leave the index past the end.
+  const slide = slides[Math.min(index, count - 1)];
 
   const goTo = useCallback(
     (next: number, from = 1) => {
@@ -25,6 +38,10 @@ export function Hero() {
     },
     [count]
   );
+
+  useEffect(() => {
+    setIndex(0);
+  }, [slides]);
 
   const next = useCallback(() => goTo(index + 1, 1), [goTo, index]);
   const prev = useCallback(() => goTo(index - 1, -1), [goTo, index]);
@@ -116,12 +133,14 @@ export function Hero() {
                 <Button variant="default" size="xl" asChild>
                   <Link href={slide.primary.href}>{slide.primary.label}</Link>
                 </Button>
-                <Link
-                  href={slide.secondary.href}
-                  className="inline-flex items-center justify-center h-12 md:h-14 px-5 md:px-6 rounded-xl border border-white/25 text-white hover:bg-white/10 transition-colors text-base md:text-lg"
-                >
-                  {slide.secondary.label}
-                </Link>
+                {slide.secondary.label && slide.secondary.href && (
+                  <Link
+                    href={slide.secondary.href}
+                    className="inline-flex items-center justify-center h-12 md:h-14 px-5 md:px-6 rounded-xl border border-white/25 text-white hover:bg-white/10 transition-colors text-base md:text-lg"
+                  >
+                    {slide.secondary.label}
+                  </Link>
+                )}
               </div>
             </motion.div>
           </AnimatePresence>
@@ -140,15 +159,19 @@ export function Hero() {
                 transition={{ duration: 0.5, ease: "easeOut" }}
                 className="absolute inset-0"
               >
-                <Image
-                  src={slide.image}
-                  alt={slide.imageAlt}
-                  fill
-                  // The first slide is the LCP image on the home page.
-                  priority={index === 0}
-                  className="object-contain object-center drop-shadow-2xl"
-                  sizes="(max-width: 1024px) 100vw, 560px"
-                />
+                {/* A CMS slide can carry copy without art; next/image throws
+                    on an empty src, so render the frame without it. */}
+                {slide.image ? (
+                  <Image
+                    src={slide.image}
+                    alt={slide.imageAlt}
+                    fill
+                    // The first slide is the LCP image on the home page.
+                    priority={index === 0}
+                    className="object-contain object-center drop-shadow-2xl"
+                    sizes="(max-width: 1024px) 100vw, 560px"
+                  />
+                ) : null}
               </motion.div>
             </AnimatePresence>
           </div>

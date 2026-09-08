@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/auth-context";
 import { orderService, orderReference } from "@/services/order.service";
 import { OrderStatusBadge } from "@/components/account/order-status-badge";
+import { AddressBook } from "@/components/account/address-book";
 
 export function AccountPanel() {
   const router = useRouter();
@@ -81,6 +82,8 @@ export function AccountPanel() {
           ))}
         </div>
       )}
+
+      <AddressBook enabled={isReady && isAuthenticated} />
     </section>
   );
 }

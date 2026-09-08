@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { useProductImages, useProductDescriptions, useProductFaqs, useProductVariants, useIncreaseView, useProduct } from '@/hooks/use-products';
 import { useCart } from '@/contexts/cart-context';
 import { useReviews } from '@/hooks/use-reviews';
+import { ProductReviews } from '@/components/product-detail/product-reviews';
 import type { Product } from '@/services/product.service';
 import { resolveImageUrl } from '@/lib/image-url';
 import { VariantSelector } from '@/components/product-detail/variant-selector';
@@ -91,7 +92,8 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
 
     const sortedDescriptions = descriptions?.sort((a, b) => a.sort_order - b.sort_order) ?? [];
     const sortedFaqs = faqs?.sort((a, b) => a.sort_order - b.sort_order) ?? [];
-    const reviewCount = reviewsData?.pagination?.total ?? 0;
+    const reviewCount = reviewsData?.summary?.total_reviews ?? reviewsData?.pagination?.total ?? 0;
+    const averageRating = reviewsData?.summary?.average_rating ?? 0;
 
     // A chosen variant overrides the product's headline price.
     const listPrice = selectedVariant?.price ?? product?.base_price;
@@ -332,12 +334,24 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
 
                     {reviewCount > 0 && (
                         <div className="flex items-center gap-2 mb-6">
-                            <div className="flex gap-1">
+                            {/* Stars reflect the real average — a filled star is
+                                shown only up to the rounded rating. */}
+                            <div className="flex gap-1" aria-label={`Rated ${averageRating} out of 5`}>
                                 {[...Array(5)].map((_, i) => (
-                                    <Image key={i} src="/images/icons/star.svg" alt="Star" width={16} height={16} />
+                                    <Image
+                                        key={i}
+                                        src="/images/icons/star.svg"
+                                        alt=""
+                                        width={16}
+                                        height={16}
+                                        className={i < Math.round(averageRating) ? "" : "opacity-25 grayscale"}
+                                    />
                                 ))}
                             </div>
-                            <span className="text-sm text-gray-600">/ {reviewCount} reviews</span>
+                            <span className="text-sm text-gray-600">
+                                {averageRating > 0 ? `${averageRating.toFixed(1)} / ` : ""}
+                                {reviewCount} review{reviewCount === 1 ? "" : "s"}
+                            </span>
                         </div>
                     )}
 
@@ -448,6 +462,8 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                     )}
                 </div>
             </div>
+
+            {id ? <ProductReviews productId={id} /> : null}
 
             {usesTransfersBySize && (
                 <TransfersBySizeModal

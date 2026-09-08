@@ -23,6 +23,21 @@ const fallbackProducts = [
     { title: "Custom Patches", count: "50 Products", img_path: "/images/banners-compositions/stamp.svg" },
 ];
 
+/**
+ * Static sections, in the order they appear between the category rails.
+ * A category rail is slotted after each of these; whatever categories are left
+ * over run at the end, so adding a category in the dashboard shows up on the
+ * home page without a code change.
+ */
+const INTERLEAVED = [
+    PromotionalBanners,
+    OurOrderProcess,
+    VideoSection,
+    WhyModfirst,
+    FastProduction,
+    CustomerFeedback,
+] as const;
+
 const HomeWrapper = () => {
     const { data: categories } = useProductCategories(null);
 
@@ -35,41 +50,55 @@ const HomeWrapper = () => {
         href: `/collections/${cat.slug}`,
     })) ?? fallbackProducts;
 
+    // Category rails were previously pinned to hardcoded ids (59, 1, 3, 60, 61),
+    // so they broke whenever the catalogue was re-imported. They are derived
+    // from the live categories now; each rail hides itself when empty.
+    const railCategories = (categories ?? []).filter(
+        (cat) => cat.is_active !== false && (cat._count?.products ?? 1) > 0
+    );
+
     return (
         <>
             <Hero />
             <ScrollReveal>
-                <ProductCarousel data={categoryCards} title="Our Categories" description="From small business advertising to big event displays, Modfirst delivers bold." />
+                <ProductCarousel
+                    data={categoryCards}
+                    title="Our Categories"
+                    description="From small business advertising to big event displays, Modfirst delivers bold."
+                />
             </ScrollReveal>
-            <PromotionalBanners />
-             <ScrollReveal>
-                <CategoryCarousel categoryId={59} title="DTF Transfer Products" description="From small business advertising to big event displays, Modfirst delivers bold." />
-            </ScrollReveal>
-            <OurOrderProcess />
-            <ScrollReveal>
-                <CategoryCarousel categoryId={1} title="DTF Supplies Products" description="From small business advertising to big event displays, Modfirst delivers bold." />
-            </ScrollReveal>
-            <ScrollReveal>
-                <VideoSection />
-            </ScrollReveal>
-            <ScrollReveal>
-                <CategoryCarousel categoryId={3} title="Blank Tshirts" description="From small business advertising to big event displays, Modfirst delivers bold." />
-            </ScrollReveal>
-            <ScrollReveal>
-                <WhyModfirst />
-            </ScrollReveal>
-            <ScrollReveal>
-                <FastProduction />
-            </ScrollReveal>
-            <ScrollReveal>
-                <CategoryCarousel categoryId={60} title="Sign & Displays" description="From small business advertising to big event displays, Modfirst delivers bold." />
-            </ScrollReveal>
-            <ScrollReveal>
-                <CustomerFeedback />
-            </ScrollReveal>
-            <ScrollReveal>
-                <CategoryCarousel categoryId={61} title="NEED A HEAT PRESS FOR YOUR DTF TRANSFERS? WE GOT YOUR BACK!" description="From small business advertising to big event displays, Modfirst delivers bold." />
-            </ScrollReveal>
+
+            {INTERLEAVED.map((Section, i) => (
+                <div key={i}>
+                    <Section />
+                    {railCategories[i] && (
+                        <ScrollReveal>
+                            <CategoryCarousel
+                                categoryId={railCategories[i].id}
+                                title={railCategories[i].name}
+                                description={
+                                    railCategories[i].description ??
+                                    "From small business advertising to big event displays, Modfirst delivers bold."
+                                }
+                            />
+                        </ScrollReveal>
+                    )}
+                </div>
+            ))}
+
+            {railCategories.slice(INTERLEAVED.length).map((cat) => (
+                <ScrollReveal key={cat.id}>
+                    <CategoryCarousel
+                        categoryId={cat.id}
+                        title={cat.name}
+                        description={
+                            cat.description ??
+                            "From small business advertising to big event displays, Modfirst delivers bold."
+                        }
+                    />
+                </ScrollReveal>
+            ))}
+
             <ScrollReveal>
                 <BlogSection />
             </ScrollReveal>

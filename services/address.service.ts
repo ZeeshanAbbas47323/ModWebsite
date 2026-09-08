@@ -31,4 +31,27 @@ export const addressService = {
     const { data } = await apiClient.post("/addresses?action=create", input);
     return data.payload ?? data.data ?? data;
   },
+
+  update: async (
+    id: number,
+    input: Partial<CreateAddressInput>
+  ): Promise<Address> => {
+    const { data } = await apiClient.put(`/addresses/${id}`, input);
+    return data.payload ?? data.data ?? data;
+  },
+
+  /**
+   * Soft-deletes through the shared customer endpoint — there is no
+   * DELETE /addresses/:id upstream.
+   */
+  remove: async (id: number): Promise<void> => {
+    await apiClient.delete("/common/delete", {
+      data: { id, table: "address" },
+    });
+  },
+
+  /** Promoting an address is just an update; the API clears the previous default. */
+  setDefault: async (id: number): Promise<void> => {
+    await apiClient.put(`/addresses/${id}`, { is_default: true });
+  },
 };

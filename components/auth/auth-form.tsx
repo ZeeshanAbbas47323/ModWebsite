@@ -182,6 +182,15 @@ export function AuthForm({ mode }: AuthFormProps) {
             </div>
           )}
 
+          {!isRegister && (
+            <Link
+              href="/forgot-password"
+              className="-mt-1 self-end text-sm text-gray-600 underline"
+            >
+              Forgot your password?
+            </Link>
+          )}
+
           {error && <p className="text-sm text-red-600">{error}</p>}
 
           <Button type="submit" size="xl" disabled={busy} className="mt-2">
