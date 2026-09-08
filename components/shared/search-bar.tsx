@@ -60,8 +60,8 @@ const SearchBar = () => {
                                             onClick={() => { setIsOpen(false); setQuery(''); }}
                                             className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-gray-50 transition-colors"
                                         >
-                                            {p.image_url && (
-                                                <Image src={resolveImageUrl(p.image_url)} alt={p.name} width={40} height={40} className="rounded-lg object-cover" unoptimized />
+                                            {p.images?.[0]?.image_url && (
+                                                <Image src={resolveImageUrl(p.images[0].image_url)} alt={p.name} width={40} height={40} className="rounded-lg object-cover" unoptimized />
                                             )}
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-sm font-medium text-black truncate">{p.name}</p>

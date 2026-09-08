@@ -171,40 +171,40 @@ export function ProductReviews({ productId }: { productId: number }) {
 
   return (
     <div className="mt-16 border-t border-gray-200 pt-10">
-      <h2 className="text-2xl font-bold text-black">Reviews</h2>
+      <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-black">Reviews</h2>
 
       {isLoading ? (
         <p className="mt-4 text-sm text-gray-500">Loading reviews…</p>
       ) : (
         <>
-          <div className="mt-6 flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-12">
-            <div className="shrink-0">
-              <p className="text-4xl font-bold text-black">
+          <div className="mt-6 bg-[#F4F4F5] rounded-[24px] p-6 md:p-8 flex flex-col gap-6 sm:flex-row sm:items-center sm:gap-12">
+            <div className="shrink-0 text-center sm:text-left">
+              <p className="text-5xl font-bold text-black leading-none">
                 {average.toFixed(1)}
               </p>
-              <Stars rating={average} className="mt-2" />
+              <Stars rating={average} size={18} className="mt-3 justify-center sm:justify-start" />
               <p className="mt-2 text-sm text-gray-600">
-                {total} review{total === 1 ? "" : "s"}
+                Based on {total} review{total === 1 ? "" : "s"}
               </p>
             </div>
 
             {total > 0 && (
-              <div className="flex-1 space-y-1.5">
+              <div className="flex-1 space-y-2 w-full min-w-0">
                 {[5, 4, 3, 2, 1].map((star) => {
                   const count = distribution[star] ?? 0;
                   const pct = total ? (count / total) * 100 : 0;
                   return (
                     <div key={star} className="flex items-center gap-3 text-sm">
-                      <span className="w-8 shrink-0 text-gray-600">
+                      <span className="w-10 shrink-0 text-gray-600 font-medium">
                         {star} ★
                       </span>
-                      <div className="h-2 flex-1 overflow-hidden rounded-full bg-gray-100">
+                      <div className="h-2 flex-1 min-w-0 overflow-hidden rounded-full bg-white">
                         <div
-                          className="h-full rounded-full bg-black"
+                          className="h-full rounded-full bg-primary"
                           style={{ width: `${pct}%` }}
                         />
                       </div>
-                      <span className="w-8 shrink-0 text-right text-gray-500">
+                      <span className="w-6 shrink-0 text-right text-gray-500">
                         {count}
                       </span>
                     </div>
@@ -366,31 +366,47 @@ export function ProductReviews({ productId }: { productId: number }) {
                   key={review.id}
                   className="border-b border-gray-100 pb-6 last:border-b-0"
                 >
-                  <div className="flex flex-wrap items-center gap-3">
-                    <Stars rating={review.rating} />
-                    <span className="text-sm font-semibold text-black">
-                      {review.user?.full_name ?? "Verified buyer"}
-                    </span>
-                    {review.is_verified && (
-                      <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
-                        Verified purchase
-                      </span>
-                    )}
+                  <div className="flex flex-wrap items-start gap-3">
+                    <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#F4F4F5] text-sm font-bold text-black">
+                      {(review.user?.full_name ?? "V")[0].toUpperCase()}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-sm font-semibold text-black">
+                          {review.user?.full_name ?? "Verified buyer"}
+                        </span>
+                        {review.is_verified && (
+                          <span className="rounded-full bg-[#F4F4F5] px-2 py-0.5 text-xs font-medium text-black">
+                            Verified purchase
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-1 flex flex-wrap items-center gap-2">
+                        <Stars rating={review.rating} size={14} />
+                        <span className="text-xs text-gray-500">
+                          {new Date(review.created_at).toLocaleDateString(undefined, {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </span>
+                      </div>
+                    </div>
                   </div>
 
                   {review.title && (
-                    <p className="mt-2 font-semibold text-black">
+                    <p className="mt-3 ml-12 font-semibold text-black">
                       {review.title}
                     </p>
                   )}
                   {review.comment && (
-                    <p className="mt-1 text-sm text-gray-600">
+                    <p className="mt-1 ml-12 text-sm text-gray-600 leading-relaxed">
                       {review.comment}
                     </p>
                   )}
 
                   {((review.images?.length ?? 0) > 0 || review.video_url) && (
-                    <div className="mt-3 flex flex-wrap gap-2">
+                    <div className="mt-3 ml-12 flex flex-wrap gap-2">
                       {review.images?.map((url) => (
                         <a
                           key={url}
@@ -421,7 +437,7 @@ export function ProductReviews({ productId }: { productId: number }) {
                       type="button"
                       onClick={() => markHelpful.mutate(review.id)}
                       disabled={markHelpful.isPending}
-                      className="mt-3 text-xs text-gray-500 underline hover:text-black"
+                      className="mt-3 ml-12 text-xs text-gray-500 underline hover:text-black"
                     >
                       Helpful{" "}
                       {review.helpful_count > 0 ? `(${review.helpful_count})` : ""}

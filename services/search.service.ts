@@ -3,7 +3,13 @@ import apiClient from "@/lib/axios";
 export interface SearchResult {
   query: string;
   total: number;
-  products: Array<{ id: number; name: string; slug: string; base_price: number; image_url?: string }>;
+  products: Array<{
+    id: number;
+    name: string;
+    slug: string;
+    base_price: number;
+    images?: Array<{ image_url: string }>;
+  }>;
   categories: Array<{ id: number; name: string; slug?: string }>;
   blogs: Array<{ id: number; title: string; slug: string }>;
   pages: Array<{ id: number; title: string; slug: string }>;

@@ -311,14 +311,14 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
             </Breadcrumb>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-                <div className="lg:col-span-7 min-w-0 flex flex-col sm:flex-row gap-4">
-                    <div className="order-2 sm:order-1 sm:w-[100px] shrink-0 flex flex-row sm:flex-col gap-4 overflow-x-auto sm:overflow-visible no-scrollbar">
+                <div className="lg:col-span-7 min-w-0 flex flex-col lg:flex-row gap-4">
+                    <div className="order-2 lg:order-1 lg:w-[100px] shrink-0 flex flex-row lg:flex-col gap-4 overflow-x-auto lg:overflow-visible no-scrollbar">
                         {galleryImages.map((img, index) => (
                             <button
                                 key={index}
                                 onClick={() => onThumbClick(index)}
                                 className={cn(
-                                    "relative w-20 h-20 sm:w-full sm:h-[100px] rounded-xl overflow-hidden border-2 transition-all shrink-0",
+                                    "relative w-20 h-20 lg:w-full lg:h-[100px] rounded-xl overflow-hidden border-2 transition-all shrink-0",
                                     activeThumb === index ? "border-primary" : "border-transparent"
                                 )}
                             >
@@ -327,11 +327,11 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                         ))}
                     </div>
 
-                    <div className="order-1 sm:order-2 min-w-0 flex-1 rounded-[24px] relative overflow-hidden aspect-square sm:aspect-auto sm:h-[500px] lg:h-[600px] flex items-center justify-center bg-[#F4F4F5]">
+                    <div className="order-1 lg:order-2 min-w-0 flex-1 rounded-[24px] relative overflow-hidden aspect-square md:aspect-auto md:h-[450px] lg:h-[600px] flex items-center justify-center bg-[#F4F4F5]">
                         <Carousel setApi={setApi} opts={{ loop: true }} className="w-full h-full">
                             <CarouselContent className="ml-0">
                                 {galleryImages.map((img, idx) => (
-                                    <CarouselItem key={idx} className="relative w-full pl-0 aspect-square sm:aspect-auto sm:h-[500px] lg:h-[600px] group">
+                                    <CarouselItem key={idx} className="relative w-full pl-0 aspect-square md:aspect-auto md:h-[450px] lg:h-[600px] group">
                                         <div className="relative w-full h-full overflow-hidden">
                                             <Image
                                                 src={img}

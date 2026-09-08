@@ -41,12 +41,30 @@ const STATIC_PAGE_SLUGS: Record<string, string> = {
   "dtf supplies": "/dtf-supplies",
 };
 
+/**
+ * A few more "category" menu items name a group of products (T-Shirts,
+ * Hoodies) with no real ProductCategory behind them — checked directly
+ * against the database, there simply is no such category. Rather than
+ * invent one, these route to a real-data-driven search listing
+ * (/products?q=<name>, backed by the same search endpoint used elsewhere)
+ * instead of a dead /categories/<slug> page.
+ */
+const SEARCH_LISTING_SLUGS: Record<string, string> = {
+  "t-shirts": "T-Shirts",
+  "hoodies": "Hoodies",
+  "hat-heat-press": "Heat Press",
+};
+
 export function getMenuHref(node: MenuNode): string | undefined {
   if (node.link_type === "external" && node.external_url) return node.external_url;
 
   if (node.link_type === "category") {
-    const staticPage = STATIC_PAGE_SLUGS[clean(node.slug).toLowerCase()];
+    const cleanedSlug = clean(node.slug).toLowerCase();
+    const staticPage = STATIC_PAGE_SLUGS[cleanedSlug];
     if (staticPage) return staticPage;
+
+    const searchQuery = SEARCH_LISTING_SLUGS[cleanedSlug];
+    if (searchQuery) return `/products?q=${encodeURIComponent(searchQuery)}`;
 
     // `target_category_id` points at a legacy `Category` table with no
     // relation to the real catalog (`ProductCategory`, which
