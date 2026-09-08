@@ -30,10 +30,37 @@ export function pathFromSlug(slug: string | null | undefined): string | undefine
   return `/${segments.join("/")}`;
 }
 
+/**
+ * A handful of menu rows are labelled "category" but are actually one of the
+ * site's static pages — bad authoring, not something a slug format can tell
+ * apart on its own. Matched case-insensitively against the cleaned slug.
+ */
+const STATIC_PAGE_SLUGS: Record<string, string> = {
+  "contact us": "/contact-us",
+  "net 30": "/net-30",
+  "dtf supplies": "/dtf-supplies",
+};
+
 export function getMenuHref(node: MenuNode): string | undefined {
   if (node.link_type === "external" && node.external_url) return node.external_url;
-  if (node.link_type === "category" && node.target_category_id)
-    return `/products?category=${node.target_category_id}`;
+
+  if (node.link_type === "category") {
+    const staticPage = STATIC_PAGE_SLUGS[clean(node.slug).toLowerCase()];
+    if (staticPage) return staticPage;
+
+    // `target_category_id` points at a legacy `Category` table with no
+    // relation to the real catalog (`ProductCategory`, which
+    // `/collections/[slug]` actually reads) — every menu authored so far has
+    // it null anyway. The slug is what these menus were actually built with,
+    // so route through the real collection page by slug instead. A slug that
+    // already looks like a product path ("products/...") is a product page
+    // that was mislabeled "category" — send it there directly rather than
+    // wrapping it in /collections.
+    const slug = pathFromSlug(node.slug);
+    if (slug && !slug.startsWith("/products/")) return `/collections${slug}`;
+    return slug;
+  }
+
   if (node.link_type === "product" && node.target_product_id)
     return `/product-detail?id=${node.target_product_id}`;
   if (node.link_type === "page" && node.target_page_id) return `/pages/${clean(node.slug)}`;
