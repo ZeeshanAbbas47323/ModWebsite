@@ -6,10 +6,15 @@ import { mapProductToCard } from "@/lib/map-product-to-card";
 
 interface CategoryCarouselProps {
   categoryId: number;
-  title: string;
-  description: string;
+  /** Falls back to the category's own name (read off its products) when omitted. */
+  title?: string;
+  description?: string;
   limit?: number;
+  viewAllHref?: string;
 }
+
+const DEFAULT_DESCRIPTION =
+  "From small business advertising to big event displays, Modfirst delivers bold.";
 
 /**
  * One home-page row, filled from a single product category.
@@ -23,6 +28,7 @@ export function CategoryCarousel({
   title,
   description,
   limit = 8,
+  viewAllHref,
 }: CategoryCarouselProps) {
   const { data, isLoading } = useProducts({
     limit,
@@ -46,11 +52,17 @@ export function CategoryCarousel({
 
   if (products.length === 0) return null;
 
+  const resolvedCategory = products.find((p) => p.category?.name)?.category;
+  const resolvedTitle = title ?? resolvedCategory?.name ?? "Shop the collection";
+  const resolvedViewAllHref =
+    viewAllHref ?? (resolvedCategory?.slug ? `/collections/${resolvedCategory.slug}` : "/products");
+
   return (
     <ProductCarousel
       data={products.map(mapProductToCard)}
-      title={title}
-      description={description}
+      title={resolvedTitle}
+      description={description ?? DEFAULT_DESCRIPTION}
+      viewAllHref={resolvedViewAllHref}
     />
   );
 }

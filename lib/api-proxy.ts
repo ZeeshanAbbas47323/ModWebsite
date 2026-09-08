@@ -18,9 +18,17 @@ export const SHARED_CONTENT_TTL = 2 * 60 * 60;
 function cacheHeaders(seconds?: number) {
   if (!seconds) return undefined;
   return {
-    // Serve stale for a day while revalidating, so a slow upstream never
-    // blocks a page render.
-    "Cache-Control": `public, max-age=${seconds}, stale-while-revalidate=86400`,
+    // s-maxage (shared/CDN caches) only — not max-age. max-age caches inside
+    // each visitor's own browser; a response cached there while a section had
+    // no data (e.g. before a seed script ran) stays stuck for the full TTL on
+    // that one visitor with no way to purge it centrally. That's exactly what
+    // showed empty menus on staging: the browser had cached the empty answer
+    // and kept serving it "from disk cache" long after the real data existed.
+    // A shared/CDN cache can still be purged or simply doesn't hold it as long
+    // as a browser does by default, so this keeps the origin round-trip
+    // savings without that trap. Serve stale for a day while revalidating, so
+    // a slow upstream never blocks a page render.
+    "Cache-Control": `public, s-maxage=${seconds}, stale-while-revalidate=86400`,
   };
 }
 

@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { AuthShell } from "@/components/auth/auth-shell";
 import { OtpInput } from "@/components/auth/otp-input";
 import { authService } from "@/services/auth.service";
 import { PASSWORD_RULES, isStrongPassword } from "@/lib/password-rules";
@@ -98,9 +99,8 @@ export function ForgotPasswordForm() {
   };
 
   return (
-    <section className="container py-16 md:py-24 flex justify-center">
-      <div className="w-full max-w-md">
-        <h1 className="text-3xl md:text-4xl font-bold text-black mb-2">
+    <AuthShell>
+        <h1 className="text-2xl md:text-3xl font-bold text-black mb-2">
           Reset your password
         </h1>
         <p className="text-gray-600 mb-8">
@@ -229,7 +229,6 @@ export function ForgotPasswordForm() {
             Sign in
           </Link>
         </p>
-      </div>
-    </section>
+    </AuthShell>
   );
 }

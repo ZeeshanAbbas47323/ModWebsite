@@ -11,7 +11,7 @@ import { useWebsiteSettings } from "@/hooks/use-website-settings";
 import { useCart } from "@/contexts/cart-context";
 import { useWishlist } from "@/contexts/wishlist-context";
 import { useAuth } from "@/contexts/auth-context";
-import { resolveImageUrl } from "@/lib/image-url";
+import { SiteLogo } from "@/components/shared/site-logo";
 
 export function Header() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -21,7 +21,6 @@ export function Header() {
   const { isAuthenticated } = useAuth();
 
   const phone = settings?.contact_phone ?? "+92 3123456789";
-  const logoUrl = settings?.logo_black_url || settings?.logo_url || "/images/branding/logo-dark.svg";
 
   return (
     <>
@@ -39,14 +38,7 @@ export function Header() {
             </Button>
             <div className="relative w-32 h-8 lg:w-48 lg:h-11">
               <Link href="/">
-                <Image
-                  src={resolveImageUrl(logoUrl)}
-                  alt={settings?.site_name ?? "Modfirst Logo"}
-                  fill
-                  className="object-contain object-left"
-                  priority
-                  unoptimized={logoUrl.startsWith("http")}
-                />
+                <SiteLogo fill className="object-contain object-left" priority />
               </Link>
             </div>
           </div>

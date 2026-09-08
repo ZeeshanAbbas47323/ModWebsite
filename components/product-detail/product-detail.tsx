@@ -459,6 +459,16 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                 </div>
             </div>
 
+            {product?.description && (
+                <div className="mt-12 max-w-3xl">
+                    <h2 className="text-xl font-bold text-black mb-4">Description</h2>
+                    <div
+                        className="text-sm sm:text-base text-gray-600 leading-relaxed [&>*+*]:mt-4 [&_strong]:text-black [&_h2]:text-lg [&_h2]:text-black [&_h2]:font-bold [&_h3]:text-base [&_h3]:text-black [&_h3]:font-bold [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:text-black [&_a]:underline"
+                        dangerouslySetInnerHTML={{ __html: product.description }}
+                    />
+                </div>
+            )}
+
             {id ? <ProductReviews productId={id} /> : null}
 
             {usesTransfersBySize && (

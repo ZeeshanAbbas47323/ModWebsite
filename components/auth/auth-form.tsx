@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/auth-context";
+import { AuthShell } from "@/components/auth/auth-shell";
 import { OtpForm } from "@/components/auth/otp-form";
 import { PASSWORD_RULES, digitCount, isStrongPassword } from "@/lib/password-rules";
 
@@ -79,9 +80,8 @@ export function AuthForm({ mode }: AuthFormProps) {
   }
 
   return (
-    <section className="container py-16 md:py-24 flex justify-center">
-      <div className="w-full max-w-md">
-        <h1 className="text-3xl md:text-4xl font-bold text-black mb-2">
+    <AuthShell>
+        <h1 className="text-2xl md:text-3xl font-bold text-black mb-2">
           {isRegister ? "Create an account" : "Welcome back"}
         </h1>
         <p className="text-gray-600 mb-8">
@@ -215,7 +215,6 @@ export function AuthForm({ mode }: AuthFormProps) {
           You can also{" "}
           <Link href="/checkout" className="underline">check out as a guest</Link>.
         </p>
-      </div>
-    </section>
+    </AuthShell>
   );
 }

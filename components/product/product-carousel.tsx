@@ -15,9 +15,10 @@ interface ProductCarouselProps {
   title?: string;
   description?: string;
   loading?: boolean;
+  viewAllHref?: string;
 }
 
-const ProductCarousel: React.FC<ProductCarouselProps> = ({ data, title, description }) => {
+const ProductCarousel: React.FC<ProductCarouselProps> = ({ data, title, description, viewAllHref = "/products" }) => {
   return (
     <section className="container w-full pt-10 md:pt-12 lg:pt-16 flex flex-col items-center">
       <div className="text-center mb-6 md:mb-10">
@@ -54,7 +55,7 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ data, title, descript
       </div>
 
       <Button variant="default" size="xl" asChild>
-        <Link href="/products">
+        <Link href={viewAllHref}>
           View All
         </Link>
       </Button>

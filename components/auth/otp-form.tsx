@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
+import { AuthShell } from "@/components/auth/auth-shell";
 import { OtpInput } from "@/components/auth/otp-input";
 
 interface OtpFormProps {
@@ -71,9 +72,9 @@ export function OtpForm({ onVerified }: OtpFormProps) {
   };
 
   return (
-    <section className="container flex justify-center py-16 md:py-24">
-      <div className="w-full max-w-md text-center">
-        <h1 className="mb-2 text-3xl font-bold text-black md:text-4xl">
+    <AuthShell>
+      <div className="text-center">
+        <h1 className="mb-2 text-2xl font-bold text-black md:text-3xl">
           Enter Verification Code
         </h1>
         <p className="mb-8 text-gray-600">
@@ -129,6 +130,6 @@ export function OtpForm({ onVerified }: OtpFormProps) {
           </button>
         </div>
       </div>
-    </section>
+    </AuthShell>
   );
 }

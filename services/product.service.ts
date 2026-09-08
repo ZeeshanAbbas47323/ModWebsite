@@ -33,7 +33,7 @@ export interface Product {
   order_count: number;
   images?: ProductImage[];
   variants?: ProductVariant[];
-  category?: { id: number; name: string };
+  category?: { id: number; name: string; slug?: string };
   /** One row per variant, plus a variant_id:null row for the product itself. */
   inventory?: { id?: number; variant_id: number | null; quantity: number }[] | null;
 }
