@@ -61,8 +61,16 @@ export function getMenuHref(node: MenuNode): string | undefined {
     return slug;
   }
 
-  if (node.link_type === "product" && node.target_product_id)
+  if (node.link_type === "product" && node.target_product_id) {
+    // Prefer the real, SEO-friendly /products/<slug> page — it also has the
+    // "You may also like" rail and page metadata that /product-detail?id=
+    // (a legacy client-only fallback) does not. The menu's own slug is set
+    // to the product's slug for every product-type link (see DB-FIXES.sql);
+    // fall back to the id-based route only for a menu row that predates that.
+    const slug = clean(node.slug);
+    if (slug && !slug.startsWith("/") && !/\s/.test(slug)) return `/products/${slug}`;
     return `/product-detail?id=${node.target_product_id}`;
+  }
   if (node.link_type === "page" && node.target_page_id) return `/pages/${clean(node.slug)}`;
   if (node.link_value) return clean(node.link_value) || undefined;
   // Nothing else is configured on these menus, so the slug is the only

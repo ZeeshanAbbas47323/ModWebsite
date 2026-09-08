@@ -98,6 +98,7 @@ const HomeWrapper = () => {
                     type="MOST_POPULAR"
                     title="Most Popular"
                     description="What everyone's ordering right now."
+                    viewAllHref="/shop/most-popular"
                 />
             </ScrollReveal>
 

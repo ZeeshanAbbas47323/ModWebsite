@@ -5,13 +5,32 @@ import ProductSection from "./product-section";
 import { useProductCollection } from "@/hooks/use-products";
 import { mapProductToCard } from "@/lib/map-product-to-card";
 
+export type ShopCollectionType = "BEST_SELLERS" | "MOST_POPULAR" | "NEWEST" | "FEATURED";
+
+interface ShopCollectionWrapperProps {
+  type: ShopCollectionType;
+  title: string;
+  description: string;
+  emptyTitle?: string;
+  emptyDescription?: string;
+  limit?: number;
+}
+
 /**
- * Ranked by real sales (`orderItems` count) via the same `frontend/collection`
- * endpoint the product-detail page's "related products" rail already uses —
- * no separate best-seller flag to maintain.
+ * A full "view all" page for one of the `products/frontend/collection`
+ * rankings — the same backend endpoint the home page's carousels and the
+ * product-detail "related products" rail use, just with more items and its
+ * own page/title instead of a home-page rail.
  */
-export default function BestSellersWrapper() {
-  const { data: products, isLoading } = useProductCollection("BEST_SELLERS", 24);
+export function ShopCollectionWrapper({
+  type,
+  title,
+  description,
+  emptyTitle = "Nothing here yet",
+  emptyDescription = "Check back again soon.",
+  limit = 24,
+}: ShopCollectionWrapperProps) {
+  const { data: products, isLoading } = useProductCollection(type, limit);
   const productCards = (products ?? []).map(mapProductToCard);
 
   return (
@@ -29,15 +48,11 @@ export default function BestSellersWrapper() {
           </div>
         </section>
       ) : productCards.length > 0 ? (
-        <ProductSection
-          data={productCards}
-          title="Best Sellers"
-          description="Our most-ordered products, ranked by real sales."
-        />
+        <ProductSection data={productCards} title={title} description={description} />
       ) : (
         <section className="container pt-10 md:pt-16 pb-10 text-center">
-          <h1 className="text-2xl font-bold text-black mb-3">Nothing here yet</h1>
-          <p className="text-gray-600">Check back once a few orders are in.</p>
+          <h1 className="text-2xl font-bold text-black mb-3">{emptyTitle}</h1>
+          <p className="text-gray-600">{emptyDescription}</p>
         </section>
       )}
 

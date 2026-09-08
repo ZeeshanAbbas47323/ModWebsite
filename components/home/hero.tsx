@@ -183,7 +183,7 @@ export function Hero() {
       <div className="absolute bottom-6 md:bottom-8 left-0 right-0 z-20">
         <div className="container flex items-center justify-between gap-4">
           <div className="flex items-center gap-2 md:gap-3 flex-wrap">
-            {HERO_SLIDES.map((item, i) => (
+            {slides.map((item, i) => (
               <button
                 key={item.id}
                 type="button"
