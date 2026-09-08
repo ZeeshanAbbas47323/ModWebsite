@@ -68,7 +68,7 @@ export const ORDER_PROCESS_FALLBACK: OrderProcessViewModel = {
       id: "choose",
       title: "Choose Your Perfect Product",
       description:
-        "Browse our wide range of custom T-shirts, hoodies, banners, yard signs, business cards, embroidery, and DTF UV DTF transfers. Select the product type, size, and style that matches your vision. Every option is designed to give you creative freedom and professional results.",
+        "Browse our wide range of custom T-shirts, hoodies, banners, yard signs, business cards, embroidery, and DTF UV DTF transfers, and pick the product type, size, and style that matches your vision.",
       imageUrl: "/images/icons/gallery.svg",
       alt: "Choose Your Perfect Product",
       badge: "1",
@@ -77,7 +77,7 @@ export const ORDER_PROCESS_FALLBACK: OrderProcessViewModel = {
       id: "upload",
       title: "Upload or Create Your Design",
       description:
-        "Browse our wide range of custom T-shirts, hoodies, banners, yard signs, business cards, embroidery, and DTF UV DTF transfers. Select the product type, size, and style that matches your vision. Every option is designed to give you creative freedom and professional results.",
+        "Upload your own artwork or start from one of our templates. We'll check it over so what prints matches what you sent us.",
       imageUrl: "/images/icons/upload.svg",
       alt: "Upload or Create Your Design",
       badge: "2",
@@ -86,7 +86,7 @@ export const ORDER_PROCESS_FALLBACK: OrderProcessViewModel = {
       id: "confirm",
       title: "Confirm and Place Your Order",
       description:
-        "Browse our wide range of custom T-shirts, hoodies, banners, yard signs, business cards, embroidery, and DTF UV DTF transfers. Select the product type, size, and style that matches your vision. Every option is designed to give you creative freedom and professional results.",
+        "Review your product, design, and quantity, then place your order. You'll get a confirmation the moment it's in.",
       imageUrl: "/images/icons/cloud.svg",
       alt: "Confirm and Place Your Order",
       badge: "3",
@@ -95,7 +95,7 @@ export const ORDER_PROCESS_FALLBACK: OrderProcessViewModel = {
       id: "receive",
       title: "Receive and Enjoy Your Items",
       description:
-        "Browse our wide range of custom T-shirts, hoodies, banners, yard signs, business cards, embroidery, and DTF UV DTF transfers. Select the product type, size, and style that matches your vision. Every option is designed to give you creative freedom and professional results.",
+        "We print, pack, and ship your order fast — most orders are on their way within 1–2 business days.",
       imageUrl: "/images/icons/package.svg",
       alt: "Receive and Enjoy Your Items",
       badge: "4",
