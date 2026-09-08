@@ -6,10 +6,13 @@ import { WHY_MODFIRST_IMAGES } from "@/lib/home-showcase-images";
 import { useHomeSection } from "@/hooks/use-home-section";
 import { mapHomeWhyModfirst } from "@/lib/map-home-why-modfirst";
 import { resolveImageUrl } from "@/lib/image-url";
+import { WHY_MODFIRST_FALLBACK } from "@/lib/home-fallback-content";
 
 export const WhyModfirst = () => {
   const { data: section, isLoading } = useHomeSection("home_why_modfirst");
-  const why = mapHomeWhyModfirst(section);
+  // No `home_why_modfirst` row exists yet, so this fell back to rendering
+  // nothing; the mosaic images are already local, so only the copy needs one.
+  const why = mapHomeWhyModfirst(section) ?? WHY_MODFIRST_FALLBACK;
 
   if (isLoading) {
     return (
@@ -31,8 +34,6 @@ export const WhyModfirst = () => {
       </section>
     );
   }
-
-  if (!why) return null;
 
   return (
     <section className="relative w-full pt-10 md:pt-12 lg:pt-16 overflow-hidden">

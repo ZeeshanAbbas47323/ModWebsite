@@ -5,6 +5,7 @@ import { motion, Variants } from "framer-motion";
 import { useHomeSection } from "@/hooks/use-home-section";
 import { mapHomeOrderProcess } from "@/lib/map-home-order-process";
 import { resolveImageUrl } from "@/lib/image-url";
+import { ORDER_PROCESS_FALLBACK } from "@/lib/home-fallback-content";
 
 const headerVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -44,7 +45,9 @@ const cardItemVariants: Variants = {
 
 export function OurOrderProcess() {
   const { data: section, isLoading } = useHomeSection("home_order_process");
-  const process = mapHomeOrderProcess(section);
+  // No `home_order_process` row exists yet, so this fell back to rendering
+  // nothing.
+  const process = mapHomeOrderProcess(section) ?? ORDER_PROCESS_FALLBACK;
 
   if (isLoading) {
     return (
@@ -65,10 +68,6 @@ export function OurOrderProcess() {
         </div>
       </section>
     );
-  }
-
-  if (!process || (!process.title && process.steps.length === 0)) {
-    return null;
   }
 
   return (

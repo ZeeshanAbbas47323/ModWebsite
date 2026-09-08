@@ -6,10 +6,13 @@ import { FAST_PRODUCTION_IMAGES } from "@/lib/home-showcase-images";
 import { useHomeSection } from "@/hooks/use-home-section";
 import { mapHomeFastProduction } from "@/lib/map-home-fast-production";
 import { resolveImageUrl } from "@/lib/image-url";
+import { FAST_PRODUCTION_FALLBACK } from "@/lib/home-fallback-content";
 
 export const FastProduction = () => {
   const { data: section, isLoading } = useHomeSection("home_fast_production");
-  const data = mapHomeFastProduction(section);
+  // No `home_fast_production` row exists yet, so this fell back to rendering
+  // nothing; the mosaic images are already local, so only the copy needs one.
+  const data = mapHomeFastProduction(section) ?? FAST_PRODUCTION_FALLBACK;
 
   if (isLoading) {
     return (
@@ -30,8 +33,6 @@ export const FastProduction = () => {
       </section>
     );
   }
-
-  if (!data) return null;
 
   return (
     <section className="relative w-full pt-10 md:pt-12 lg:pt-16 overflow-hidden">
