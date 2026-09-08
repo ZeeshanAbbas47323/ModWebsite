@@ -375,10 +375,6 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                         <p className="text-sm text-gray-600 mb-6">{product.short_desc}</p>
                     )}
 
-                    <div className="text-sm text-gray-600 mb-8">
-                        <span className="underline cursor-pointer decoration-gray-400 underline-offset-4">Shipping</span> calculated at checkout.
-                    </div>
-
                     {!usesGangSheetBuilder && !usesTransfersBySize && variants && variants.length > 0 && (
                         <VariantSelector
                             variants={variants}
