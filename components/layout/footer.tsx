@@ -194,7 +194,7 @@ export function Footer() {
 
           <div className="flex flex-col md:flex-row justify-between items-center pt-6 border-t border-white/10 gap-6">
             <p className="text-[#A3A3A3] text-sm text-center md:text-left">
-              &copy; {new Date().getFullYear()} Modfirst. All rights reserved.
+              &copy; {new Date().getFullYear()} {settings?.site_name ?? "ModFirst"}. All rights reserved.
             </p>
 
             {socials.length > 0 && (

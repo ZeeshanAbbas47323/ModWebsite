@@ -135,6 +135,10 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Safety net: no single stray element (CMS content, a fixed-width embed,
+       an over-wide table) should be able to force a page-level horizontal
+       scrollbar, on top of the overflow guards on individual rich-text blocks. */
+    overflow-x: hidden;
   }
   button:not(:disabled),
   [role="button"]:not(:disabled) {
@@ -179,6 +183,11 @@
 .cms-prose h2,
 .cms-prose h3 { color: #000; font-weight: 700; margin: 1rem 0 0.5rem; }
 .cms-prose img { max-width: 100%; height: auto; border-radius: 0.75rem; }
+.cms-prose { overflow-wrap: break-word; word-break: break-word; }
+.cms-prose table { display: block; width: 100%; max-width: 100%; overflow-x: auto; border-collapse: collapse; white-space: nowrap; }
+.cms-prose th, .cms-prose td { border: 1px solid #e5e5e5; padding: 0.5rem 0.75rem; text-align: left; }
+.cms-prose pre { max-width: 100%; overflow-x: auto; white-space: pre-wrap; word-break: break-word; }
+.cms-prose iframe { max-width: 100%; }
 /* Icon fonts are not loaded, so decorative <i> tags would render as blanks. */
 .cms-prose i[class^="fa"],
 .cms-prose i[class*=" fa"] { display: none; }

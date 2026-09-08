@@ -50,14 +50,14 @@ export function getMenuHref(node: MenuNode): string | undefined {
 
     // `target_category_id` points at a legacy `Category` table with no
     // relation to the real catalog (`ProductCategory`, which
-    // `/collections/[slug]` actually reads) — every menu authored so far has
+    // `/categories/[slug]` actually reads) — every menu authored so far has
     // it null anyway. The slug is what these menus were actually built with,
     // so route through the real collection page by slug instead. A slug that
     // already looks like a product path ("products/...") is a product page
     // that was mislabeled "category" — send it there directly rather than
-    // wrapping it in /collections.
+    // wrapping it in /categories.
     const slug = pathFromSlug(node.slug);
-    if (slug && !slug.startsWith("/products/")) return `/collections${slug}`;
+    if (slug && !slug.startsWith("/products/")) return `/categories${slug}`;
     return slug;
   }
 

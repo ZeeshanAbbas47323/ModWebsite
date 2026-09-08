@@ -36,7 +36,7 @@ const ProductWrapper = () => {
                         {categories.map((cat) => (
                             <Link
                                 key={cat.id}
-                                href={`/collections/${cat.slug}`}
+                                href={`/categories/${cat.slug}`}
                                 className="px-5 py-2 rounded-full text-sm font-medium transition-colors bg-[#F4F4F5] text-black hover:bg-black/10"
                             >
                                 {cat.name}

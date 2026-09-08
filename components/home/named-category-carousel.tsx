@@ -20,7 +20,7 @@ export function NamedCategoryCarousel({ name, limit }: { name: string; limit?: n
     <CategoryCarousel
       categoryId={category.id}
       title={category.name}
-      viewAllHref={`/collections/${category.slug}`}
+      viewAllHref={`/categories/${category.slug}`}
       limit={limit}
     />
   );

@@ -9,6 +9,15 @@ const nextConfig: NextConfig = {
       { source: "/Net 30", destination: "/net-30", permanent: false },
       { source: "/Net%2030", destination: "/net-30", permanent: false },
       { source: "/net30", destination: "/net-30", permanent: false },
+      // The old live site used /collections/... URLs (Shopify-style) even
+      // though there is no Collection entity — the data was always product
+      // categories. Routes moved to /categories; these keep old links,
+      // bookmarks, and search-engine results working instead of 404ing.
+      // Old Shopify-style nested product URL (/collections/<cat>/products/<slug>) —
+      // the category segment was never meaningful to the lookup, only the slug.
+      { source: "/collections/:category/products/:slug", destination: "/products/:slug", permanent: true },
+      { source: "/collections", destination: "/categories", permanent: true },
+      { source: "/collections/:slug*", destination: "/categories/:slug*", permanent: true },
     ];
   },
   // A lockfile in the parent directory makes Next infer the wrong workspace

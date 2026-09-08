@@ -40,7 +40,7 @@ const HomeWrapper = () => {
         count: cat._count?.products ? `${cat._count.products} Products` : "",
         img_path: resolveImageUrl(cat.image_url, "/images/banners-compositions/booklet.png"),
         // Categories are collections, not products — link them accordingly.
-        href: `/collections/${cat.slug}`,
+        href: `/categories/${cat.slug}`,
     })) ?? fallbackProducts;
 
     return (
@@ -53,7 +53,7 @@ const HomeWrapper = () => {
                     data={categoryCards}
                     title="Our Categories"
                     description="From small business advertising to big event displays, Modfirst delivers bold."
-                    viewAllHref="/collections"
+                    viewAllHref="/categories"
                 />
             </ScrollReveal>
 
@@ -76,12 +76,17 @@ const HomeWrapper = () => {
                 <OurOrderProcess />
             </ScrollReveal>
 
-            {/* Two specific catalogue categories */}
+            {/* Sublimation (#60) + UV DTF (#62) — one shared rail rather than
+                two separate carousels, since they're presented as one
+                offering on the site. */}
             <ScrollReveal>
-                <CategoryCarousel categoryId={60} />
-            </ScrollReveal>
-            <ScrollReveal>
-                <CategoryCarousel categoryId={62} />
+                <CategoryCarousel
+                    categoryId={[60, 62]}
+                    title="Sublimation & DTF"
+                    description="Vibrant, durable transfers for apparel, signage and more."
+                    limit={12}
+                    viewAllHref="/products"
+                />
             </ScrollReveal>
 
             <ScrollReveal>

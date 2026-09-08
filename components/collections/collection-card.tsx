@@ -12,7 +12,7 @@ export function CollectionCard({ collection }: { collection: ProductCategory }) 
 
   return (
     <Link
-      href={`/collections/${collection.slug}`}
+      href={`/categories/${collection.slug}`}
       className="flex flex-col items-center group cursor-pointer"
     >
       <div className="w-full bg-[#F4F4F5] h-[280px] md:h-[350px] rounded-[24px] flex items-center justify-center p-8 mb-5 relative overflow-hidden">

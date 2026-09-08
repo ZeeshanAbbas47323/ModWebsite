@@ -20,7 +20,7 @@ export function Header() {
   const { count: wishlistCount } = useWishlist();
   const { isAuthenticated } = useAuth();
 
-  const phone = settings?.contact_phone ?? "+92 3123456789";
+  const phone = settings?.contact_phone?.trim() || null;
 
   return (
     <>
@@ -48,10 +48,12 @@ export function Header() {
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            <a href={`tel:${phone.replace(/[^+\d]/g, "")}`} className="hidden lg:flex items-center gap-2 hover:opacity-75 transition-opacity">
-              <Image src="/images/icons/phone.svg" alt="Phone" width={20} height={20} />
-              <span className="text-sm font-medium whitespace-nowrap">{phone}</span>
-            </a>
+            {phone && (
+              <a href={`tel:${phone.replace(/[^+\d]/g, "")}`} className="hidden lg:flex items-center gap-2 hover:opacity-75 transition-opacity">
+                <Image src="/images/icons/phone.svg" alt="Phone" width={20} height={20} />
+                <span className="text-sm font-medium whitespace-nowrap">{phone}</span>
+              </a>
+            )}
 
             <Button size="icon-lg" variant="ghost" asChild>
               <Link href={isAuthenticated ? "/account" : "/login"} aria-label={isAuthenticated ? "My account" : "Sign in"}>

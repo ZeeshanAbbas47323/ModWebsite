@@ -53,9 +53,13 @@ function extractAuth(raw: Record<string, unknown>): AuthResult {
 
 export const authService = {
   login: async (input: LoginInput): Promise<AuthResult> => {
+    // `/auth/login` is shared with the dashboard's staff login — passing
+    // user_type makes the backend reject a staff/admin account here instead
+    // of silently granting them a customer session on the storefront.
     const { data } = await apiClient.post("/auth/login", {
       rememberMe: true,
       ...input,
+      user_type: "customer",
     });
     return extractAuth(data);
   },

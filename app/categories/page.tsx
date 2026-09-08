@@ -7,12 +7,12 @@ import { CollectionCard } from "@/components/collections/collection-card";
 import { getCollections } from "@/services/product-category.server";
 
 export const metadata: Metadata = {
-  title: "Collections",
+  title: "Categories",
   description:
     "Browse Modfirst collections — DTF transfers, glitter DTF, blank apparel and printing supplies.",
 };
 
-export default async function CollectionsPage() {
+export default async function CategoriesPage() {
   const collections = await getCollections();
   // Sub-collections belong on their parent's page, not in the top-level grid.
   const roots = collections.filter((c) => c.parent_id == null);
@@ -21,7 +21,7 @@ export default async function CollectionsPage() {
     <main className="flex flex-col flex-1 min-h-screen">
       <section className="container pt-10 md:pt-16">
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-black mb-4">
-          Collections
+          Categories
         </h1>
         <p className="text-gray-600 text-base md:text-lg max-w-2xl mb-10">
           From small business advertising to big event displays, Modfirst delivers bold.

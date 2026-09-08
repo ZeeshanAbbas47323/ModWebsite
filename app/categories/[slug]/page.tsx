@@ -44,7 +44,7 @@ export default async function CollectionPage({ params }: Props) {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink asChild><Link href="/collections">Collections</Link></BreadcrumbLink>
+              <BreadcrumbLink asChild><Link href="/categories">Categories</Link></BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>

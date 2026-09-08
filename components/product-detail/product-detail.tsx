@@ -44,6 +44,21 @@ interface ProductDetailProps {
     productId?: number;
 }
 
+// Product descriptions/FAQs are admin-authored HTML (from the dashboard's rich
+// text editor) — they can contain tables, long unbroken strings (SKUs, URLs),
+// and images with explicit widths. Without these guards any one of those
+// blows out the layout width and causes horizontal scroll on mobile.
+const richTextClasses =
+    "break-words [&>*+*]:mt-4 [&_strong]:text-black [&_b]:text-black " +
+    "[&_h2]:text-lg [&_h2]:text-black [&_h2]:font-bold [&_h3]:text-base [&_h3]:text-black [&_h3]:font-bold " +
+    "[&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:text-black [&_a]:underline [&_a]:break-words " +
+    "[&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-lg " +
+    "[&_table]:block [&_table]:w-full [&_table]:max-w-full [&_table]:overflow-x-auto [&_table]:whitespace-nowrap [&_table]:border-collapse " +
+    "[&_th]:border [&_th]:border-gray-200 [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:font-semibold [&_th]:text-black " +
+    "[&_td]:border [&_td]:border-gray-200 [&_td]:px-3 [&_td]:py-2 " +
+    "[&_pre]:overflow-x-auto [&_pre]:max-w-full [&_pre]:whitespace-pre-wrap [&_pre]:break-words " +
+    "[&_iframe]:max-w-full";
+
 const fallbackImages = [
     "/images/products/dtf-ink-cymk.png",
     "/images/products/dtf-printing-service.png",
@@ -296,7 +311,7 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
             </Breadcrumb>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-                <div className="lg:col-span-7 flex flex-col sm:flex-row gap-4">
+                <div className="lg:col-span-7 min-w-0 flex flex-col sm:flex-row gap-4">
                     <div className="order-2 sm:order-1 sm:w-[100px] shrink-0 flex flex-row sm:flex-col gap-4 overflow-x-auto sm:overflow-visible no-scrollbar">
                         {galleryImages.map((img, index) => (
                             <button
@@ -312,7 +327,7 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                         ))}
                     </div>
 
-                    <div className="order-1 sm:order-2 flex-1 rounded-3xl relative overflow-hidden aspect-square sm:aspect-auto sm:h-[500px] lg:h-[600px] flex items-center justify-center bg-gray-100">
+                    <div className="order-1 sm:order-2 min-w-0 flex-1 rounded-3xl relative overflow-hidden aspect-square sm:aspect-auto sm:h-[500px] lg:h-[600px] flex items-center justify-center bg-gray-100">
                         <Carousel setApi={setApi} opts={{ loop: true }} className="w-full h-full">
                             <CarouselContent className="ml-0">
                                 {galleryImages.map((img, idx) => (
@@ -327,7 +342,7 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                     </div>
                 </div>
 
-                <div className="lg:col-span-5 w-full">
+                <div className="lg:col-span-5 min-w-0 w-full">
                     <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-black mb-4 leading-tight">
                         {product?.name ?? "Product"}
                     </h1>
@@ -441,7 +456,7 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                                     <AccordionTrigger className="text-base font-bold hover:no-underline py-3 px-0 text-black [&>svg]:text-black">
                                         {desc.title}
                                     </AccordionTrigger>
-                                    <AccordionContent className="text-gray-600 text-base" dangerouslySetInnerHTML={{ __html: desc.content }} />
+                                    <AccordionContent className={cn("text-gray-600 text-base min-w-0", richTextClasses)} dangerouslySetInnerHTML={{ __html: desc.content }} />
                                 </AccordionItem>
                             ))}
                             {sortedFaqs.map((faq, i) => (
@@ -449,7 +464,7 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                                     <AccordionTrigger className="text-base font-bold hover:no-underline py-3 px-0 text-black [&>svg]:text-black">
                                         {faq.question}
                                     </AccordionTrigger>
-                                    <AccordionContent className="text-gray-600 text-base">
+                                    <AccordionContent className="text-gray-600 text-base break-words">
                                         {faq.answer}
                                     </AccordionContent>
                                 </AccordionItem>
@@ -460,10 +475,10 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
             </div>
 
             {product?.description && (
-                <div className="mt-12 max-w-3xl">
+                <div className="mt-12 max-w-3xl min-w-0">
                     <h2 className="text-xl font-bold text-black mb-4">Description</h2>
                     <div
-                        className="text-sm sm:text-base text-gray-600 leading-relaxed [&>*+*]:mt-4 [&_strong]:text-black [&_h2]:text-lg [&_h2]:text-black [&_h2]:font-bold [&_h3]:text-base [&_h3]:text-black [&_h3]:font-bold [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:text-black [&_a]:underline"
+                        className={cn("text-sm sm:text-base text-gray-600 leading-relaxed min-w-0", richTextClasses)}
                         dangerouslySetInnerHTML={{ __html: product.description }}
                     />
                 </div>

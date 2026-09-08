@@ -76,7 +76,7 @@ export const HERO_SLIDES: HeroSlide[] = [
       "Keep production moving with DTF film, CMYK ink and adhesive powder from the same shop that prints for thousands of brands. Order before 2 PM and it ships today.",
     image: "/images/hero/heat-press.png",
     imageAlt: "Heat press applying a transfer to a t-shirt",
-    primary: { label: "Shop DTF Supplies", href: "/collections/dtf-supplies" },
+    primary: { label: "Shop DTF Supplies", href: "/categories/dtf-supplies" },
     secondary: { label: "Browse All Products", href: "/products" },
     gradient: "linear-gradient(to bottom, #5ED6C0 0%, #0f3a34 55%, #000000 100%)",
   },

@@ -131,7 +131,7 @@ export interface ProductListParams {
   page?: number;
   limit?: number;
   filters?: {
-    category_id?: number;
+    category_id?: number | number[];
     name?: string;
     slug?: string;
     is_featured?: boolean;
