@@ -51,7 +51,7 @@ export default function RootLayout({
               <Footer />
               <PopupBanner />
               <Toaster
-                position="top-center"
+                position="bottom-right"
                 richColors
                 closeButton
                 toastOptions={{
