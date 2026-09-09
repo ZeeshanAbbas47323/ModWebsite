@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { useCart } from '@/contexts/cart-context';
@@ -13,7 +14,6 @@ export const OrderSummary = () => {
   const { lines, subtotal, discount, total, coupon, applyCoupon, removeCoupon } = useCart();
 
   const [code, setCode] = useState('');
-  const [couponError, setCouponError] = useState<string | null>(null);
   const [applying, setApplying] = useState(false);
 
 
@@ -24,16 +24,21 @@ export const OrderSummary = () => {
 
   const handleApply = async (e: React.FormEvent) => {
     e.preventDefault();
-    setCouponError(null);
     setApplying(true);
     try {
       await applyCoupon(code);
+      toast.success(`Coupon "${code.trim()}" applied.`);
       setCode('');
     } catch (err) {
-      setCouponError(err instanceof Error ? err.message : 'Invalid coupon code');
+      toast.error(err instanceof Error ? err.message : 'Invalid coupon code');
     } finally {
       setApplying(false);
     }
+  };
+
+  const handleRemoveCoupon = () => {
+    removeCoupon();
+    toast.info('Coupon removed.');
   };
 
   return (
@@ -48,7 +53,7 @@ export const OrderSummary = () => {
             <p className="text-xs text-green-700">Coupon applied</p>
           </div>
           <button
-            onClick={removeCoupon}
+            onClick={handleRemoveCoupon}
             className="text-sm text-gray-500 hover:text-black underline shrink-0 ml-3"
           >
             Remove
@@ -68,7 +73,6 @@ export const OrderSummary = () => {
               {applying ? 'Checking…' : 'Apply'}
             </Button>
           </div>
-          {couponError && <p className="text-xs text-red-600 mt-2">{couponError}</p>}
         </form>
       )}
 

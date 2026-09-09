@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useWishlist, type WishlistInput } from "@/contexts/wishlist-context";
 
@@ -27,9 +28,12 @@ export function WishlistButton({
     e.stopPropagation();
     if (busy) return;
     setBusy(true);
+    const wasSaved = saved;
     try {
       await toggle(input);
-    } catch {
+      toast(wasSaved ? "Removed from wishlist" : "Saved to wishlist");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not update your wishlist");
     } finally {
       setBusy(false);
     }

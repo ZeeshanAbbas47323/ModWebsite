@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { toast } from 'sonner';
 import { useCart } from '@/contexts/cart-context';
 import type { CartLine } from '@/lib/cart-storage';
 import { resolveImageUrl } from "@/lib/image-url";
@@ -14,20 +15,24 @@ interface CartItemProps {
 export const CartItem: React.FC<CartItemProps> = ({ line }) => {
   const { updateQuantity, removeItem } = useCart();
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const run = async (action: () => Promise<void>) => {
     if (busy) return;
     setBusy(true);
-    setError(null);
     try {
       await action();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not update this item");
+      toast.error(err instanceof Error ? err.message : "Could not update this item");
     } finally {
       setBusy(false);
     }
   };
+
+  const handleRemove = () =>
+    run(async () => {
+      await removeItem(line.key);
+      toast(`Removed ${line.name} from cart`);
+    });
 
   const isExternal = line.image.startsWith('http');
   const isGangSheet = !!line.design_uploads?.length;
@@ -95,8 +100,6 @@ export const CartItem: React.FC<CartItemProps> = ({ line }) => {
             ))}
           </ul>
         )}
-
-        {error && <p className="text-red-600 text-xs mt-1">{error}</p>}
       </div>
 
 
@@ -130,7 +133,7 @@ export const CartItem: React.FC<CartItemProps> = ({ line }) => {
         <button
           aria-label={`Remove ${line.name} from cart`}
           disabled={busy}
-          onClick={() => run(() => removeItem(line.key))}
+          onClick={handleRemove}
           className="hover:opacity-70 transition-opacity p-2 shrink-0 sm:ml-4 disabled:opacity-40"
         >
           <Image src="/images/icons/delete.svg" alt="" width={24} height={24} className="object-contain" />

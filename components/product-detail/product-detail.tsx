@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
     Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator,
@@ -163,6 +164,7 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                 print_method: "dtf",
             }],
         });
+        toast.success(`${product.name} added to your cart.`);
     };
 
     const handleGangSheetAdd = async (item: GangSheetCartItem) => {
@@ -175,6 +177,7 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
             print_method: gangSheetPrintMethod(item),
             design_uploads: gangSheetDesignUploads(item),
         });
+        toast.success(`${product.name} added to your cart.`);
     };
 
     const handleAddToCart = async () => {
@@ -233,8 +236,11 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
             setArtwork([]);
             setAdded(true);
             setTimeout(() => setAdded(false), 2500);
+            toast.success(`${product.name} added to your cart.`);
         } catch (err) {
-            setAddError(err instanceof Error ? err.message : "Could not add to cart");
+            const message = err instanceof Error ? err.message : "Could not add to cart";
+            setAddError(message);
+            toast.error(message);
         } finally {
             setAdding(false);
         }

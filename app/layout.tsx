@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
+import { Toaster } from "sonner";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Header } from "@/components/layout/header";
@@ -49,6 +50,14 @@ export default function RootLayout({
               </div>
               <Footer />
               <PopupBanner />
+              <Toaster
+                position="top-center"
+                richColors
+                closeButton
+                toastOptions={{
+                  style: { fontFamily: "var(--font-sans)" },
+                }}
+              />
               </WishlistProvider>
             </CartProvider>
           </AuthProvider>

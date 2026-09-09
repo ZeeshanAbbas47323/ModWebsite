@@ -466,30 +466,59 @@ export function CheckoutWrapper() {
 
 
           <div className="bg-[#F4F4F5] rounded-[24px] p-6 md:p-8">
-            <h2 className="text-xl font-bold text-black mb-5">Payment</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <h2 className="text-xl font-bold text-black mb-1">Payment</h2>
+            <p className="text-sm text-gray-500 mb-5">Choose how you'd like to pay — both are processed securely.</p>
+            <div className="grid grid-cols-2 gap-3">
               {([
-                { value: "stripe", label: "Card", icon: "/images/payment-gateways/shop.png" },
-                { value: "paypal", label: "PayPal", icon: "/images/payment-gateways/pay-pal.png" },
-                { value: "bank_transfer", label: "Bank transfer", icon: null },
-                { value: "cash", label: "Pay on collection", icon: null },
-              ] as const).map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => setPaymentMethod(option.value)}
-                  className={`h-16 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 px-2 ${
-                    paymentMethod === option.value
-                      ? "bg-black text-white"
-                      : "bg-white text-black hover:bg-black/5"
-                  }`}
-                >
-                  {option.icon && (
-                    <Image src={resolveImageUrl(option.icon)} alt="" width={44} height={16} className="object-contain" />
-                  )}
-                  <span className="text-sm text-center leading-tight">{option.label}</span>
-                </button>
-              ))}
+                {
+                  value: "stripe",
+                  label: "Credit / Debit Card",
+                  sublabel: "Visa, Mastercard, Amex",
+                  icon: "/images/payment-gateways/shop.png",
+                },
+                {
+                  value: "paypal",
+                  label: "PayPal",
+                  sublabel: "Pay with your PayPal account",
+                  icon: "/images/payment-gateways/pay-pal.png",
+                },
+              ] as const).map((option) => {
+                const active = paymentMethod === option.value;
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => setPaymentMethod(option.value)}
+                    className={`relative flex flex-col items-start gap-3 rounded-2xl border-2 p-4 sm:p-5 text-left transition-colors ${
+                      active
+                        ? "border-black bg-white"
+                        : "border-transparent bg-white/70 hover:bg-white"
+                    }`}
+                  >
+                    <span
+                      className={`absolute right-4 top-4 flex size-5 items-center justify-center rounded-full border-2 ${
+                        active ? "border-black bg-black" : "border-gray-300"
+                      }`}
+                    >
+                      {active && <span className="size-2 rounded-full bg-white" />}
+                    </span>
+                    <div className="flex h-10 items-center">
+                      <Image
+                        src={resolveImageUrl(option.icon)}
+                        alt=""
+                        width={64}
+                        height={28}
+                        className="object-contain object-left"
+                      />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-black text-sm sm:text-base">{option.label}</p>
+                      <p className="text-xs text-gray-500">{option.sublabel}</p>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
 
 

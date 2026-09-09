@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Loader2, Play, Plus, X } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -180,12 +181,14 @@ export function ProductReviews({ productId }: { productId: number }) {
       setImages([]);
       setVideoUrl(null);
       setFormOpen(false);
+      toast.success("Thanks — your review has been posted.");
     } catch (err) {
-      setError(
+      const message =
         err instanceof Error
           ? err.message
-          : "Couldn't post your review. Please try again."
-      );
+          : "Couldn't post your review. Please try again.";
+      setError(message);
+      toast.error(message);
     }
   };
 
