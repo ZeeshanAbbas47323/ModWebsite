@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Loader2, Play, Plus, X } from "lucide-react";
@@ -17,6 +17,7 @@ import {
   useMarkReviewHelpful,
   useReviews,
 } from "@/hooks/use-reviews";
+import type { Review } from "@/services/review.service";
 
 /** Where review photos/videos are filed on the media CDN. */
 const REVIEW_UPLOAD_FOLDER = "reviews";
@@ -82,12 +83,42 @@ function RatingInput({
   );
 }
 
+/** Reviewers type their own name however they like ("tami huggins",
+ * "JOHN SMITH") — title-case it for a consistent, professional look without
+ * touching the stored value. */
+function formatDisplayName(name: string): string {
+  return name
+    .split(" ")
+    .map((word) =>
+      word ? word[0].toUpperCase() + word.slice(1).toLowerCase() : word
+    )
+    .join(" ");
+}
+
+const REVIEWS_PAGE_SIZE = 5;
+
 export function ProductReviews({ productId }: { productId: number }) {
   const { isAuthenticated } = useAuth();
-  const { data, isLoading } = useReviews({
+  // Paginated (not one big fetch) so the section loads fast even when a
+  // product has 40+ reviews; "Show more" below fetches the next page.
+  const [page, setPage] = useState(1);
+  const { data, isLoading, isFetching } = useReviews({
     filters: { product_id: productId },
-    limit: 20,
+    page,
+    limit: REVIEWS_PAGE_SIZE,
   });
+  const [loadedReviews, setLoadedReviews] = useState<Review[]>([]);
+  useEffect(() => {
+    if (!data) return;
+    setLoadedReviews((prev) => (page === 1 ? data.data : [...prev, ...data.data]));
+  }, [data, page]);
+  // A different product's reviews shouldn't inherit the previous product's
+  // already-loaded pages.
+  useEffect(() => {
+    setPage(1);
+    setLoadedReviews([]);
+  }, [productId]);
+
   const createReview = useCreateReview(productId);
   const markHelpful = useMarkReviewHelpful();
 
@@ -106,7 +137,7 @@ export function ProductReviews({ productId }: { productId: number }) {
   const imageInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
 
-  const reviews = data?.data ?? [];
+  const reviews = loadedReviews;
   const summary = data?.summary;
   const total = summary?.total_reviews ?? 0;
   const average = summary?.average_rating ?? 0;
@@ -373,7 +404,7 @@ export function ProductReviews({ productId }: { productId: number }) {
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="text-sm font-semibold text-black">
-                          {review.user?.full_name ?? "Verified buyer"}
+                          {review.user?.full_name ? formatDisplayName(review.user.full_name) : "Verified buyer"}
                         </span>
                         {review.is_verified && (
                           <span className="rounded-full bg-[#F4F4F5] px-2 py-0.5 text-xs font-medium text-black">
@@ -447,6 +478,23 @@ export function ProductReviews({ productId }: { productId: number }) {
               ))
             )}
           </div>
+
+          {reviews.length < total && (
+            <div className="mt-6 flex justify-center">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setPage((p) => p + 1)}
+                disabled={isFetching}
+              >
+                {isFetching ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  `Show more reviews (${total - reviews.length} left)`
+                )}
+              </Button>
+            </div>
+          )}
         </>
       )}
     </div>
