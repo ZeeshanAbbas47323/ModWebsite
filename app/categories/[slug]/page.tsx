@@ -61,7 +61,8 @@ export default async function CollectionPage({ params }: Props) {
                 src={image}
                 alt={collection.name}
                 fill
-                className="object-contain p-4"
+                sizes="208px"
+                className="object-cover"
                 priority
                 {...(image.startsWith("http") ? { unoptimized: true } : {})}
               />
