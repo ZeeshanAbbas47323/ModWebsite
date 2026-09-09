@@ -15,18 +15,30 @@ export interface ProductCategory {
 }
 
 export const productCategoryService = {
+  /**
+   * `GET /product-categories` never existed (only `POST /product-categories`,
+   * staff-only) — this call 404'd silently on every load, so the home page
+   * always fell back to its hardcoded placeholder categories instead of the
+   * real ones. The only public route is `POST /product-categories/frontend`,
+   * which also enforces `is_active` server-side.
+   */
   list: async (parentId?: number | null): Promise<ProductCategory[]> => {
-    // GET so the response is cacheable by URL.
-    const query =
-      parentId !== undefined ? `?parent_id=${parentId ?? ""}` : "";
-    const { data } = await apiClient.get(`/product-categories${query}`);
+    const filters: Record<string, unknown> = {};
+    if (parentId !== undefined) filters.parent_id = parentId;
+    const { data } = await apiClient.post("/product-categories/frontend", {
+      page: 1,
+      limit: 100,
+      filters,
+    });
     return data.payload ?? data.data ?? [];
   },
 
   bySlug: async (slug: string): Promise<ProductCategory | null> => {
-    const { data } = await apiClient.get(
-      `/product-categories?slug=${encodeURIComponent(slug)}`
-    );
+    const { data } = await apiClient.post("/product-categories/frontend", {
+      page: 1,
+      limit: 1,
+      filters: { slug },
+    });
     const categories: ProductCategory[] = data.payload ?? data.data ?? [];
     return categories[0] ?? null;
   },
