@@ -28,7 +28,7 @@ export interface CreateOrderInput {
   notes?: string;
 }
 
-/** A design file attached to an order line. */
+
 export interface OrderItemDesign {
   id?: number;
   design_upload_id?: number;
@@ -46,7 +46,7 @@ export interface OrderItem {
   product_id: number;
   variant_id?: number | null;
   quantity: number;
-  /** Money fields arrive as decimal strings. */
+
   unit_price?: string | number;
   total_price?: string | number;
   print_method?: PrintMethod | null;
@@ -81,13 +81,13 @@ export interface OrderAddress {
 
 export interface Order {
   id: number;
-  /** The customer-facing reference, e.g. "MF-1787438010028-KQV99". */
+
   order_number: string;
-  /** Older deployments named the same value order_code. */
+
   order_code?: string;
   status: string;
   payment_status?: string;
-  /** Money fields arrive as decimal strings. */
+
   total_amount: string | number;
   subtotal?: string | number;
   discount_amount?: string | number;
@@ -115,19 +115,19 @@ export interface Order {
   } | null;
 }
 
-/** The API has used both keys for the lines; accept either. */
+
 export function orderItemsOf(order: Order): OrderItem[] {
   return order.items ?? order.orderItems ?? [];
 }
 
-/** Design files attached to a line, flattened for rendering. */
+
 export function orderItemDesigns(item: OrderItem) {
   return (item.designs ?? [])
     .map((d) => d.designUpload)
     .filter((u): u is NonNullable<typeof u> => !!u?.file_url);
 }
 
-/** The reference used for payment sessions and order lookups. */
+
 export function orderReference(order: Order): string {
   return order.order_number ?? order.order_code ?? "";
 }
@@ -148,7 +148,7 @@ export const orderService = {
     return data.payload ?? data.data ?? data;
   },
 
-  /** Re-adds a past order's items to the cart and returns what was added. */
+
   reorder: async (code: string): Promise<unknown> => {
     const { data } = await apiClient.post(
       `/orders/${encodeURIComponent(code)}/reorder`,
@@ -157,7 +157,7 @@ export const orderService = {
     return data.payload ?? data.data ?? data;
   },
 
-  /** Carrier tracking events for an order, when a label has been created. */
+
   track: async (code: string): Promise<OrderTracking | null> => {
     const { data } = await apiClient.get(
       `/orders/${encodeURIComponent(code)}/track`
@@ -166,7 +166,7 @@ export const orderService = {
   },
 };
 
-/** What the carrier reports right now. Shipment identifiers live on the order. */
+
 export interface OrderTracking {
   status?: string;
   statusDescription?: string;

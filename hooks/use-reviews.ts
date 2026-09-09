@@ -14,7 +14,6 @@ export function useReviews(params: ReviewListParams = {}) {
   });
 }
 
-/** Submitting refreshes the product's review list so the new entry shows up. */
 export function useCreateReview(productId?: number) {
   const queryClient = useQueryClient();
   return useMutation({

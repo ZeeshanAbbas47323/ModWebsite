@@ -32,7 +32,7 @@ export function AuthForm({ mode }: AuthFormProps) {
 
   const isRegister = mode === "register";
 
-  /** Client-side mirror of the API's rules, so errors show before the request. */
+
   const validate = (): string | null => {
     if (!isRegister) return null;
     if (fullName.trim().length < 2) return "Please enter your full name.";
@@ -66,7 +66,7 @@ export function AuthForm({ mode }: AuthFormProps) {
           })
         : await login({ email, password, rememberMe: true });
 
-      // Staff accounts (and any account the API gates) finish on the OTP screen.
+
       if (step === "authenticated") router.push(redirectTo);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");

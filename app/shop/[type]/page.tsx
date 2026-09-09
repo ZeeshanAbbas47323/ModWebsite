@@ -39,12 +39,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: collection?.title ?? "Shop" };
 }
 
-/**
- * One route for every ranked product collection (`best-sellers`,
- * `most-popular`, `newest`, `featured`) — so a "View All" link always lands
- * on the same ranking it was shown from, instead of every one of them
- * falling back to the generic, unfiltered /products listing.
- */
 export default async function ShopCollectionPage({ params }: Props) {
   const { type } = await params;
   const collection = COLLECTIONS[type];

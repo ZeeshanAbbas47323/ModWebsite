@@ -165,7 +165,7 @@ export function OrderDetail({ code }: { code: string }) {
     mutationFn: () => orderService.reorder(code),
     onSuccess: () => {
       setReorderError(null);
-      // The items were added server-side, so the cart has to re-read.
+
       queryClient.invalidateQueries({ queryKey: ["cart", "server"] });
       router.push("/cart");
     },
@@ -175,7 +175,7 @@ export function OrderDetail({ code }: { code: string }) {
       ),
   });
 
-  // Only fetched when the shopper actually asks — it calls the carrier live.
+
   const tracking = useQuery({
     queryKey: ["order-tracking", code],
     queryFn: () => orderService.track(code),
@@ -214,7 +214,7 @@ export function OrderDetail({ code }: { code: string }) {
   const items = orderItemsOf(order);
   const placed = formatDate(order.order_date ?? order.created_at);
   const isPickup = order.delivery_type === "store_pickup";
-  // Tracking only exists once a label has been created.
+
   const canTrack =
     !isPickup &&
     !!order.shipping_status &&
@@ -229,7 +229,7 @@ export function OrderDetail({ code }: { code: string }) {
         <span aria-hidden>←</span> My orders
       </Link>
 
-      {/* Header */}
+
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl md:text-4xl font-bold text-black tracking-tight">
@@ -297,7 +297,7 @@ export function OrderDetail({ code }: { code: string }) {
       )}
 
       <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
-        {/* Items */}
+
         <div className="w-full lg:w-2/3 flex flex-col gap-6">
           <div>
             <h2 className="text-xl font-bold text-black mb-4">
@@ -316,7 +316,7 @@ export function OrderDetail({ code }: { code: string }) {
             )}
           </div>
 
-          {/* Delivery */}
+
           <div className="bg-[#F4F4F5] rounded-[24px] p-6 md:p-8">
             <h2 className="text-xl font-bold text-black mb-5">
               {isPickup ? "Pickup" : "Delivery"}
@@ -357,7 +357,7 @@ export function OrderDetail({ code }: { code: string }) {
           </div>
         </div>
 
-        {/* Summary */}
+
         <div className="w-full lg:w-1/3 lg:sticky lg:top-24">
           <div className="bg-[#F4F4F5] rounded-[24px] p-6 md:p-8">
             <h2 className="text-xl font-bold text-black mb-6">Order summary</h2>

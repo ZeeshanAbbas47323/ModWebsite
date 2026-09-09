@@ -20,10 +20,7 @@ export interface ContentPageFilters {
 }
 
 export const contentPageService = {
-  /**
-   * The by-id endpoint (`content-pages/get/:id`) is admin-only, so the
-   * storefront reads pages through the frontend list with a filter.
-   */
+
   find: async (filters: ContentPageFilters): Promise<ContentPage | null> => {
     const { data } = await apiClient.post("/content-pages", {
       page: 1,

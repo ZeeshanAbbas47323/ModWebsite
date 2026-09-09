@@ -23,11 +23,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-/**
- * Title, description, keywords, share image and favicon all come from Website
- * Settings in the dashboard. `title.template` appends " | <site name>" to every
- * page that sets a plain title.
- */
+
 export async function generateMetadata(): Promise<Metadata> {
   return buildSiteMetadata();
 }

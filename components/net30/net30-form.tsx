@@ -31,7 +31,7 @@ export function Net30Form() {
     (e: React.ChangeEvent<HTMLInputElement>) =>
       setForm((current) => ({ ...current, [name]: e.target.value }));
 
-  /** The API types these as numbers, so blank or junk must not be sent. */
+
   const validate = (): string | null => {
     const years = Number(form.years_in_business);
     const credit = Number(form.requested_credit_amount);
@@ -105,7 +105,7 @@ export function Net30Form() {
       onSubmit={handleSubmit}
       className="bg-white border border-[#E5E5E5] rounded-[24px] md:rounded-[32px] p-6 md:p-8 lg:p-10 shadow-sm flex flex-col gap-6"
     >
-      {/* Business */}
+
       <div className="flex flex-col gap-5">
         <h2 className="text-lg font-bold text-black">Your business</h2>
 
@@ -133,7 +133,7 @@ export function Net30Form() {
 
       <div className="border-t border-gray-200" />
 
-      {/* Contact */}
+
       <div className="flex flex-col gap-5">
         <h2 className="text-lg font-bold text-black">Who should we contact?</h2>
 
@@ -170,7 +170,7 @@ export function Net30Form() {
 
       <div className="border-t border-gray-200" />
 
-      {/* Documents */}
+
       <div className="flex flex-col gap-5">
         <div>
           <h2 className="text-lg font-bold text-black">Documents</h2>

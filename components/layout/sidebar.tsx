@@ -13,14 +13,7 @@ interface SidebarProps {
   onClose: () => void;
 }
 
-/**
- * Small-screen navigation.
- *
- * An accordion rather than a drill-down: a branch expands in place, so the
- * level above stays visible and a third-level product is one tap away instead
- * of three. Everything here is CSS-driven — a stalled animation frame can no
- * longer strand the menu between levels.
- */
+
 export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const { data: menuNodes } = useMenuTree();
   const { data: settings } = useWebsiteSettings();
@@ -169,7 +162,7 @@ function AccordionRow({ item, depth, expanded, onToggle, onNavigate }: Accordion
   const hasChildren = !!item.children?.length;
   const isOpen = expanded.has(item.id);
 
-  // Each level steps in a little so the shape of the tree stays readable.
+
   const rowClass = [
     "flex w-full items-center justify-between gap-3 rounded-lg py-3 pr-3 text-left transition-colors",
     depth === 0

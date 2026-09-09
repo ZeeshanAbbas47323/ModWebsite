@@ -45,7 +45,7 @@ export function BlogListing() {
         Tips, guides, and inspiration for custom printing and apparel.
       </p>
 
-      {/* Category filter */}
+
       <div className="flex flex-wrap gap-2 justify-center mb-4">
         {CATEGORIES.map((cat) => (
           <button
@@ -62,7 +62,7 @@ export function BlogListing() {
         ))}
       </div>
 
-      {/* Tag filter */}
+
       <div className="flex flex-wrap gap-2 justify-center mb-10">
         {TAGS.map((tag) => (
           <button
@@ -79,7 +79,7 @@ export function BlogListing() {
         ))}
       </div>
 
-      {/* States */}
+
       {isError && (
         <p className="text-center text-red-500 py-20">
           Failed to load blogs. Please try again.
@@ -108,7 +108,7 @@ export function BlogListing() {
         </div>
       )}
 
-      {/* Pagination */}
+
       {pagination && pagination.totalPages > 1 && (
         <div className="flex items-center justify-center gap-3 mt-12">
           <Button

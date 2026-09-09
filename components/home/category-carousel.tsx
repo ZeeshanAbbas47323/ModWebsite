@@ -5,9 +5,7 @@ import { useProducts } from "@/hooks/use-products";
 import { mapProductToCard } from "@/lib/map-product-to-card";
 
 interface CategoryCarouselProps {
-  /** One category, or several shown together in a single rail (e.g. Sublimation + DTF). */
   categoryId: number | number[];
-  /** Falls back to the category's own name (read off its products) when omitted. */
   title?: string;
   description?: string;
   limit?: number;
@@ -17,13 +15,6 @@ interface CategoryCarouselProps {
 const DEFAULT_DESCRIPTION =
   "From small business advertising to big event displays, Modfirst delivers bold.";
 
-/**
- * One home-page row, filled from one or more product categories.
- *
- * Renders nothing when the category is empty — a heading over an empty rail
- * reads as a broken page, and the placeholder products it used to fall back on
- * belonged to a different category entirely.
- */
 export function CategoryCarousel({
   categoryId,
   title,

@@ -34,7 +34,7 @@ const STEPS = [
 export default function Net30Page() {
   return (
     <main className="flex flex-col flex-1 min-h-screen">
-      {/* Hero */}
+
       <section className="relative w-full overflow-hidden">
         <div className="absolute inset-0 bg-linear-to-b from-primary via-[#262e01] to-black" />
         <div
@@ -56,7 +56,7 @@ export default function Net30Page() {
         </div>
       </section>
 
-      {/* Benefits */}
+
       <section className="container pt-10 md:pt-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {BENEFITS.map((benefit) => (
@@ -68,7 +68,7 @@ export default function Net30Page() {
         </div>
       </section>
 
-      {/* Form + how it works */}
+
       <section className="container pt-10 md:pt-16 pb-10 md:pb-16">
         <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-start">
           <div className="w-full lg:w-1/3 lg:sticky lg:top-24">

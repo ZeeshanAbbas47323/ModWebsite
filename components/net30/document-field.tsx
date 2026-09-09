@@ -13,12 +13,7 @@ interface DocumentFieldProps {
   onChange: (url: string) => void;
 }
 
-/**
- * Upload a document, or paste a link to one.
- *
- * The upload endpoint only accepts images, so PDFs have to be hosted elsewhere
- * and linked — both paths end up as a URL on the application.
- */
+
 export function DocumentField({ id, label, hint, value, onChange }: DocumentFieldProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +32,7 @@ export function DocumentField({ id, label, hint, value, onChange }: DocumentFiel
       setError(err instanceof Error ? err.message : "Upload failed.");
     } finally {
       setUploading(false);
-      // Allow re-picking the same file after a failure.
+
       e.target.value = "";
     }
   };

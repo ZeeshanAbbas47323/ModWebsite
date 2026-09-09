@@ -58,8 +58,7 @@ function Row({ line }: { line: WishlistLine }) {
       </div>
 
       <div className="flex items-center gap-3 shrink-0">
-        {/* Variant-specific saves can go straight in; anything else needs the
-            product page, where the options are chosen. */}
+
         {line.variant_id || line.slug === undefined ? (
           <Button
             disabled={busy !== null}

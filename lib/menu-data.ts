@@ -5,13 +5,6 @@ export type MenuItem = {
   children?: MenuItem[];
 };
 
-/**
- * Fallback nav, used only if the CMS menu tree fetch fails or comes back
- * empty (see useNavItems in lib/menu-nav.ts) — so it should never be a
- * visitor's actual experience, but every href here still needs to go
- * somewhere real rather than "#" in case it ever is. Matches the same
- * real routes the CMS menu rows were corrected to point at.
- */
 export const menuData: MenuItem[] = [
   {
     id: "dtf-transfer",

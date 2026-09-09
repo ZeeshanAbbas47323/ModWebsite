@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 export function AboutHero() {
   return (
     <section className="relative w-full overflow-hidden">
-      {/* Background gradient — mirrors home hero */}
+
       <div className="absolute inset-0 bg-linear-to-b from-primary via-[#262e01] to-black" />
       <div
         className="absolute inset-0 bg-no-repeat bg-contain bg-right opacity-5"
@@ -16,7 +16,7 @@ export function AboutHero() {
       />
 
       <div className="container relative z-10 flex flex-col lg:flex-row items-center gap-10 py-16 md:py-20 lg:py-24">
-        {/* Left content */}
+
         <div className="flex-1 w-full text-white">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -64,7 +64,7 @@ export function AboutHero() {
           </motion.div>
         </div>
 
-        {/* Right image composition */}
+
         <div className="flex-1 w-full mt-12 lg:mt-0 relative flex justify-center lg:justify-end">
           <div className="relative w-full max-w-[600px] h-[420px] md:h-[480px]">
             <div className="absolute left-0 bottom-0 w-[62%] h-[78%] rounded-4xl overflow-hidden shadow-2xl z-10">

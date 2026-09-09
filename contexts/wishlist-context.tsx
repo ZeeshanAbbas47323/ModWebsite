@@ -70,7 +70,7 @@ function productImage(product: WishlistInput["product"]): string {
   return resolveImageUrl(primary?.image_url, PLACEHOLDER_IMAGE);
 }
 
-/** Server rows do not always embed the product, so snapshots fill the gaps. */
+
 function mapServerItem(
   item: ServerWishlistItem,
   snapshot?: WishlistLine
@@ -100,7 +100,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const stored = readLocalWishlist();
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+
     setLocalLines(stored);
     try {
       const raw = window.localStorage.getItem(SNAPSHOT_KEY);
@@ -109,7 +109,6 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
        
       setSnapshots(restored);
     } catch {
-      // ignore
     }
      
     setHydrated(true);
@@ -127,7 +126,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
     [queryClient]
   );
 
-  // On login, push whatever the guest saved into the account.
+
   const synced = useRef(false);
   useEffect(() => {
     if (!isReady || !isAuthenticated || !hydrated) {
@@ -152,7 +151,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
         setLocalLines([]);
         await refetchServer();
       } catch {
-        // Keep the guest list so nothing is lost; it retries on next login.
+
         synced.current = false;
       }
     })();
@@ -203,7 +202,6 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
         try {
           window.localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(next));
         } catch {
-          // ignore
         }
         return next;
       });

@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { proxyClipdrop } from "@/lib/clipdrop";
 
-/** ClipDrop caps upscaling at 4096 px per side. */
+
 const MAX_SIDE = 4096;
 
 function side(value: FormDataEntryValue | null, fallback: number): number {

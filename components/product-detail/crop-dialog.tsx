@@ -16,7 +16,7 @@ const MIN_FRACTION = 0.05;
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 
-/** Drag a selection over the artwork; the rect is stored as 0–1 fractions. */
+
 export function CropDialog({ file, onCancel, onApply }: CropDialogProps) {
   const [url, setUrl] = useState<string | null>(null);
   const [rect, setRect] = useState<CropRect>({ x: 0.1, y: 0.1, width: 0.8, height: 0.8 });
@@ -25,8 +25,8 @@ export function CropDialog({ file, onCancel, onApply }: CropDialogProps) {
 
   useEffect(() => {
     const objectUrl = URL.createObjectURL(file);
-    // Object URLs only exist on the client, so this has to happen after mount.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+
+
     setUrl(objectUrl);
     return () => URL.revokeObjectURL(objectUrl);
   }, [file]);
@@ -124,12 +124,12 @@ export function CropDialog({ file, onCancel, onApply }: CropDialogProps) {
           style={{ aspectRatio: "4 / 3" }}
         >
           {url && (
-            // A local blob URL — next/image would add nothing here.
-            // eslint-disable-next-line @next/next/no-img-element
+
+
             <img src={url} alt="" className="w-full h-full object-contain pointer-events-none" />
           )}
 
-          {/* Dimmed area outside the selection */}
+
           <div className="absolute inset-0 bg-black/45 pointer-events-none" />
 
           <div
@@ -144,7 +144,7 @@ export function CropDialog({ file, onCancel, onApply }: CropDialogProps) {
             }}
           >
             {url && (
-              // eslint-disable-next-line @next/next/no-img-element
+
               <img
                 src={url}
                 alt="Crop preview"

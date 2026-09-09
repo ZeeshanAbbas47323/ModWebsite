@@ -1,7 +1,7 @@
-/** ClipDrop will not upscale beyond this on either side. */
+
 export const MAX_UPSCALE_SIDE = 4096;
 
-/** Natural pixel size of an image file. */
+
 export function readImageSize(
   file: File
 ): Promise<{ width: number; height: number }> {
@@ -20,7 +20,7 @@ export function readImageSize(
   });
 }
 
-/** Turn an API response into a File the tool can keep using. */
+
 async function toFile(res: Response, name: string): Promise<File> {
   if (!res.ok) {
     const data = await res.json().catch(() => ({}));
@@ -45,8 +45,8 @@ export const imageToolsService = {
   },
 
   upscale: async (file: File, scale = 2): Promise<File> => {
-    // The API stretches to whatever dimensions it is given, so the target has
-    // to keep the source's aspect ratio or the artwork comes back distorted.
+
+
     const { width, height } = await readImageSize(file);
     const capped = Math.min(scale, MAX_UPSCALE_SIDE / Math.max(width, height));
     const targetWidth = Math.max(1, Math.round(width * capped));
@@ -62,17 +62,14 @@ export const imageToolsService = {
 };
 
 export interface CropRect {
-  /** Fractions of the source image, 0–1. */
+
   x: number;
   y: number;
   width: number;
   height: number;
 }
 
-/**
- * Crop in the browser — no round trip needed, and it keeps the full resolution
- * of the source rather than the on-screen preview size.
- */
+
 export function cropImageFile(file: File, rect: CropRect): Promise<File> {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file);
@@ -102,7 +99,6 @@ export function cropImageFile(file: File, rect: CropRect): Promise<File> {
         }
         const base = file.name.replace(/\.[^.]+$/, "");
         resolve(new File([blob], `${base}-cropped.png`, { type: "image/png" }));
-        // PNG keeps any transparency a background removal produced.
       }, "image/png");
     };
 

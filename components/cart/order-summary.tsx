@@ -16,8 +16,8 @@ export const OrderSummary = () => {
   const [couponError, setCouponError] = useState<string | null>(null);
   const [applying, setApplying] = useState(false);
 
-  // Shipping and the final tax are calculated by the API once the delivery
-  // method is known; this is only an on-page estimate.
+
+
   const estimatedTax = total * TAX_RATE;
   const estimatedTotal = total + estimatedTax;
   const isEmpty = lines.length === 0;
@@ -40,7 +40,7 @@ export const OrderSummary = () => {
     <div className="bg-[#F4F4F5] rounded-[24px] p-6 md:p-8 w-full flex flex-col h-fit">
       <h2 className="text-xl md:text-2xl font-bold text-black mb-6">Order Summary</h2>
 
-      {/* Coupon */}
+
       {coupon ? (
         <div className="flex items-center justify-between bg-white rounded-xl px-4 py-3 mb-6">
           <div className="min-w-0">

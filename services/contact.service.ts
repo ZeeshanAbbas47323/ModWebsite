@@ -1,7 +1,7 @@
 import apiClient from "@/lib/axios";
 import { omitEmpty } from "@/lib/utils";
 
-/** The topics the API accepts, paired with what the form shows. */
+
 export const HELP_TOPICS = [
   { value: "custom_order", label: "Custom Order" },
   { value: "dtf_transfer", label: "DTF Transfer" },

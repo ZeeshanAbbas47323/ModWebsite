@@ -35,7 +35,7 @@ export const CartItem: React.FC<CartItemProps> = ({ line }) => {
 
   return (
     <div className={`flex flex-col sm:flex-row items-center gap-4 sm:gap-6 bg-[#F4F4F5] p-4 rounded-[20px] w-full transition-opacity ${busy ? 'opacity-60' : ''}`}>
-      {/* Product Image */}
+
       <div className="relative w-20 h-20 sm:w-24 sm:h-24 shrink-0 rounded-xl overflow-hidden bg-white">
         <Image
           src={resolveImageUrl(line.image)}
@@ -46,7 +46,7 @@ export const CartItem: React.FC<CartItemProps> = ({ line }) => {
         />
       </div>
 
-      {/* Product Info */}
+
       <div className="flex-1 flex flex-col justify-center text-center sm:text-left w-full">
         {line.slug ? (
           <Link href={`/products/${line.slug}`} className="text-lg font-bold text-black hover:text-primary transition-colors">
@@ -74,7 +74,7 @@ export const CartItem: React.FC<CartItemProps> = ({ line }) => {
         )}
         <p className="text-gray-500 text-sm mt-1">${line.price.toFixed(2)} each</p>
 
-        {/* Print files the gang sheet builder produced for this line. */}
+
         {!!line.design_uploads?.length && (
           <ul className="flex flex-col gap-1 mt-2 items-center sm:items-start">
             {line.design_uploads.map((file) => (
@@ -99,9 +99,9 @@ export const CartItem: React.FC<CartItemProps> = ({ line }) => {
         {error && <p className="text-red-600 text-xs mt-1">{error}</p>}
       </div>
 
-      {/* Actions */}
+
       <div className="flex items-center gap-6 sm:ml-auto w-full sm:w-auto justify-between sm:justify-end">
-        {/* Quantity Selector */}
+
         <div className="flex items-center gap-4">
           <button
             aria-label="Decrease quantity"
@@ -126,7 +126,7 @@ export const CartItem: React.FC<CartItemProps> = ({ line }) => {
           ${lineTotal.toFixed(2)}
         </span>
 
-        {/* Delete Button */}
+
         <button
           aria-label={`Remove ${line.name} from cart`}
           disabled={busy}

@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { proxyDelete } from "@/lib/api-proxy";
 
-/** Wishlist rows are removed through the shared frontend delete endpoint. */
+
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }

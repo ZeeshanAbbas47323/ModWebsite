@@ -16,12 +16,6 @@ interface ShopCollectionWrapperProps {
   limit?: number;
 }
 
-/**
- * A full "view all" page for one of the `products/frontend/collection`
- * rankings — the same backend endpoint the home page's carousels and the
- * product-detail "related products" rail use, just with more items and its
- * own page/title instead of a home-page rail.
- */
 export function ShopCollectionWrapper({
   type,
   title,

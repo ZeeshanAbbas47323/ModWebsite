@@ -23,8 +23,8 @@ export default async function FaqPage() {
   const page = await getContentPage(PAGE_FILTERS);
   const entries = parseFaqContent(page?.content ?? "");
 
-  // The CMS stores the title as "FAQS"; a shouted acronym makes a poor H1, so
-  // fall back to the spelled-out heading unless an editor set a real title.
+
+
   const heading =
     page?.title && page.title !== page.title.toUpperCase()
       ? page.title
@@ -32,7 +32,7 @@ export default async function FaqPage() {
 
   return (
     <main className="flex flex-col flex-1 min-h-screen">
-      {/* Header */}
+
       <section className="relative w-full overflow-hidden">
         <div className="absolute inset-0 bg-linear-to-b from-primary via-[#262e01] to-black" />
         <div
@@ -54,7 +54,7 @@ export default async function FaqPage() {
         </div>
       </section>
 
-      {/* Questions */}
+
       <section className="container pt-10 md:pt-16 pb-10 md:pb-16">
         {page ? (
           <FaqAccordion entries={entries} fallbackHtml={page.content} />
@@ -69,7 +69,7 @@ export default async function FaqPage() {
         )}
       </section>
 
-      {/* Still stuck */}
+
       <ScrollReveal>
         <section className="container pb-10 md:pb-16">
           <div className="bg-black rounded-[24px] p-8 md:p-12 flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">

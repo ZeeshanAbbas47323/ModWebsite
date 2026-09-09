@@ -12,9 +12,9 @@ import { mapHomeHeroSlides } from "@/lib/map-home-hero-slides";
 import { resolveImageUrl } from "@/lib/image-url";
 
 export function Hero() {
-  // Slides come from the `home_hero` CMS section. The built-in slides stand in
-  // while that loads and if the section has no items, so the hero is never
-  // empty on a fresh install or a failed request.
+
+
+
   const { data: heroSection } = useHomeSection("home_hero");
   const cmsSlides = useMemo(
     () => mapHomeHeroSlides(heroSection),
@@ -24,12 +24,12 @@ export function Hero() {
 
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
-  /** Which way the last move went, so slides enter from the right side. */
+
   const [direction, setDirection] = useState(1);
   const reduceMotion = useReducedMotion();
 
   const count = slides.length;
-  // Swapping in a shorter CMS set can leave the index past the end.
+
   const slide = slides[Math.min(index, count - 1)];
 
   const goTo = useCallback(
@@ -47,8 +47,8 @@ export function Hero() {
   const next = useCallback(() => goTo(index + 1, 1), [goTo, index]);
   const prev = useCallback(() => goTo(index - 1, -1), [goTo, index]);
 
-  // A hidden tab freezes requestAnimationFrame, so transitions cannot finish.
-  // Advancing anyway would stack up slides that never leave.
+
+
   const [hidden, setHidden] = useState(false);
   useEffect(() => {
     const sync = () => setHidden(document.visibilityState === "hidden");
@@ -57,7 +57,7 @@ export function Hero() {
     return () => document.removeEventListener("visibilitychange", sync);
   }, []);
 
-  // Auto-advance, held while the shopper is reading or interacting.
+
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (paused || hidden || reduceMotion || count < 2) return;
@@ -91,7 +91,7 @@ export function Hero() {
       onBlurCapture={() => setPaused(false)}
       className="relative w-full overflow-hidden bg-black lg:min-h-[calc(100svh-5.05rem)]"
     >
-      {/* Background wash, cross-faded between slides */}
+
       <AnimatePresence initial={false}>
         <motion.div
           key={slide.id}
@@ -104,9 +104,7 @@ export function Hero() {
         />
       </AnimatePresence>
 
-      {/* Positioned against the same capped width as the content below it, so
-          on an ultra-wide screen the pattern sits near the visual instead of
-          floating off in empty space near the true (uncapped) edge. */}
+
       <div className="absolute inset-0 flex justify-center pointer-events-none">
         <div
           className="w-full 2xl:max-w-[1600px] h-full bg-no-repeat bg-contain bg-right opacity-[0.06]"
@@ -114,12 +112,9 @@ export function Hero() {
         />
       </div>
 
-      {/* `.container` has no max-width (it's meant to hug any viewport), which
-          on a very wide/ultra-wide monitor leaves the hero's copy and product
-          shot stranded in a tiny island inside a huge, empty gradient — this
-          caps it so content stays proportionate to the section instead. */}
+
       <div className="container relative z-10 flex flex-col lg:flex-row items-center gap-8 pt-10 pb-24 md:pt-14 md:pb-28 lg:min-h-[calc(100svh-5.05rem)] lg:py-20 2xl:max-w-[1600px]">
-        {/* Copy */}
+
         <div className="flex-1 w-full text-white">
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
@@ -156,10 +151,10 @@ export function Hero() {
           </AnimatePresence>
         </div>
 
-        {/* Visual */}
+
         <div className="flex-1 w-full mt-6 lg:mt-0 flex justify-center lg:justify-end">
           <div className="relative w-full max-w-[560px] h-[240px] sm:h-[320px] md:h-[420px] lg:h-[500px]">
-            {/* Crossfaded rather than swapped, so the frame is never empty. */}
+
             <AnimatePresence initial={false}>
               <motion.div
                 key={slide.id}
@@ -169,14 +164,13 @@ export function Hero() {
                 transition={{ duration: 0.5, ease: "easeOut" }}
                 className="absolute inset-0"
               >
-                {/* A CMS slide can carry copy without art; next/image throws
-                    on an empty src, so render the frame without it. */}
+
                 {slide.image ? (
                   <Image
                     src={resolveImageUrl(slide.image)}
                     alt={slide.imageAlt}
                     fill
-                    // The first slide is the LCP image on the home page.
+
                     priority={index === 0}
                     className="object-contain object-center drop-shadow-2xl"
                     sizes="(max-width: 1024px) 100vw, 560px"
@@ -188,7 +182,7 @@ export function Hero() {
         </div>
       </div>
 
-      {/* Controls */}
+
       <div className="absolute bottom-6 md:bottom-8 left-0 right-0 z-20">
         <div className="container flex items-center justify-between gap-4">
           <div className="flex items-center gap-2 md:gap-3 flex-wrap">
@@ -241,7 +235,7 @@ export function Hero() {
         </div>
       </div>
 
-      {/* Live region for screen readers, since the slider moves on its own. */}
+
       <p className="sr-only" aria-live="polite">
         Slide {index + 1} of {count}: {slide.title}
       </p>

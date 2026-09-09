@@ -20,16 +20,16 @@ export function TransfersBySizeModal({
   productName,
   onAddToCart,
 }: TransfersBySizeModalProps) {
-  // The layout wraps pages in a z-indexed element, which would trap a fixed
-  // overlay beneath the sticky header. Portal to <body> to escape it.
+
+
   const [portalHost, setPortalHost] = useState<HTMLElement | null>(null);
   useEffect(() => {
-    // document is client-only, so the host can only be picked up after mount.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+
+
     setPortalHost(document.body);
   }, []);
 
-  // Close on Escape, and stop the page behind from scrolling.
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {

@@ -1,16 +1,11 @@
 export interface ShowcaseImage {
   src: string;
   alt: string;
-  /** Landscape art, so it takes the full width of the mosaic. */
+
   wide?: boolean;
 }
 
-/**
- * Artwork for the two home showcase sections.
- *
- * Supplied as files rather than through the CMS, so it lives here next to the
- * hero slides. The copy for these sections still comes from `home-sections`.
- */
+
 export const WHY_MODFIRST_IMAGES: ShowcaseImage[] = [
   { src: "/images/showcase/branded-tees-pair.png", alt: "Two branded t-shirts printed front and chest", wide: true },
   { src: "/images/showcase/branded-tote.png", alt: "Screen-printed tote bag carried over the shoulder" },

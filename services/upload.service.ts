@@ -8,32 +8,28 @@ export interface UploadedFile {
   originalName: string;
 }
 
-/** What the upstream image endpoint accepts — PDFs are not supported. */
+
 export const ACCEPTED_IMAGE_TYPES =
   "image/jpeg,image/png,image/gif,image/webp,image/svg+xml";
 
 export interface StoredUpload {
-  /** Path the API reports, e.g. /product/foo-123.png */
+
   key: string;
-  /** Permanent public link — safe to store on a cart item or order. */
+
   url: string;
   contentType: string;
   size: number;
   originalName: string;
 }
 
-/** Folder the upload endpoint files product artwork under. */
+
 export const PRODUCT_UPLOAD_FOLDER = "product";
 
-/** What the upstream video endpoint accepts. */
+
 export const ACCEPTED_VIDEO_TYPES = "video/mp4,video/quicktime,video/webm";
 
 export const uploadService = {
-  /**
-   * Upload artwork for a product. This goes to the ModFirst upload endpoint,
-   * which stores the file on the media CDN and returns a permanent URL — no
-   * presigning, no expiry.
-   */
+
   toStorage: async (
     file: File,
     folder: string = PRODUCT_UPLOAD_FOLDER,
@@ -65,7 +61,7 @@ export const uploadService = {
     const { data } = await apiClient.post(
       `/upload?folder=${encodeURIComponent(folder)}`,
       form,
-      // Let the browser set the multipart boundary.
+
       { headers: { "Content-Type": undefined } }
     );
     return data.payload ?? data.data ?? data;

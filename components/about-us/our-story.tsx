@@ -10,7 +10,7 @@ const stats = [
 export function OurStory() {
   return (
     <section className="relative w-full pt-10 md:pt-12 lg:pt-16 overflow-hidden">
-      {/* Decorative element — mirrors WhyModfirst */}
+
       <div className="absolute right-[-5%] md:right-0 top-1/2 -translate-y-1/2 -z-10 w-[250px] md:w-[450px] h-[120%] opacity-90 pointer-events-none">
         <Image
           src="/images/branding/element-2.svg"
@@ -21,7 +21,7 @@ export function OurStory() {
       </div>
 
       <div className="container flex flex-col lg:flex-row items-center gap-12 lg:gap-20 relative z-10">
-        {/* Left images */}
+
         <div className="w-full lg:w-1/2 grid grid-cols-2 gap-4 md:gap-6">
           <div className="col-span-2 relative h-40 md:h-64 rounded-[20px] md:rounded-[24px] overflow-hidden shadow-md">
             <Image src="/images/branding/banner.jpg" alt="Modfirst studio" fill className="object-cover" />
@@ -34,7 +34,7 @@ export function OurStory() {
           </div>
         </div>
 
-        {/* Right text */}
+
         <div className="w-full lg:w-1/2 flex flex-col gap-6">
           <span className="text-primary font-bold uppercase tracking-wider text-sm">Our Story</span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-black tracking-tight">

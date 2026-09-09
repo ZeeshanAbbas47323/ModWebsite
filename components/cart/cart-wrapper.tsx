@@ -12,7 +12,7 @@ export const CartWrapper = () => {
 
   return (
     <section className="container pt-10 pb-20 md:pt-16 md:pb-32">
-      {/* Header section */}
+
       <div className="mb-8 md:mb-12">
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-black mb-4">
           Your Cart{itemCount > 0 ? ` (${itemCount})` : ''}
@@ -42,16 +42,16 @@ export const CartWrapper = () => {
           </Link>
         </div>
       ) : (
-        /* Main Cart Layout */
+
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
-          {/* Left Column: Cart Items */}
+
           <div className="w-full lg:w-2/3 flex flex-col gap-4">
             {lines.map((line) => (
               <CartItem key={line.key} line={line} />
             ))}
           </div>
 
-          {/* Right Column: Order Summary */}
+
           <div className="w-full lg:w-1/3 lg:sticky lg:top-24">
             <OrderSummary />
           </div>

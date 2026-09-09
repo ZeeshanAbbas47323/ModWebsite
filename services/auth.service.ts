@@ -19,18 +19,11 @@ export interface AuthResult {
   token: string;
   refreshToken?: string;
   user: StoredUser | null;
-  /**
-   * True when the account did not receive a token on sign-in and must complete
-   * the emailed OTP step. Customer accounts normally get a token immediately;
-   * staff accounts always go through the OTP.
-   */
+
   otpRequired: boolean;
 }
 
-/**
- * The API returns tokens as `payload.tokens.{accessToken,refreshToken}`, but
- * older deployments used a flat `token`. Accept both.
- */
+
 function extractAuth(raw: Record<string, unknown>): AuthResult {
   const body = (raw.payload ?? raw.data ?? raw) as Record<string, unknown>;
   const tokens = (body.tokens ?? {}) as Record<string, unknown>;
@@ -53,9 +46,9 @@ function extractAuth(raw: Record<string, unknown>): AuthResult {
 
 export const authService = {
   login: async (input: LoginInput): Promise<AuthResult> => {
-    // `/auth/login` is shared with the dashboard's staff login — passing
-    // user_type makes the backend reject a staff/admin account here instead
-    // of silently granting them a customer session on the storefront.
+
+
+
     const { data } = await apiClient.post("/auth/login", {
       rememberMe: true,
       ...input,
@@ -72,12 +65,12 @@ export const authService = {
     return extractAuth(data);
   },
 
-  /** Re-send the sign-in OTP for accounts that require one. */
+
   sendOtp: async (email: string): Promise<void> => {
     await apiClient.post("/auth/send-otp", { email });
   },
 
-  /** Exchange the emailed 6-digit code for a session token. */
+
   verifyOtp: async (email: string, otp: string): Promise<AuthResult> => {
     const { data } = await apiClient.post("/auth/verify-otp", { email, otp });
     return extractAuth(data);
@@ -92,10 +85,10 @@ export const authService = {
     await apiClient.post("/auth/logout", {});
   },
 
-  // ── Password reset ───────────────────────────────────────────────────────
-  // Three steps: request a code, confirm the code is valid, then set the new
-  // password. The confirm step exists so the form can reject a bad code before
-  // asking someone to type a password twice.
+
+
+
+
 
   forgotPassword: async (email: string): Promise<string> => {
     const { data } = await apiClient.post("/auth/forgot-password", { email });

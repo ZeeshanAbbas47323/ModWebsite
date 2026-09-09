@@ -9,8 +9,7 @@ import { mapProductToCard } from "@/lib/map-product-to-card";
 
 const PAGE_SIZE = 24;
 
-/** Mirrors backend PRODUCT_SORT_OPTIONS (productValidations.ts) — each value
- * already bakes in its own direction, so no separate order control is needed. */
+
 const SORT_OPTIONS: { value: string; label: string }[] = [
   { value: "newest", label: "Newest" },
   { value: "oldest", label: "Oldest" },
@@ -23,16 +22,7 @@ const SORT_OPTIONS: { value: string; label: string }[] = [
   { value: "featured", label: "Featured" },
 ];
 
-/**
- * Product grid for one collection, with its own pagination.
- *
- * A parent category (e.g. "Apparel & Accessories") never holds products
- * directly — every real product sits on one of its subcategories (T-Shirts,
- * Hoodies, ...) — so querying by the parent's own id alone always came back
- * empty even though the page visibly lists non-empty subcategories right
- * above. Passing the subcategory ids too so the parent's own product grid
- * shows everything underneath it, not just direct members.
- */
+
 export function CollectionProducts({
   categoryId,
   childCategoryIds,
@@ -57,8 +47,8 @@ export function CollectionProducts({
   const totalPages = pagination?.totalPages ?? 1;
   const total = pagination?.total;
 
-  // A small header row (count + sort), not a standalone dropdown floating
-  // below "Shop by category" with a big empty gap above it.
+
+
   const sortControl = (
     <div className="flex items-center justify-between gap-4 mb-5 pb-3 border-b border-gray-100">
       <span className="text-sm text-gray-500">

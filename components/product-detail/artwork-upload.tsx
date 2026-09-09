@@ -24,7 +24,7 @@ interface ArtworkUploadProps {
 
 let seq = 0;
 
-/** Lets the customer attach print-ready files to an ordinary product. */
+
 export function ArtworkUpload({ files, onChange }: ArtworkUploadProps) {
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -56,7 +56,7 @@ export function ArtworkUpload({ files, onChange }: ArtworkUploadProps) {
       };
     });
 
-    // Show the rows immediately; each upload fills its own row in.
+
     let working = [...files, ...added];
     onChange(working);
 
@@ -105,7 +105,7 @@ export function ArtworkUpload({ files, onChange }: ArtworkUploadProps) {
           accept={ARTWORK_ACCEPT}
           onChange={(e) => {
             void accept(e.target.files);
-            // Allow re-picking the same file after removing it.
+
             e.target.value = "";
           }}
           className="sr-only"
@@ -132,8 +132,8 @@ export function ArtworkUpload({ files, onChange }: ArtworkUploadProps) {
             >
               <span className="w-10 h-10 shrink-0 rounded-lg bg-white overflow-hidden flex items-center justify-center">
                 {file.previewUrl ? (
-                  // A local blob URL — next/image would add nothing here.
-                  // eslint-disable-next-line @next/next/no-img-element
+
+
                   <img src={file.previewUrl} alt="" className="max-w-full max-h-full object-contain" />
                 ) : (
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="text-gray-400">

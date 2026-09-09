@@ -15,8 +15,8 @@ import { CUSTOMER_FEEDBACK_FALLBACK } from "@/lib/home-fallback-content";
 
 export function CustomerFeedback() {
   const { data: section, isLoading } = useHomeSection("home_customer_feedback");
-  // No `home_customer_feedback` row exists yet, so this fell back to
-  // rendering nothing.
+
+
   const feedback = mapHomeCustomerFeedback(section) ?? CUSTOMER_FEEDBACK_FALLBACK;
 
   if (isLoading) {

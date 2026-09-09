@@ -1,12 +1,6 @@
-/**
- * Configuration for the "Transfers by Size" tool.
- *
- * These values mirror the reference tool at builder.modfirst.com/transfers-by-size,
- * which hardcodes them client-side. There is no API for them yet, so a price
- * change means editing this file — move it behind an endpoint when one exists.
- */
 
-/** Products carrying this vendor open the tool instead of the normal buy box. */
+
+
 export const TRANSFERS_BY_SIZE_VENDOR_ID = Number(
   process.env.NEXT_PUBLIC_TRANSFERS_BY_SIZE_VENDOR_ID ?? 1
 );
@@ -21,13 +15,13 @@ export const MIN_SIDE_IN = 0.1;
 export const MAX_NOTES = 500;
 export const MAX_UPLOAD_BYTES = 100 * 1024 * 1024;
 
-/** Print quality is judged against this effective DPI. */
+
 export const GOOD_DPI = 200;
 
 export const ACCEPTED_UPLOAD =
   ".png,.jpg,.jpeg,.webp,.ai,.eps,.pdf,image/png,image/jpeg,image/webp,application/pdf,application/postscript";
 
-/** Unit price by printed area, cheapest band first. */
+
 export const PRICE_TIERS = [
   { maxSqIn: 12, pricePerUnit: 0.5 },
   { maxSqIn: 25, pricePerUnit: 0.75 },
@@ -37,7 +31,7 @@ export const PRICE_TIERS = [
   { maxSqIn: Infinity, pricePerUnit: 5 },
 ] as const;
 
-/** Volume discounts applied to the unit price. */
+
 export const QUANTITY_BREAKS = [
   { minQty: 1, maxQty: 9, discountPct: 0 },
   { minQty: 10, maxQty: 24, discountPct: 5 },
@@ -110,7 +104,7 @@ export function priceTransfer(
   };
 }
 
-/** The next volume break, so the UI can nudge toward it. */
+
 export function nextQuantityBreak(quantity: number) {
   return QUANTITY_BREAKS.find((b) => b.minQty > quantity) ?? null;
 }

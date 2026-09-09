@@ -1,19 +1,15 @@
 import type { DesignUploadInput, PrintMethod } from "@/services/cart.service";
 
-/** Where the builder is hosted. Overridable per environment. */
+
 export const BUILDER_ORIGIN = (
   process.env.NEXT_PUBLIC_GANG_SHEET_BUILDER_URL ?? "https://builder.modfirst.com"
 ).replace(/\/$/, "");
 
-/** Builder-side product a session opens on when the storefront has no mapping. */
+
 export const DEFAULT_BUILDER_PRODUCT_SLUG =
   process.env.NEXT_PUBLIC_GANG_SHEET_PRODUCT_SLUG ?? "build-your-own-gangsheet";
 
-/**
- * Storefront slug → builder slug, for pairs whose slugs and names do not line
- * up. Comma-separated `storefront:builder` entries, so adding a pair is a
- * config change rather than a deploy.
- */
+
 const EXPLICIT_MAP: Record<string, string> = Object.fromEntries(
   (
     process.env.NEXT_PUBLIC_GANG_SHEET_PRODUCT_MAP ??
@@ -24,10 +20,7 @@ const EXPLICIT_MAP: Record<string, string> = Object.fromEntries(
     .filter((pair) => pair.length === 2 && pair[0] && pair[1])
 );
 
-/**
- * Which print process a finished sheet belongs to. The builder does not send
- * this directly, so it is read off the product it was built on.
- */
+
 export function gangSheetPrintMethod(item: GangSheetCartItem): PrintMethod {
   const slug = String(
     (item.priceBreakdown as { productSlug?: string } | undefined)?.productSlug ?? ""
@@ -35,24 +28,24 @@ export function gangSheetPrintMethod(item: GangSheetCartItem): PrintMethod {
   return slug.includes("sublimation") ? "sublimation" : "dtf";
 }
 
-/** Map a finished sheet onto the cart's design-upload shape. */
+
 export function gangSheetDesignUploads(item: GangSheetCartItem): DesignUploadInput[] {
   const print_method = gangSheetPrintMethod(item);
   return item.artifacts.map((artifact) => ({
     file_url: artifact.url,
     file_name: artifact.name,
-    // Lets a shopper (or the team) reopen the exact sheet later.
+
     ...(item.editUrl ? { edit_url: item.editUrl } : {}),
     print_method,
   }));
 }
 
-/** One rendered print file produced by the builder. */
+
 export interface GangSheetArtifact {
   name: string;
   format: string;
   sizeBytes: number;
-  /** Pre-signed S3 URL — expires, so persist it server-side promptly. */
+
   url: string;
 }
 
@@ -69,7 +62,7 @@ export interface GangSheetMetrics {
   printLengthLabel: string;
 }
 
-/** Payload the builder hands back when the shopper finishes a sheet. */
+
 export interface GangSheetCartItem {
   orderId: string;
   sessionId: string;
@@ -96,7 +89,7 @@ export interface GangSheetCartItem {
   };
 }
 
-/** One product the builder can open a session on. */
+
 export interface BuilderProduct {
   id: string;
   slug: string;
@@ -106,7 +99,7 @@ export interface BuilderProduct {
   currency: string;
 }
 
-/** Loose key for comparing catalogue names across the two systems. */
+
 function nameKey(value: string | null | undefined): string {
   return (value ?? "")
     .toLowerCase()
@@ -114,21 +107,14 @@ function nameKey(value: string | null | undefined): string {
     .trim();
 }
 
-/**
- * Find the builder product a storefront product should open.
- *
- * Slugs line up for most products, but not all — the sublimation sheet is
- * `build-your-own-sublimation-gang-sheets` here and
- * `custom-sublimation-gang-sheets-maryland` in the builder — so the name is
- * used as a second pass. Both are data, so a new product needs no code change.
- */
+
 export function matchBuilderProduct(
   product: { slug?: string | null; name?: string | null } | null | undefined,
   builderProducts: BuilderProduct[] | undefined
 ): BuilderProduct | undefined {
   if (!product || !builderProducts?.length) return undefined;
 
-  // An explicit pairing wins, for products whose names differ from the builder.
+
   const mapped = product.slug ? EXPLICIT_MAP[product.slug] : undefined;
   if (mapped) {
     const byMap = builderProducts.find((candidate) => candidate.slug === mapped);
@@ -184,7 +170,7 @@ declare global {
 const EMBED_SRC = `${BUILDER_ORIGIN}/embed/gangsheet-embed.js`;
 let loader: Promise<void> | null = null;
 
-/** Inject the embed loader once, and resolve when `GangSheetBuilder` exists. */
+
 export function loadGangSheetEmbed(): Promise<void> {
   if (typeof window === "undefined") return Promise.resolve();
   if (window.GangSheetBuilder) return Promise.resolve();

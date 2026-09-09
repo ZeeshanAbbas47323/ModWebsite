@@ -10,8 +10,8 @@ import { FAST_PRODUCTION_FALLBACK } from "@/lib/home-fallback-content";
 
 export const FastProduction = () => {
   const { data: section, isLoading } = useHomeSection("home_fast_production");
-  // No `home_fast_production` row exists yet, so this fell back to rendering
-  // nothing; the mosaic images are already local, so only the copy needs one.
+
+
   const data = mapHomeFastProduction(section) ?? FAST_PRODUCTION_FALLBACK;
 
   if (isLoading) {

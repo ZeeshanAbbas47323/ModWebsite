@@ -50,7 +50,7 @@ export function OurValues() {
   return (
     <section className="relative w-full pt-10 md:pt-12 lg:pt-16 overflow-hidden">
       <div className="bg-black py-10 md:py-12 lg:py-16 relative overflow-hidden">
-        {/* Glow */}
+
         <div className="absolute top-0 left-0 w-[400px] h-[400px] md:w-[600px] md:h-[600px] bg-primary opacity-40 blur-[120px] rounded-full pointer-events-none -translate-x-1/3 -translate-y-1/3" />
 
         <div className="container relative z-10">

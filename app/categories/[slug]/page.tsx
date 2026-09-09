@@ -50,7 +50,6 @@ export default async function CollectionPage({ params }: Props) {
           </BreadcrumbList>
         </Breadcrumb>
 
-        {/* Title */}
         <div className="mb-10 md:mb-14">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-black mb-3">
             {collection.name}
@@ -62,7 +61,6 @@ export default async function CollectionPage({ params }: Props) {
           )}
         </div>
 
-        {/* Sub-collections, when the catalogue is nested */}
         {children.length > 0 && (
           <div className="mb-8 md:mb-10">
             <h2 className="text-2xl font-bold text-black mb-6">Shop by category</h2>

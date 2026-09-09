@@ -5,16 +5,6 @@ import type {
 import { resolveImageUrl } from "@/lib/image-url";
 import type { HeroSlide } from "@/lib/home-hero-slides";
 
-/**
- * Turns the CMS `home_hero` section's items into hero slides.
- *
- * One item is one slide. Everything a slide needs already exists on
- * HomeSectionItem — the two button pairs, the image, the badge — with the
- * eyebrow and per-slide gradient carried in `extra_data`.
- *
- * Returns an empty array when the section has no usable items, so the caller
- * can fall back to the built-in slides rather than render an empty carousel.
- */
 export function mapHomeHeroSlides(
   section: HomeSection | null | undefined
 ): HeroSlide[] {
@@ -27,7 +17,6 @@ export function mapHomeHeroSlides(
     .filter((item) => item.is_active !== false)
     .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
     .map((item, index) => toSlide(item, index, sectionGradient))
-    // A slide with no headline and no image has nothing to show.
     .filter((slide): slide is HeroSlide => slide !== null);
 }
 

@@ -12,9 +12,9 @@ import {
 interface GangSheetBuilderProps {
   open: boolean;
   onClose: () => void;
-  /** Shown in the overlay header. */
+
   productName: string;
-  /** Builder-side product slug the session should open on. */
+
   builderProductSlug?: string;
   onAddToCart: (item: GangSheetCartItem) => Promise<void>;
 }
@@ -44,7 +44,7 @@ export function GangSheetBuilder({
 }: GangSheetBuilderProps) {
   const mountRef = useRef<HTMLDivElement>(null);
   const instanceRef = useRef<GangSheetInstance | null>(null);
-  // Callbacks are read from a ref so remounting never depends on their identity.
+
   const handlersRef = useRef({ onAddToCart, onClose });
   useEffect(() => {
     handlersRef.current = { onAddToCart, onClose };
@@ -54,12 +54,12 @@ export function GangSheetBuilder({
     "idle"
   );
   const [error, setError] = useState<string | null>(null);
-  // The layout wraps pages in a z-indexed element, which would trap a fixed
-  // overlay beneath the sticky header. Portal to <body> to escape it.
+
+
   const [portalHost, setPortalHost] = useState<HTMLElement | null>(null);
   useEffect(() => {
-    // document is client-only, so the host can only be picked up after mount.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+
+
     setPortalHost(document.body);
   }, []);
 
@@ -67,9 +67,9 @@ export function GangSheetBuilder({
     if (!open) return;
 
     let cancelled = false;
-    // Mounting the builder is an external side effect, so the loading state has
-    // to be entered from the effect that starts it.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+
+
+
     setStatus("loading");
      
     setError(null);
@@ -86,8 +86,8 @@ export function GangSheetBuilder({
             if (!cancelled) setStatus("ready");
           },
           onAddToCart: async (item) => {
-            // Throwing here tells the builder the add failed, so it keeps the
-            // shopper's work instead of clearing the canvas.
+
+
             await handlersRef.current.onAddToCart(item);
             handlersRef.current.onClose();
           },
@@ -112,7 +112,7 @@ export function GangSheetBuilder({
     };
   }, [open, builderProductSlug, productName]);
 
-  // Close on Escape, and stop the page behind from scrolling.
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {

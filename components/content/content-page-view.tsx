@@ -7,14 +7,14 @@ import type { ContentPage } from "@/services/content-page.service";
 
 interface ContentPageViewProps {
   page: ContentPage | null;
-  /** Badge above the title, e.g. "Legal". */
+
   eyebrow?: string;
-  /** Used when the CMS record could not be loaded. */
+
   fallbackTitle: string;
   intro?: string;
 }
 
-/** Shared layout for CMS-authored policy pages. */
+
 export function ContentPageView({
   page,
   eyebrow = "Legal",
@@ -24,7 +24,7 @@ export function ContentPageView({
   const { html, headings } = withHeadingIds(
     promoteStrongHeadings(page?.content ?? "")
   );
-  // A handful of sections is not worth a contents list; a long policy is.
+
   const showToc = headings.length >= 3;
 
   return (

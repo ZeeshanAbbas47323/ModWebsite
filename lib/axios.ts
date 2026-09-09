@@ -23,8 +23,8 @@ apiClient.interceptors.response.use(
     const message =
       error.response?.data?.message ?? error.message ?? "Something went wrong";
     const wrapped = new Error(message);
-    // Callers (e.g. the cart) need to distinguish an expired session from a
-    // genuine failure so they can fall back to the guest cart.
+
+
     Object.assign(wrapped, { status: error.response?.status });
     return Promise.reject(wrapped);
   }

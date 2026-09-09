@@ -1,16 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { API_BASE } from "@/lib/upstream";
 
-/**
- * Proxy for file uploads.
- *
- * The body is multipart, so it is streamed through untouched — setting a
- * Content-Type here would break the boundary the browser generated.
- */
+
 export async function POST(req: NextRequest) {
   const url = new URL(req.url);
   const folder = url.searchParams.get("folder") ?? "uploads";
-  // "video" for review/product video attachments; anything else stays image.
+
   const kind = url.searchParams.get("type") === "video" ? "video" : "image";
 
   try {
@@ -25,7 +20,7 @@ export async function POST(req: NextRequest) {
         },
         body: form,
         cache: "no-store",
-        // Artwork files can be large, so allow a slow upstream write.
+
         signal: AbortSignal.timeout(180_000),
       }
     );

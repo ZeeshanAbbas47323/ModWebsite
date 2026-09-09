@@ -15,8 +15,8 @@ export function OrderConfirmation() {
   const { isAuthenticated, isReady } = useAuth();
   const { clearCart, lines } = useCart();
 
-  // The order is placed, so the cart has served its purpose. Gateway payments
-  // deliberately keep it until this point, so a cancelled payment can retry.
+
+
   const cleared = useRef(false);
   useEffect(() => {
     if (cleared.current || lines.length === 0) return;
@@ -24,8 +24,8 @@ export function OrderConfirmation() {
     void clearCart();
   }, [lines.length, clearCart]);
 
-  // Order lookup is customer-authenticated, so guests only ever see the code
-  // they were given — which is enough to quote in an email.
+
+
   const { data: order, isLoading } = useQuery({
     queryKey: ["order", orderCode],
     queryFn: () => orderService.byCode(orderCode!),

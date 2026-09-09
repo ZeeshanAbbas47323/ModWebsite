@@ -14,7 +14,6 @@ export const metadata: Metadata = {
 
 export default async function CategoriesPage() {
   const collections = await getCollections();
-  // Sub-collections belong on their parent's page, not in the top-level grid.
   const roots = collections.filter((c) => c.parent_id == null);
 
   return (

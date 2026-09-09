@@ -13,14 +13,13 @@ interface VariantSelectorProps {
   variants: ProductVariant[];
   selected: ProductVariant | null;
   onSelect: (variant: ProductVariant | null) => void;
-  /** Product-level stock, used when variants are not tracked individually. */
+
   pooledStock?: number;
-  /** Only Apparel & Accessories holds real stock — everything else is made
-   * to order, so every option stays pickable regardless of quantity on hand. */
+
   enforceStock?: boolean;
 }
 
-/** Smallest-to-largest, so pills read the way a size chart does. */
+
 const SIZE_ORDER = [
   "xxs", "2xs", "xs", "s", "small", "m", "medium", "l", "large",
   "xl", "xxl", "2xl", "xxxl", "3xl", "4xl", "5xl",
@@ -31,7 +30,7 @@ function sizeRank(name: string) {
   return index === -1 ? Number.MAX_SAFE_INTEGER : index;
 }
 
-/** Pick a readable tick colour for a swatch of the given background. */
+
 function isLightHex(hex?: string) {
   if (!hex) return false;
   const value = hex.replace("#", "");
@@ -39,7 +38,7 @@ function isLightHex(hex?: string) {
   const r = parseInt(value.slice(0, 2), 16);
   const g = parseInt(value.slice(2, 4), 16);
   const b = parseInt(value.slice(4, 6), 16);
-  // Perceived brightness (ITU-R BT.601)
+
   return (r * 299 + g * 587 + b * 114) / 1000 > 165;
 }
 
@@ -50,7 +49,7 @@ export function VariantSelector({
   pooledStock = 0,
   enforceStock = true,
 }: VariantSelectorProps) {
-  // Worked out once for the whole product, not per option.
+
   const perVariantTracking = tracksVariantStock(variants);
   const isAvailable = (variant: ProductVariant) =>
     !enforceStock || isVariantAvailable(variant, { pooledStock, perVariantTracking });
@@ -76,15 +75,15 @@ export function VariantSelector({
   const hasColors = colors.length > 0;
   const hasSizes = sizes.length > 0;
 
-  // Some products (Foamboard/Posterboard, imported from Shopify) encode
-  // several real option axes as one composite Size name — e.g.
-  // "Foam Board (Indoors) / 12×12 / 3/16"" is really Board Type / Size /
-  // Thickness. There's no separate column for that in this schema, so
-  // without this every one of the 50+ combinations rendered as one giant
-  // flat, mostly-crossed-out row instead of the tiered picker the
-  // reference site actually has. Detected generically: no colour axis, and
-  // every size name splits into the same number (2+) of " / "-separated
-  // parts.
+
+
+
+
+
+
+
+
+
   const compositeParts = useMemo(() => {
     if (hasColors || !hasSizes) return null;
     const parts = sizes.map((s) => s.name.split(" / ").map((p) => p.trim()));
@@ -93,7 +92,7 @@ export function VariantSelector({
     return parts;
   }, [hasColors, hasSizes, sizes]);
 
-  // A single option on an axis is not a choice — pre-select it.
+
   const colorId = colorIdInput ?? (colors.length === 1 ? colors[0].id : null);
   const sizeId = sizeIdInput ?? (sizes.length === 1 ? sizes[0].id : null);
 
@@ -103,7 +102,7 @@ export function VariantSelector({
         (!hasColors || v.color?.id === cId) && (!hasSizes || v.size?.id === sId)
     ) ?? null;
 
-  /** Is there a variant on this axis value that pairs with the other axis? */
+
   const colorAvailable = (cId: number) =>
     variants.some(
       (v) =>
@@ -127,13 +126,13 @@ export function VariantSelector({
   };
 
   const handleColor = (cId: number) => {
-    // Clearing this axis leaves the other one alone.
+
     if (cId === colorId) {
       commit(null, sizeId);
       return;
     }
-    // Switching to a colour that does not stock the chosen size clears the
-    // size rather than leaving an impossible pair selected.
+
+
     const keepSize =
       sizeId != null &&
       variants.some(
@@ -155,16 +154,15 @@ export function VariantSelector({
     commit(keepColor ? colorId : null, sId);
   };
 
-  // A single variant with no colour/size is not a choice at all — e.g. a
-  // one-off service (Rush Order, Resend Artwork) that only has one SKU.
-  // Rendering an "Options" heading over one unlabeled/blank button forced a
-  // click on a no-op before the item could be added to cart. Auto-select it
-  // and show nothing instead.
+
+
+
+
+
   const onlyVariant = variants.length === 1 ? variants[0] : null;
   const autoSelect = !hasColors && !hasSizes && !!onlyVariant;
   useEffect(() => {
     if (autoSelect && selected?.id !== onlyVariant!.id) onSelect(onlyVariant);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoSelect, onlyVariant?.id]);
 
   if (variants.length === 0) return null;
@@ -184,7 +182,7 @@ export function VariantSelector({
     );
   }
 
-  // Variants that carry neither colour nor size are listed by SKU instead.
+
   if (!hasColors && !hasSizes) {
     return (
       <div className="mb-6">
@@ -222,8 +220,8 @@ export function VariantSelector({
 
   const selectedColor = colors.find((c) => c.id === colorId);
   const selectedSize = sizes.find((s) => s.id === sizeId);
-  // Show the count that actually governs this variant, so a product-level
-  // pool is not reported as "out of stock".
+
+
   const stock = selected
     ? perVariantTracking
       ? variantStock(selected)
@@ -335,7 +333,7 @@ export function VariantSelector({
   );
 }
 
-/** Friendly labels for the common 2-3 axis composite-size cases. */
+
 function axisLabel(index: number, count: number): string {
   if (count === 3) return ["Board Type", "Size", "Thickness"][index];
   if (count === 2) return ["Type", "Size"][index];
@@ -344,7 +342,7 @@ function axisLabel(index: number, count: number): string {
 
 interface CompositeSizeSelectorProps {
   sizes: { id: number; name: string; display_name?: string }[];
-  /** parts[i] is sizes[i].name.split(" / ") — same index, already trimmed. */
+
   parts: string[][];
   variants: ProductVariant[];
   selected: ProductVariant | null;
@@ -353,11 +351,7 @@ interface CompositeSizeSelectorProps {
   enforceStock?: boolean;
 }
 
-/**
- * A tiered picker for products whose "Size" is really several option axes
- * squashed into one composite string (Board Type / Size / Thickness, etc.)
- * — see the comment where this is detected in VariantSelector above.
- */
+
 function CompositeSizeSelector({
   sizes,
   parts,
@@ -385,8 +379,8 @@ function CompositeSizeSelector({
     [parts, axisCount]
   );
 
-  // One selection per axis; null = not chosen yet. Pre-select an axis that
-  // only has one possible value, same rule the colour/size axes use.
+
+
   const [chosen, setChosen] = useState<(string | null)[]>(() =>
     axisValues.map((values) => (values.length === 1 ? values[0] : null))
   );
@@ -401,11 +395,9 @@ function CompositeSizeSelector({
 
   useEffect(() => {
     onSelect(variantForParts(chosen));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chosen.join("|")]);
 
-  /** Is there any variant with this axis value that's consistent with what's
-   *  already chosen on the other axes (unconstrained axes match anything)? */
+
   const valueAvailable = (axis: number, value: string) =>
     parts.some(
       (p, i) =>

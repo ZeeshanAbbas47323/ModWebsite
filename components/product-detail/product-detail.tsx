@@ -40,12 +40,6 @@ import { isVariantAvailable, productStock, tracksVariantStock } from '@/services
 import type { ProductVariant } from '@/services/product.service';
 import { useProductCategories } from '@/hooks/use-product-categories';
 
-/**
- * Only Apparel & Accessories (category 72 and its subcategories — T-Shirts,
- * Hoodies, ...) is real held stock. Everything else (DTF transfers, signage,
- * services, ...) is made to order, so blocking checkout on an "out of stock"
- * variant there stopped orders the business could actually fulfill.
- */
 const INVENTORY_ENFORCED_CATEGORY_ID = 72;
 
 interface ProductDetailProps {
@@ -53,10 +47,6 @@ interface ProductDetailProps {
     productId?: number;
 }
 
-// Product descriptions/FAQs are admin-authored HTML (from the dashboard's rich
-// text editor) — they can contain tables, long unbroken strings (SKUs, URLs),
-// and images with explicit widths. Without these guards any one of those
-// blows out the layout width and causes horizontal scroll on mobile.
 const richTextClasses =
     "break-words [&>*+*]:mt-4 [&_strong]:text-black [&_b]:text-black " +
     "[&_h2]:text-lg [&_h2]:text-black [&_h2]:font-bold [&_h3]:text-base [&_h3]:text-black [&_h3]:font-bold " +
@@ -82,8 +72,6 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
     const increaseView = useIncreaseView();
     const { addItem } = useCart();
 
-    // The /product-detail?id= route passes only an id, so fetch the record the
-    // cart needs (name, price, images) when the parent did not supply it.
     const { data: fetchedProduct } = useProduct(productProp ? 0 : id);
     const product = productProp ?? fetchedProduct ?? null;
 
@@ -101,9 +89,6 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
     const { data: faqs } = useProductFaqs(id);
     const { data: variants } = useProductVariants(id);
 
-    // Real subcategories of Apparel & Accessories, fetched live so this stays
-    // correct if a subcategory is added/removed later — see
-    // INVENTORY_ENFORCED_CATEGORY_ID above.
     const { data: apparelSubcategories } = useProductCategories(INVENTORY_ENFORCED_CATEGORY_ID);
     const enforceStock =
         !!product &&
@@ -112,9 +97,6 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
     const { data: reviewsData } = useReviews({ filters: { product_id: id } });
     const { data: builderProducts } = useGangSheetProducts();
 
-    // `sort` mutates, so copy first — apiImages is the React Query cache.
-    // The same photo can be attached to a product more than once, so collapse
-    // duplicates rather than showing the gallery twice.
     const images = apiImages?.length
         ? [...new Set(
             [...apiImages]
@@ -128,13 +110,11 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
     const reviewCount = reviewsData?.summary?.total_reviews ?? reviewsData?.pagination?.total ?? 0;
     const averageRating = reviewsData?.summary?.average_rating ?? 0;
 
-    // A chosen variant overrides the product's headline price.
     const listPrice = selectedVariant?.price ?? product?.base_price;
     const salePrice = selectedVariant ? selectedVariant.sale_price : product?.sale_price;
     const price = salePrice != null ? Number(salePrice) : listPrice != null ? Number(listPrice) : null;
     const originalPrice = salePrice != null && listPrice != null ? Number(listPrice) : null;
 
-    // Variants can carry their own photo; show it as soon as one is picked.
     const variantImage = selectedVariant?.image_url
         ? resolveImageUrl(selectedVariant.image_url, images[0])
         : null;
@@ -143,11 +123,7 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
         ? [variantImage, ...images]
         : images;
 
-    // A product with variants cannot be added until one is chosen, otherwise
-    // the order would be missing its SKU.
     const needsVariant = !!variants?.length && !selectedVariant;
-    // Stock can live on the product instead of each variant; the selector and
-    // this guard have to read it the same way.
     const pooledStock = productStock(product);
     const perVariantTracking = tracksVariantStock(variants);
     const variantOutOfStock =
@@ -155,14 +131,9 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
         !!selectedVariant &&
         !isVariantAvailable(selectedVariant, { pooledStock, perVariantTracking });
 
-    // A product opens the builder only when the builder actually has a matching
-    // product. The old category-wide rule is gone: it put a gang sheet builder
-    // on things like adhesive powder just because they shared a category.
     const builderProductSlug = matchBuilderProduct(product, builderProducts)?.slug;
     const usesGangSheetBuilder = !!builderProductSlug;
-    // This vendor's products are sold through the transfers-by-size tool.
     const usesTransfersBySize = isTransfersBySizeProduct(product?.vendor_id);
-    // Ready-to-print products need the customer's own file attached.
     const wantsArtwork =
         !usesTransfersBySize && !usesGangSheetBuilder && needsArtworkUpload(product);
     const artworkUploading = artwork.some((f) => !f.stored && !f.error);
@@ -170,8 +141,6 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
     const handleTransferAdd = async (selection: TransferSelection) => {
         if (!product || !selection.file) return;
 
-        // The tool stores each version as it is made, so normally there is
-        // nothing left to upload here.
         const uploaded =
             selection.stored ??
             (await uploadService.toStorage(selection.file));
@@ -189,8 +158,6 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
             print_method: "dtf",
             custom_text: details,
             design_uploads: [{
-                // Permanent CDN link from the upload endpoint — it never
-                // expires, so it is still valid whenever the order is printed.
                 file_url: uploaded.url,
                 file_name: uploaded.originalName || selection.file.name,
                 print_method: "dtf",
@@ -275,15 +242,13 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
 
     useEffect(() => {
         if (id) increaseView.mutate(id);
-    }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [id]);
 
     useEffect(() => {
         if (!api) return;
         api.on("select", () => setActiveThumb(api.selectedScrollSnap()));
     }, [api]);
 
-    // Jump the gallery to the picked variant's photo. Prepended images sit at
-    // index 0; otherwise scroll to wherever the photo already lives.
     useEffect(() => {
         if (!api || !variantImage) return;
         api.scrollTo(variantImageIndex === -1 ? 0 : variantImageIndex);
@@ -382,8 +347,6 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
 
                     {reviewCount > 0 && (
                         <div className="flex items-center gap-2 mb-6">
-                            {/* Stars reflect the real average — a filled star is
-                                shown only up to the rounded rating. */}
                             <div className="flex gap-1" aria-label={`Rated ${averageRating} out of 5`}>
                                 {[...Array(5)].map((_, i) => (
                                     <Image

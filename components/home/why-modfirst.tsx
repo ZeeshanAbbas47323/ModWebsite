@@ -10,8 +10,8 @@ import { WHY_MODFIRST_FALLBACK } from "@/lib/home-fallback-content";
 
 export const WhyModfirst = () => {
   const { data: section, isLoading } = useHomeSection("home_why_modfirst");
-  // No `home_why_modfirst` row exists yet, so this fell back to rendering
-  // nothing; the mosaic images are already local, so only the copy needs one.
+
+
   const why = mapHomeWhyModfirst(section) ?? WHY_MODFIRST_FALLBACK;
 
   if (isLoading) {

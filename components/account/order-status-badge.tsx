@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-/** Colour families for the order lifecycle, so a glance reads the state. */
+
 const TONES: Record<string, string> = {
   booked: "bg-blue-50 text-blue-700 border-blue-200",
   accepted: "bg-blue-50 text-blue-700 border-blue-200",

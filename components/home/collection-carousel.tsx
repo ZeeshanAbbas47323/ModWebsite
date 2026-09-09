@@ -15,7 +15,6 @@ interface CollectionCarouselProps {
 const DEFAULT_DESCRIPTION =
   "From small business advertising to big event displays, Modfirst delivers bold.";
 
-/** One home-page row backed by `products/frontend/collection`. */
 export function CollectionCarousel({
   type,
   title,

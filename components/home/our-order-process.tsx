@@ -45,8 +45,8 @@ const cardItemVariants: Variants = {
 
 export function OurOrderProcess() {
   const { data: section, isLoading } = useHomeSection("home_order_process");
-  // No `home_order_process` row exists yet, so this fell back to rendering
-  // nothing.
+
+
   const process = mapHomeOrderProcess(section) ?? ORDER_PROCESS_FALLBACK;
 
   if (isLoading) {

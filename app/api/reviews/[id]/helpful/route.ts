@@ -1,7 +1,6 @@
 import { NextRequest } from "next/server";
 import { proxyPost } from "@/lib/api-proxy";
 
-/** Mark a review helpful. Requires a signed-in customer. */
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }

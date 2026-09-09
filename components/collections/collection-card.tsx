@@ -10,8 +10,6 @@ export function CollectionCard({
   compact = false,
 }: {
   collection: ProductCategory;
-  /** Smaller card — used for the "Shop by category" sub-list on a category's
-   * own page, where these are a secondary aid, not the page's main content. */
   compact?: boolean;
 }) {
   const image = resolveImageUrl(collection.image_url, PLACEHOLDER);
@@ -35,11 +33,6 @@ export function CollectionCard({
           className="object-cover transition-transform duration-500 ease-out group-hover:scale-110"
           placeholderClassName="!object-contain p-10 bg-white"
         />
-        {/* The real product photos behind these tiles come from many
-            different supplier mockups, each with its own studio backdrop
-            (gradients, faint watermarks). A soft vignette to the card's own
-            neutral gray fades that backdrop out at the edges so every tile
-            reads as one consistent, clean set regardless of source photo. */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{

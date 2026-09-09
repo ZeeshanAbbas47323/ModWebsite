@@ -2,12 +2,7 @@ import Image from "next/image";
 import type { ShowcaseImage } from "@/lib/home-showcase-images";
 import { resolveImageUrl } from "@/lib/image-url";
 
-/**
- * The image half of the two home showcase sections.
- *
- * Two columns, with landscape art taking the full width. An odd tile at the
- * end is widened too, so the grid never finishes on a lone square.
- */
+
 export function ShowcaseMosaic({ images }: { images: ShowcaseImage[] }) {
   const squares = images.filter((image) => !image.wide);
   const lastSquare = squares.length % 2 === 1 ? squares[squares.length - 1] : null;

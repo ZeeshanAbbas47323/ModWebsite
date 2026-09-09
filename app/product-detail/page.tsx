@@ -7,14 +7,6 @@ interface Props {
   searchParams: Promise<{ id?: string }>;
 }
 
-/**
- * Legacy id-based product URL (?id=123) — kept only so old links/menu rows
- * built before slugs were reliable everywhere still work. Redirects
- * server-side to the real, SEO-friendly /products/<slug> page whenever the
- * product has one (nearly always), so a visitor never actually sees or
- * shares a /product-detail?id= URL — falls back to rendering here directly
- * only for the rare product with no slug at all.
- */
 export default async function ProductDetailPage({ searchParams }: Props) {
   const { id: idParam } = await searchParams;
   const id = Number(idParam) || 0;

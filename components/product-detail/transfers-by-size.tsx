@@ -29,7 +29,7 @@ import {
 
 export interface TransferSelection {
   file: File | null;
-  /** Already-stored copy, so the caller does not upload again. */
+
   stored?: StoredUpload | null;
   widthIn: number;
   heightIn: number;
@@ -40,7 +40,7 @@ export interface TransferSelection {
   totalPrice: number;
 }
 
-/** One uploaded artwork with its own size, quantity and edit history. */
+
 interface Design {
   id: string;
   file: File;
@@ -52,11 +52,11 @@ interface Design {
   rushOrder: boolean;
   notes: string;
   naturalWidth: number | null;
-  /** Previous versions, so each design can be undone independently. */
+
   history: File[];
-  /** Blob URL for the preview, created once per file version. */
+
   previewUrl: string | null;
-  /** Where this exact version lives in storage. */
+
   remote: StoredUpload | null;
   uploading: boolean;
   uploadError: string | null;
@@ -91,7 +91,7 @@ interface TransfersBySizeProps {
 
 const money = (n: number) => `$${n.toFixed(2)}`;
 
-/** Vector and PDF artwork cannot be previewed in the browser. */
+
 function isPreviewable(file: File) {
   return file.type.startsWith("image/") && file.type !== "image/svg+xml";
 }
@@ -108,8 +108,8 @@ export function TransfersBySize({ onAddToCart }: TransfersBySizeProps) {
 
   const active = designs.find((d) => d.id === activeId) ?? null;
 
-  // Blob URLs are minted in the handlers that create each file version, so the
-  // only cleanup left is releasing whatever is still open when the tool closes.
+
+
   const liveDesigns = useRef<Design[]>([]);
   useEffect(() => {
     liveDesigns.current = designs;
@@ -127,7 +127,7 @@ export function TransfersBySize({ onAddToCart }: TransfersBySizeProps) {
     setDesigns((list) => {
       const current = list.find((d) => d.id === id);
       if (!current) return list;
-      // Returning the same array when nothing moved stops needless re-renders.
+
       const changed = (Object.keys(patch) as (keyof Design)[]).some(
         (key) => current[key] !== patch[key]
       );
@@ -135,10 +135,10 @@ export function TransfersBySize({ onAddToCart }: TransfersBySizeProps) {
       return list.map((d) => (d.id === id ? { ...d, ...patch } : d));
     });
 
-  /** Every version of an artwork gets its own object in storage. */
+
   const storeFile = async (id: string, file: File) => {
-    // Reading the pixel size here keeps it out of the preview's onLoad, which
-    // would otherwise feed state changes straight back into the preview.
+
+
     readImageSize(file)
       .then(({ width }) => patchDesign(id, { naturalWidth: width }))
       .catch(() => patchDesign(id, { naturalWidth: null }));
@@ -176,7 +176,7 @@ export function TransfersBySize({ onAddToCart }: TransfersBySizeProps) {
     const added = usable.map(newDesign);
     setDesigns((list) => [...list, ...added]);
     setActiveId((current) => current ?? added[0].id);
-    // Store each one straight away, so the URL is ready before checkout.
+
     added.forEach((design) => void storeFile(design.id, design.file));
   };
 
@@ -190,7 +190,7 @@ export function TransfersBySize({ onAddToCart }: TransfersBySizeProps) {
     });
   };
 
-  /** Replace the active artwork, keeping the previous one for undo. */
+
   const applyEdit = (edited: File) => {
     if (!active) return;
     if (active.previewUrl) URL.revokeObjectURL(active.previewUrl);
@@ -201,7 +201,7 @@ export function TransfersBySize({ onAddToCart }: TransfersBySizeProps) {
       naturalWidth: null,
       remote: null,
     });
-    // An edit is a different image, so it needs its own stored copy and URL.
+
     void storeFile(active.id, edited);
   };
 
@@ -235,7 +235,7 @@ export function TransfersBySize({ onAddToCart }: TransfersBySizeProps) {
           : await imageToolsService.upscale(active.file);
       applyEdit(edited);
 
-      // Upscaling comes back as JPEG, which cannot carry an alpha channel.
+
       const lostTransparency =
         tool === "upscale" && wasTransparent && edited.type !== "image/png";
 
@@ -291,7 +291,7 @@ export function TransfersBySize({ onAddToCart }: TransfersBySizeProps) {
   const applyPreset = (w: number, h: number) =>
     patchActive({ widthIn: w, heightIn: h, ratio: w / h });
 
-  // Every design is priced on its own, then summed.
+
   const lines = designs.map((design) => ({
     design,
     pricing: priceTransfer(design.widthIn, design.heightIn, design.quantity, design.rushOrder),
@@ -328,8 +328,8 @@ export function TransfersBySize({ onAddToCart }: TransfersBySizeProps) {
     setMessage(null);
     setAdding(true);
     try {
-      // Sequential, so a mid-way failure leaves earlier lines in the cart
-      // rather than firing every upload at once.
+
+
       for (const { design, pricing: linePricing } of lines) {
         await onAddToCart({
           file: design.file,
@@ -361,7 +361,7 @@ export function TransfersBySize({ onAddToCart }: TransfersBySizeProps) {
 
   return (
     <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
-      {/* Preview */}
+
       <div className="w-full lg:w-1/2">
         <p className="text-xs uppercase tracking-widest text-gray-500 mb-4">Preview</p>
 
@@ -391,8 +391,8 @@ export function TransfersBySize({ onAddToCart }: TransfersBySizeProps) {
                   }}
                 >
                   {activePreview ? (
-                    // Object URLs are local blobs, so next/image adds nothing here.
-                    // eslint-disable-next-line @next/next/no-img-element
+
+
                     <img
                       src={activePreview}
                       alt={active.file.name}
@@ -447,7 +447,7 @@ export function TransfersBySize({ onAddToCart }: TransfersBySizeProps) {
           </div>
         </div>
 
-        {/* Designs in this order */}
+
         {designs.length > 0 && (
           <div className="mt-6">
             <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">
@@ -470,7 +470,7 @@ export function TransfersBySize({ onAddToCart }: TransfersBySizeProps) {
                   >
                     <span className="block w-full h-16 flex items-center justify-center bg-[#F4F4F5]">
                       {design.previewUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
+
                         <img
                           src={design.previewUrl}
                           alt=""
@@ -509,9 +509,9 @@ export function TransfersBySize({ onAddToCart }: TransfersBySizeProps) {
         )}
       </div>
 
-      {/* Controls */}
+
       <div className="w-full lg:w-1/2 flex flex-col gap-7">
-        {/* Upload */}
+
         <div>
           <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">Upload design</p>
           <label
@@ -528,7 +528,7 @@ export function TransfersBySize({ onAddToCart }: TransfersBySizeProps) {
               accept={ACCEPTED_UPLOAD}
               onChange={(e) => {
                 acceptFiles(e.target.files);
-                // Allow picking the same file again after removing it.
+
                 e.target.value = "";
               }}
               className="sr-only"
@@ -601,7 +601,7 @@ export function TransfersBySize({ onAddToCart }: TransfersBySizeProps) {
               </p>
             )}
 
-            {/* Size */}
+
             <div>
               <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">Size</p>
               <div className="flex flex-wrap gap-2 mb-4">
@@ -673,7 +673,7 @@ export function TransfersBySize({ onAddToCart }: TransfersBySizeProps) {
               </label>
             </div>
 
-            {/* Quantity */}
+
             <div>
               <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">Quantity</p>
               <div className="flex items-center gap-4 bg-[#F4F4F5] rounded-xl px-4 h-14 w-fit">
@@ -712,7 +712,7 @@ export function TransfersBySize({ onAddToCart }: TransfersBySizeProps) {
               )}
             </div>
 
-            {/* Price */}
+
             <div className="bg-[#F4F4F5] rounded-[20px] p-5 flex flex-col gap-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-600">
@@ -757,7 +757,7 @@ export function TransfersBySize({ onAddToCart }: TransfersBySizeProps) {
               </p>
             </div>
 
-            {/* Rush */}
+
             <label className="flex items-center justify-between gap-4 bg-[#F4F4F5] rounded-[20px] px-5 py-4 cursor-pointer">
               <span className="flex items-center gap-3">
                 <input
@@ -771,7 +771,7 @@ export function TransfersBySize({ onAddToCart }: TransfersBySizeProps) {
               <span className="text-sm font-bold text-primary">+{money(RUSH_ORDER_FEE)}</span>
             </label>
 
-            {/* Notes */}
+
             <div>
               <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">
                 Special instructions

@@ -1,14 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { BUILDER_ORIGIN, DEFAULT_BUILDER_PRODUCT_SLUG } from "@/lib/gang-sheet";
 
-/**
- * Open a builder session.
- *
- * This runs server-side on purpose: the builder's docs are explicit that a
- * handoff token (which attaches the customer) must never be minted in the
- * browser. Keeping it here also sidesteps CORS, since the builder only
- * allow-lists the production storefront origins.
- */
+
 export async function POST(req: NextRequest) {
   let body: {
     productSlug?: string;
@@ -18,7 +11,6 @@ export async function POST(req: NextRequest) {
   try {
     body = await req.json();
   } catch {
-    // An empty body is fine — the defaults below cover it.
   }
 
   try {
@@ -45,7 +37,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // The embed loader only needs these two fields.
+
     return NextResponse.json({
       sessionId: data.session?.id,
       token: data.token,

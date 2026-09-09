@@ -8,18 +8,9 @@ import { resolveImageUrl } from "@/lib/image-url";
 const LOCAL_LOGO = "/images/branding/logo-dark.svg";
 
 interface SiteLogoProps extends Omit<ImageProps, "src" | "alt"> {
-  /** "white" for a dark background — falls back to the same dark-on-transparent mark either way. */
   variant?: "black" | "white";
 }
 
-/**
- * The site logo, falling back to the bundled SVG whenever the CMS URL 404s —
- * `logo_url` currently points at a dead domain (`storage.modfirstapparel.com`)
- * with no usable replacement uploaded, so every `<Image src={resolveImageUrl(...)}>`
- * copy of this was rendering broken sitewide (header, footer, sidebar, auth
- * screens). `onError` catches that at render time regardless of what's in the
- * database, rather than needing the CMS data fixed first.
- */
 export function SiteLogo({ variant = "black", ...imgProps }: SiteLogoProps) {
   const { data: settings } = useWebsiteSettings();
   const [failed, setFailed] = useState(false);

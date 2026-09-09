@@ -1,6 +1,6 @@
 export interface FaqEntry {
   question: string;
-  /** Answer HTML, tag-balanced so it can be rendered on its own. */
+
   answer: string;
 }
 
@@ -29,11 +29,7 @@ function stripTags(html: string): string {
   return decodeEntities(html.replace(/<[^>]*>/g, "")).replace(/\s+/g, " ").trim();
 }
 
-/**
- * Slicing between headings cuts list and item tags in half, leaving closers
- * with no opener (and vice versa). Drop the orphans and close what is left so
- * the fragment renders as valid markup.
- */
+
 function balanceHtml(fragment: string): string {
   const stack: string[] = [];
   let out = "";
@@ -54,8 +50,8 @@ function balanceHtml(fragment: string): string {
     }
     if (closing) {
       const depth = stack.lastIndexOf(name);
-      if (depth === -1) continue; // orphan closer — drop it
-      // Close anything left open inside this element.
+      if (depth === -1) continue;
+
       for (let i = stack.length - 1; i > depth; i--) out += `</${stack[i]}>`;
       stack.length = depth;
       out += full;
@@ -70,11 +66,7 @@ function balanceHtml(fragment: string): string {
   return out.trim();
 }
 
-/**
- * Split a WordPress-style content page into question/answer pairs. Each `<h2>`
- * starts a new entry and everything up to the next one is its answer.
- * Returns an empty array when the content has no headings to split on.
- */
+
 export function parseFaqContent(html: string): FaqEntry[] {
   if (!html) return [];
 
@@ -97,8 +89,8 @@ export function parseFaqContent(html: string): FaqEntry[] {
       const next = headings[index + 1];
       const body = html.slice(heading.end, next ? next.start : html.length);
       return {
-        // Authors often number the questions by hand; the accordion numbers
-        // them itself, so drop a leading "12." or "12)".
+
+
         question: heading.text.replace(/^\s*\d+\s*[.)]\s*/, ""),
         answer: balanceHtml(body),
       };
@@ -120,27 +112,20 @@ function slugify(text: string): string {
     .slice(0, 60);
 }
 
-/**
- * Some CMS exports mark sections as a paragraph holding nothing but bold text
- * (`<p><strong>Returns</strong></p>`) instead of a real heading. Promote those
- * so they gain heading typography and appear in the table of contents.
- */
+
 export function promoteStrongHeadings(html: string): string {
   return html.replace(
     /<p\b[^>]*>\s*<(strong|b)\b[^>]*>([\s\S]*?)<\/\1>\s*(?:<br\s*\/?>)?\s*<\/p>/gi,
     (full, _tag, inner: string) => {
       const text = stripTags(inner);
-      // Long lines are emphasised sentences, not section titles.
+
       if (!text || text.length > 80) return full;
       return `<h2>${inner}</h2>`;
     }
   );
 }
 
-/**
- * Give every heading a stable id and return them for a table of contents.
- * Ids are de-duplicated so repeated headings still anchor to distinct spots.
- */
+
 export function withHeadingIds(html: string): {
   html: string;
   headings: ContentHeading[];
@@ -162,7 +147,7 @@ export function withHeadingIds(html: string): {
       used.add(id);
 
       headings.push({ id, text, level: Number(level) });
-      // Keep the author's own id if they set one.
+
       const withId = /\bid=/.test(attrs) ? attrs : `${attrs} id="${id}"`;
       return `<h${level}${withId}>${inner}</h${level}>`;
     }

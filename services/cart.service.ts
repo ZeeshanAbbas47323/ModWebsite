@@ -18,7 +18,7 @@ export interface DesignUploadInput {
   print_method?: PrintMethod;
 }
 
-/** A stored design file, as returned nested inside a cart row. */
+
 export interface DesignUpload {
   id: number;
   user_id?: number;
@@ -28,7 +28,7 @@ export interface DesignUpload {
   print_method?: PrintMethod | null;
 }
 
-/** Join row between a cart item and its design uploads. */
+
 export interface CartItemDesign {
   id: number;
   cart_item_id: number;
@@ -36,7 +36,7 @@ export interface CartItemDesign {
   designUpload?: DesignUpload | null;
 }
 
-/** A cart row as returned by the API for a logged-in customer. */
+
 export interface ServerCartItem {
   id: number;
   product_id: number;
@@ -50,7 +50,7 @@ export interface ServerCartItem {
   designs?: CartItemDesign[] | null;
 }
 
-/** Last path segment of a URL, used when the API stores no file name. */
+
 function fileNameFromUrl(url: string): string {
   try {
     const path = new URL(url, "https://placeholder.invalid").pathname;
@@ -60,7 +60,7 @@ function fileNameFromUrl(url: string): string {
   }
 }
 
-/** Flatten the nested join rows into the shape the cart UI renders. */
+
 export function designUploadsOf(item: ServerCartItem): DesignUploadInput[] {
   return (item.designs ?? [])
     .map((design) => design.designUpload)
@@ -116,10 +116,10 @@ export const cartService = {
     try {
       await apiClient.delete(`/cart-items/${id}`);
     } catch {
-      // The shared soft-delete endpoint writes deleted_by/deleted_at, which
-      // CartItem does not have, so it fails server-side. Deactivating the row
-      // has the same effect here because list() only asks for is_active rows.
-      // Remove this fallback once the delete endpoint handles cartItem.
+
+
+
+
       await apiClient.put(`/cart-items/${id}`, { is_active: false });
     }
   },

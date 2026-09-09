@@ -4,7 +4,7 @@ import {
   type WhyModfirstViewModel,
 } from "@/lib/map-home-why-modfirst";
 
-/** Same payload shape as why_modfirst — reuse mapper */
+
 export type FastProductionViewModel = WhyModfirstViewModel;
 
 export function mapHomeFastProduction(

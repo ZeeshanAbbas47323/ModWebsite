@@ -1,14 +1,3 @@
-/**
- * Fallback content for every home section except `home_hero` (which has its
- * own fallback in `home-hero-slides.ts` and is seeded separately).
- *
- * This is the same real copy the site was built with — verbatim from
- * `docs/home-*-request-body.json`, the reference payloads used to seed the
- * CMS — not placeholder text. If a section's database row is ever missing
- * (a fresh database, a row that got deleted), the page falls back to this
- * instead of rendering nothing; once the CMS row exists, a reload picks that
- * up automatically and this is never used.
- */
 
 import type { WhyModfirstViewModel } from "@/lib/map-home-why-modfirst";
 import type { OrderProcessViewModel } from "@/lib/map-home-order-process";
@@ -31,8 +20,6 @@ export const WHY_MODFIRST_FALLBACK: WhyModfirstViewModel = {
     "Superior Print and Finish",
     "Exceptional Customer Care",
   ],
-  // The mosaic images render from a local file (`home-showcase-images.ts`),
-  // not from CMS items, so this stays empty regardless.
   images: [],
 };
 

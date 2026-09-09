@@ -181,8 +181,8 @@ function RightPromoCard({ card }: { card: PromoCardViewModel }) {
 
 export function PromotionalBanners() {
   const { data: section, isLoading } = useHomeSection("home_promo_banners");
-  // No `home_promo_banners` row exists yet, so this fell back to rendering
-  // nothing.
+
+
   const promo = mapHomePromoBanners(section) ?? PROMO_BANNERS_FALLBACK;
 
   const leftCard =

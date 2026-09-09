@@ -3,7 +3,7 @@ export interface PasswordRule {
   test: (value: string) => boolean;
 }
 
-/** Mirrors the API's registration rules so failures surface before submitting. */
+
 export const PASSWORD_RULES: PasswordRule[] = [
   { label: "At least 8 characters", test: (v) => v.length >= 8 },
   { label: "An uppercase letter", test: (v) => /[A-Z]/.test(v) },
@@ -16,7 +16,7 @@ export function isStrongPassword(value: string): boolean {
   return PASSWORD_RULES.every((rule) => rule.test(value));
 }
 
-/** The API counts digits, so formatting characters do not help reach the minimum. */
+
 export function digitCount(phone: string): number {
   return (phone.match(/\d/g) ?? []).length;
 }

@@ -2,7 +2,7 @@ import apiClient from "@/lib/axios";
 import { omitEmpty } from "@/lib/utils";
 import type { Product, ProductVariant } from "@/services/product.service";
 
-/** A wishlist row as returned for a logged-in customer. */
+
 export interface ServerWishlistItem {
   id: number;
   user_id?: number;

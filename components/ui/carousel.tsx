@@ -18,9 +18,9 @@ type CarouselProps = {
   plugins?: CarouselPlugin
   orientation?: "horizontal" | "vertical"
   setApi?: (api: CarouselApi) => void
-  /** Auto-advance one slide on an interval; pauses on hover/focus/touch. */
+
   autoplay?: boolean
-  /** Milliseconds between auto-advances. */
+
   autoplayDelay?: number
 }
 
@@ -99,10 +99,10 @@ function Carousel({
     setApi(api)
   }, [api, setApi])
 
-  // Auto-advance on a timer, held while the shopper is hovering/touching so
-  // the rail doesn't jump under their cursor mid-browse. `loop: true` (set on
-  // every rail using this) means scrollNext() wraps forever without special-
-  // casing the last slide.
+
+
+
+
   React.useEffect(() => {
     if (!api || !autoplay || paused) return
     const id = setInterval(() => {
@@ -114,7 +114,7 @@ function Carousel({
 
   React.useEffect(() => {
     if (!api) return
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+
     onSelect(api)
     api.on("reInit", onSelect)
     api.on("select", onSelect)

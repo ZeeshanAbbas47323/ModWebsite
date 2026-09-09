@@ -9,7 +9,7 @@ export interface Net30ApplicationInput {
   company_tax_id: string;
   phone: string;
   phone_country_code?: string;
-  /** Whole number of years. */
+
   years_in_business: number;
   requested_credit_amount: number;
   resale_certificate_url?: string;

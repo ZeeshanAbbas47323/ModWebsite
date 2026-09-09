@@ -4,30 +4,26 @@ import { API_BASE, upstreamHeaders } from "@/lib/upstream";
 interface ProxyOptions {
   method?: string;
   revalidate?: number;
-  /**
-   * Seconds this response may be reused. Site-wide content (menus, settings,
-   * footer) is the same for every visitor and changes rarely, so letting the
-   * browser and CDN hold it avoids a round trip on every page load.
-   */
+
   cacheSeconds?: number;
 }
 
-/** Site-wide content that only changes when someone edits the CMS. */
+
 export const SHARED_CONTENT_TTL = 2 * 60 * 60;
 
 function cacheHeaders(seconds?: number) {
   if (!seconds) return undefined;
   return {
-    // s-maxage (shared/CDN caches) only — not max-age. max-age caches inside
-    // each visitor's own browser; a response cached there while a section had
-    // no data (e.g. before a seed script ran) stays stuck for the full TTL on
-    // that one visitor with no way to purge it centrally. That's exactly what
-    // showed empty menus on staging: the browser had cached the empty answer
-    // and kept serving it "from disk cache" long after the real data existed.
-    // A shared/CDN cache can still be purged or simply doesn't hold it as long
-    // as a browser does by default, so this keeps the origin round-trip
-    // savings without that trap. Serve stale for a day while revalidating, so
-    // a slow upstream never blocks a page render.
+
+
+
+
+
+
+
+
+
+
     "Cache-Control": `public, s-maxage=${seconds}, stale-while-revalidate=86400`,
   };
 }
@@ -42,7 +38,7 @@ function respond(text: string, status: number, cacheSeconds?: number) {
       { status: 502 }
     );
   }
-  // Only a good response is worth caching.
+
   const headers = status === 200 ? cacheHeaders(cacheSeconds) : undefined;
   return NextResponse.json(data, { status, headers });
 }
@@ -66,7 +62,7 @@ export async function proxyGet(path: string, opts?: ProxyOptions) {
   }
 }
 
-/** GET that forwards the caller's Authorization header (auth-gated endpoints). */
+
 export async function proxyAuthGet(req: NextRequest, path: string) {
   try {
     const res = await fetch(`${API_BASE}/${path}`, {
@@ -90,7 +86,6 @@ async function proxyWithBody(
     try {
       body = await req.json();
     } catch {
-      // no body — fine for DELETE / empty POST
     }
     const res = await fetch(`${API_BASE}/${path}`, {
       method,
@@ -120,12 +115,7 @@ export async function proxyDelete(req: NextRequest, path: string) {
   return proxyWithBody(req, path, "DELETE");
 }
 
-/**
- * A cacheable GET for an upstream endpoint that only accepts POST.
- *
- * The body is fixed here rather than taken from the caller, so the result is
- * the same for everyone and can be cached by URL.
- */
+
 export async function proxyCachedQuery(
   path: string,
   body: unknown,

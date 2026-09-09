@@ -23,14 +23,14 @@ import {
   type StoredUser,
 } from "@/lib/auth-storage";
 
-/** What the caller must do next after submitting credentials. */
+
 export type AuthStep = "authenticated" | "otp_required";
 
 interface AuthContextValue {
   user: StoredUser | null;
   isAuthenticated: boolean;
   isReady: boolean;
-  /** Set while an OTP is outstanding, so the UI knows which email to verify. */
+
   pendingEmail: string | null;
   login: (input: LoginInput) => Promise<AuthStep>;
   register: (input: RegisterInput) => Promise<AuthStep>;
@@ -45,21 +45,21 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<StoredUser | null>(null);
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
-  // Guards against rendering auth-dependent UI before localStorage is read,
-  // which would otherwise flash the logged-out state on every page load.
+
+
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // localStorage is client-only, so the session must be restored after the
-    // first paint — reading it during render would break SSR hydration.
+
+
     const token = getToken();
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+
     if (token) setUser(getStoredUser());
      
     setIsReady(true);
   }, []);
 
-  /** Persist a successful sign-in, or hold the email for the OTP step. */
+
   const applyResult = useCallback(
     async (result: AuthResult, email: string): Promise<AuthStep> => {
       if (!result.token) {
@@ -68,8 +68,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       setToken(result.token);
 
-      // Some responses omit the user object; fall back to the profile call so
-      // the account page and checkout always have a name to work with.
+
+
       let account = result.user;
       if (!account) {
         try {
@@ -98,7 +98,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async (input: RegisterInput) => {
       const result = await authService.register(input);
       if (result.token) return applyResult(result, input.email);
-      // Registration did not issue a session, so sign in with the new details.
+
       const loginResult = await authService.login({
         email: input.email,
         password: input.password,
@@ -131,7 +131,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await authService.logout();
     } catch {
-      // Even if the API call fails the local session must go.
     }
     clearAuth();
     setUser(null);

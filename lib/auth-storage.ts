@@ -24,7 +24,6 @@ export function setToken(token: string) {
   try {
     window.localStorage.setItem(TOKEN_KEY, token);
   } catch {
-    // storage unavailable (private mode) — session stays in memory only
   }
 }
 
@@ -42,7 +41,6 @@ export function setStoredUser(user: StoredUser) {
   try {
     window.localStorage.setItem(USER_KEY, JSON.stringify(user));
   } catch {
-    // ignore
   }
 }
 
@@ -51,6 +49,5 @@ export function clearAuth() {
     window.localStorage.removeItem(TOKEN_KEY);
     window.localStorage.removeItem(USER_KEY);
   } catch {
-    // ignore
   }
 }

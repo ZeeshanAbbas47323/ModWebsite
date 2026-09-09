@@ -41,11 +41,11 @@ const ProductDetailWrapper = ({ slug }: ProductDetailWrapperProps) => {
         );
     }
 
-    // The fetch finished with nothing — the product doesn't exist, or is
-    // inactive/unpublished. Rather than a dead end (or, previously, an
-    // infinite loading skeleton — ProductDetail only has a real "not found"
-    // state when a productId was passed, which this route never does), show
-    // a friendly message plus something to actually browse instead.
+
+
+
+
+
     if (!product) {
         return (
             <>

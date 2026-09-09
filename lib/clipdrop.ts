@@ -2,12 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const CLIPDROP_BASE = "https://clipdrop-api.co";
 
-/**
- * Forward an image-editing request to ClipDrop.
- *
- * The key is server-only on purpose: shipping it to the browser would let any
- * visitor spend the account's credits.
- */
+
 export async function proxyClipdrop(
   req: NextRequest,
   path: string,
@@ -44,7 +39,7 @@ export async function proxyClipdrop(
     });
 
     if (!res.ok) {
-      // ClipDrop reports failures as JSON; surface its message, not the bytes.
+
       const detail = await res.text().catch(() => "");
       let message = `Image service returned ${res.status}.`;
       try {
@@ -62,7 +57,7 @@ export async function proxyClipdrop(
       headers: {
         "Content-Type": res.headers.get("content-type") ?? "image/png",
         "Cache-Control": "no-store",
-        // Lets the UI show how many credits are left.
+
         "x-remaining-credits": res.headers.get("x-remaining-credits") ?? "",
       },
     });

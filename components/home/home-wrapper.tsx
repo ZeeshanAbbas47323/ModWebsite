@@ -44,15 +44,6 @@ const fallbackProducts = [
   },
 ];
 
-/**
- * Fixed section order for the home page (owner-specified). Each
- * category rail comes from a real main category (matched by its real,
- * live id) and shows every product under it — the parent itself plus all of
- * its subcategories — capped to a handful with a "View All" link to that
- * category's own page for the rest, rather than dumping the whole catalogue
- * into the scroller. A rail that comes back empty hides itself rather than
- * showing a heading over nothing.
- */
 const HomeWrapper = () => {
   const { data: categories } = useProductCategories(null);
 
@@ -65,7 +56,6 @@ const HomeWrapper = () => {
         cat.image_url,
         "/images/banners-compositions/booklet.png",
       ),
-      // Categories are collections, not products — link them accordingly.
       href: `/categories/${cat.slug}`,
     })) ?? fallbackProducts;
 
@@ -73,7 +63,6 @@ const HomeWrapper = () => {
     <>
       <Hero />
 
-      {/* DTF Transfers */}
       <ScrollReveal>
         <CategoryTreeCarousel
           categoryId={66}
@@ -87,7 +76,6 @@ const HomeWrapper = () => {
         <PromotionalBanners />
       </ScrollReveal>
 
-      {/* Hat Heat Press */}
       <ScrollReveal>
         <CategoryTreeCarousel
           categoryId={85}
@@ -100,7 +88,6 @@ const HomeWrapper = () => {
         <OurOrderProcess />
       </ScrollReveal>
 
-      {/* DTF Supplies */}
       <ScrollReveal>
         <CategoryTreeCarousel
           categoryId={87}
@@ -113,7 +100,6 @@ const HomeWrapper = () => {
         <VideoSection />
       </ScrollReveal>
 
-      {/* Apparel & Accessories */}
       <ScrollReveal>
         <CategoryTreeCarousel
           categoryId={72}
@@ -126,7 +112,6 @@ const HomeWrapper = () => {
         <WhyModfirst />
       </ScrollReveal>
 
-      {/* Best sellers — ranked by real sales, View All -> /shop/best-sellers */}
       <ScrollReveal>
         <CollectionCarousel
           type="BEST_SELLERS"
@@ -141,7 +126,6 @@ const HomeWrapper = () => {
         <FastProduction />
       </ScrollReveal>
 
-      {/* Signage & Displays */}
       <ScrollReveal>
         <CategoryTreeCarousel
           categoryId={79}
@@ -157,7 +141,6 @@ const HomeWrapper = () => {
       <ScrollReveal>
         <BlogSection />
       </ScrollReveal>
-      {/* Categories — scroll/slide, View All -> every category */}
       <ScrollReveal>
         <ProductCarousel
           data={categoryCards}

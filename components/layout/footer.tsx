@@ -19,19 +19,12 @@ function sortedLinks(links: FooterLink[] | undefined) {
   return [...(links ?? [])].sort((a, b) => a.sort_order - b.sort_order);
 }
 
-/**
- * Whether a CMS link points off-site.
- *
- * The link `type` is unreliable — the CMS marks internal paths as "url" too —
- * so this goes by the value itself. Getting it wrong sends an internal link
- * through a full page load, or hands next/link a bare relative path that
- * resolves against the current route and lands somewhere else entirely.
- */
+
 function isExternalUrl(url: string): boolean {
   return /^[a-z][a-z0-9+.-]*:/i.test(url) || url.startsWith("//");
 }
 
-/** Normalises a CMS path so next/link always resolves it from the site root. */
+
 function internalHref(url: string): string {
   return url.startsWith("/") || url.startsWith("#") ? url : `/${url}`;
 }
@@ -40,7 +33,7 @@ function FooterNavLink({ link }: { link: FooterLink }) {
   const className = "text-white text-sm md:text-base";
   const url = link.url?.trim() ?? "";
 
-  // A link with nowhere to go should not look clickable.
+
   if (!url || url === "#") {
     return <span className={className}>{link.name}</span>;
   }
@@ -124,8 +117,8 @@ export function Footer() {
   const { data: sections = [], isLoading } = useFooterSections();
   const { data: settings } = useWebsiteSettings();
 
-  // Social handles come from Website Settings; these icons used to be
-  // hardcoded to "#" and went nowhere. A blank handle is hidden.
+
+
   const socials = [
     { name: "Facebook", url: settings?.facebook_url, icon: "/images/icons/facebook.svg", size: 14 },
     { name: "Instagram", url: settings?.instagram_url, icon: "/images/icons/instagram.svg", size: 18 },

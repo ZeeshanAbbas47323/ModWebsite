@@ -14,9 +14,9 @@ export interface ProductCardData {
     count: string;
     img_path: string;
     slug?: string;
-    /** Overrides the product link — used by collection cards. */
+
     href?: string;
-    /** Present for real products; category cards leave it undefined. */
+
     product?: Product;
 }
 
@@ -30,8 +30,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ data }) => {
     const [adding, setAdding] = useState(false);
     const [added, setAdded] = useState(false);
 
-    // Variant products need a SKU chosen on the detail page, so quick-add is
-    // only offered for simple products.
+
+
     const canQuickAdd = !!data.product && !data.product.variants?.length;
 
     const handleQuickAdd = async (e: React.MouseEvent) => {
@@ -44,7 +44,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ data }) => {
             setAdded(true);
             setTimeout(() => setAdded(false), 2000);
         } catch {
-            // The cart page surfaces failures; keep the card quiet.
         } finally {
             setAdding(false);
         }

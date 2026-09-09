@@ -8,10 +8,7 @@ async function fetchBuilderProducts(): Promise<BuilderProduct[]> {
   return data.products ?? [];
 }
 
-/**
- * The builder's catalogue, used to decide whether a storefront product opens
- * the builder — they are matched on slug.
- */
+
 export function useGangSheetProducts() {
   return useQuery({
     queryKey: ["gang-sheet-products"],

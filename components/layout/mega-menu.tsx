@@ -5,28 +5,20 @@ import Link from "next/link";
 import { useMenuTree } from "@/hooks/use-menus";
 import { useNavItems, type NavItem } from "@/lib/menu-nav";
 
-/** How long the panel survives the pointer leaving, so a diagonal move to it
- *  does not close it. */
+
 const CLOSE_DELAY = 140;
 
-/** Space kept for the "More" button when the bar cannot fit every item. */
+
 const MORE_WIDTH = 96;
 
-/** Identifies the synthetic item holding whatever did not fit. */
+
 const OVERFLOW_ID = "__more__";
 
 const ITEM_CLASS =
   "relative flex items-center gap-1.5 px-3 py-3.5 text-[13px] font-semibold uppercase " +
   "tracking-wide whitespace-nowrap transition-colors";
 
-/**
- * Desktop navigation.
- *
- * The catalogue is three levels deep, and stepping through it one level at a
- * time — which is all the drawer can do — takes three clicks to reach a
- * product. Here a whole branch opens at once: the second level becomes the
- * column headings and the third level the links under them.
- */
+
 export function MegaMenu() {
   const { data: menuNodes } = useMenuTree();
   const items = useNavItems(menuNodes);
@@ -73,11 +65,7 @@ export function MegaMenu() {
       onMouseLeave={scheduleClose}
     >
       <div className="container">
-        {/* Off-screen copy at full width, so the widths stay measurable even
-            once items have been moved into "More". The clipping wrapper is
-            required: an absolutely positioned row still counts towards the
-            document's scroll width, which would give the page a horizontal
-            scrollbar as wide as the whole menu. */}
+
         <div aria-hidden className="pointer-events-none absolute h-0 w-0 overflow-hidden">
           <ul ref={measureRef} className="flex items-stretch gap-1">
             {items.map((item) => (
@@ -130,8 +118,8 @@ export function MegaMenu() {
 
 function MegaPanel({ item, onNavigate }: { item: NavItem; onNavigate: () => void }) {
   const columns = item.children ?? [];
-  // A branch whose children are all leaves has no headings to hang links
-  // under, so it reads better as a plain list of links.
+
+
   const flat = columns.every((column) => !column.children?.length);
 
   if (flat) {
@@ -158,7 +146,7 @@ function MegaPanel({ item, onNavigate }: { item: NavItem; onNavigate: () => void
     );
   }
 
-  // Five across still leaves a readable column; past that the labels crowd.
+
   const cols = Math.min(columns.length, 5);
 
   return (
@@ -195,7 +183,7 @@ function MegaPanel({ item, onNavigate }: { item: NavItem; onNavigate: () => void
   );
 }
 
-/** A column heading links when the CMS gave it somewhere to go. */
+
 function ColumnHeading({ item, onNavigate }: { item: NavItem; onNavigate: () => void }) {
   const text = (
     <span className="text-[13px] font-bold uppercase tracking-wide text-black">
@@ -225,14 +213,7 @@ function ColumnHeading({ item, onNavigate }: { item: NavItem; onNavigate: () => 
 }
 
 
-/**
- * How many top-level items fit on one row.
- *
- * The menu comes from the CMS, so the bar has to cope with any number of
- * items at any width rather than a count picked at build time. Widths are
- * read from an off-screen copy that always holds every item, so removing one
- * from the bar cannot change the measurement it was based on.
- */
+
 function useFittedItems(count: number) {
   const barRef = useRef<HTMLUListElement | null>(null);
   const measureRef = useRef<HTMLUListElement | null>(null);
@@ -245,8 +226,8 @@ function useFittedItems(count: number) {
 
     const widths = Array.from(measure.children, (el) => (el as HTMLElement).offsetWidth);
     const gap = parseFloat(getComputedStyle(measure).columnGap || "0") || 0;
-    // The row is a block, so its own content box is the space to fill — the
-    // container's clientWidth would include its horizontal padding.
+
+
     const available = bar.clientWidth;
 
     const total = widths.reduce((sum, w) => sum + w, 0) + gap * Math.max(widths.length - 1, 0);
@@ -263,7 +244,7 @@ function useFittedItems(count: number) {
       used = next;
       fits += 1;
     }
-    // Never collapse everything — one item plus "More" is the floor.
+
     setVisibleCount(Math.max(fits, 1));
   }, []);
 
@@ -292,7 +273,7 @@ function TopLevelItem({ item, isOpen, panelId, onOpen, onToggle }: TopLevelItemP
   const className = [
     ITEM_CLASS,
     isOpen ? "text-black" : "text-neutral-700 hover:text-black",
-    // The indicator doubles as the visual join to the open panel.
+
     "after:absolute after:inset-x-2 after:bottom-0 after:h-[3px] after:rounded-full",
     "after:bg-primary after:transition-transform after:duration-200 after:origin-center",
     isOpen ? "after:scale-x-100" : "after:scale-x-0 hover:after:scale-x-100",

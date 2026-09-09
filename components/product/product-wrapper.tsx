@@ -19,16 +19,7 @@ const fallbackProducts = [
     { title: "Custom Patches", count: "50 Products", img_path: "/images/banners-compositions/stamp.svg" },
 ];
 
-/**
- * Some menu items (T-Shirts, Hoodies) name a group of products with no real
- * ProductCategory behind them — there's simply no such category in the
- * database. Rather than invent one, /products?q=<name> reuses the search
- * endpoint as a lightweight, real-data-driven listing for exactly those
- * cases: no query -> the normal catalogue browse below; a query -> its
- * matching products instead.
- */
 function SearchResults({ query }: { query: string }) {
-    // The search endpoint caps limit at 20.
     const { data, isLoading } = useSearch(query, ["products"], 20);
     const products = data?.products ?? [];
 
@@ -73,8 +64,6 @@ function SearchResults({ query }: { query: string }) {
     );
 }
 
-/** Mirrors backend PRODUCT_SORT_OPTIONS (productValidations.ts) — each value
- * already bakes in its own direction, so no separate order control is needed. */
 const SORT_OPTIONS: { value: string; label: string }[] = [
     { value: "newest", label: "Newest" },
     { value: "oldest", label: "Oldest" },
@@ -90,9 +79,6 @@ const SORT_OPTIONS: { value: string; label: string }[] = [
 const ProductWrapper = () => {
     const [page, setPage] = useState(1);
     const [sortBy, setSortBy] = useState("newest");
-    // null = "All". Filtering happens in place — the pill no longer just
-    // links off to the category's own page, so a shopper can compare
-    // categories without losing their sort choice or scroll position.
     const [categoryId, setCategoryId] = useState<number | null>(null);
     const searchParams = useSearchParams();
     const query = searchParams.get("q")?.trim();

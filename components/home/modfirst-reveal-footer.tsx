@@ -22,15 +22,15 @@ export function ModfirstRevealFooter() {
 
   return (
     <>
-      {/* Spacer to push the scroll area so we can reveal the fixed footer */}
+
       <div style={{ height: height }} className="w-full relative z-0" />
 
-      {/* The actual fixed footer that stays at the bottom */}
+
       <div
         ref={ref}
         className="fixed bottom-0 left-0 w-full z-[-1] flex items-center justify-center bg-linear-to-t from-primary to-white overflow-hidden"
       >
-        {/* Vertical stripe pattern with wider gaps and fade gradient */}
+
         <div
           className="absolute inset-0 opacity-15"
           style={{

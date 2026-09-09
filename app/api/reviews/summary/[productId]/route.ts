@@ -1,6 +1,5 @@
 import { proxyGet } from "@/lib/api-proxy";
 
-/** Rating average and distribution for one product's review widget. */
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ productId: string }> }

@@ -2,11 +2,6 @@ import Link from "next/link";
 import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-/**
- * Site-wide 404. Without this Next falls back to its own bare default —
- * outside the app's styling, no way back to the storefront — which is what
- * a broken menu link or an unmatched collection slug landed on.
- */
 export default function NotFound() {
   return (
     <main className="flex flex-1 flex-col items-center justify-center px-4 py-24 text-center">

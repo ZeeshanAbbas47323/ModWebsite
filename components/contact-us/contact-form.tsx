@@ -63,7 +63,7 @@ export function ContactForm() {
   return (
     <section className="container pt-10 md:pt-12 lg:pt-16">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
-        {/* Left: visual */}
+
         <div className="relative overflow-hidden">
           <div className="absolute -left-4 -top-4 w-[250px] h-[120%] -z-10 pointer-events-none opacity-90">
             <Image
@@ -112,7 +112,7 @@ export function ContactForm() {
           </div>
         </div>
 
-        {/* Right: form */}
+
         <motion.form
           variants={containerVariants}
           initial="hidden"

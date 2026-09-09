@@ -9,11 +9,7 @@ export const API_HEADERS = {
   "x-api-password": process.env.NEXT_PUBLIC_X_API_PASSWORD ?? "",
 };
 
-/**
- * Upstream headers for a request, forwarding the caller's customer bearer
- * token when one is present. Auth-gated endpoints (cart, orders, addresses)
- * need it; public ones ignore it.
- */
+
 export function upstreamHeaders(authorization?: string | null) {
   return authorization
     ? { ...API_HEADERS, Authorization: authorization }

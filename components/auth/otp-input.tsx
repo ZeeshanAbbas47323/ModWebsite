@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 interface OtpInputProps {
   value: string;
   onChange: (value: string) => void;
-  /** Fired once the last box is filled, so no submit button is needed. */
   onComplete: (value: string) => void;
   length?: number;
   disabled?: boolean;
@@ -14,14 +13,6 @@ interface OtpInputProps {
   autoFocus?: boolean;
 }
 
-/**
- * One box per digit, with the behaviour people expect from a code field:
- * typing advances, backspace retreats, arrows move, and pasting a whole code
- * fills every box at once.
- *
- * `onComplete` fires as soon as the last digit lands, so the caller can verify
- * immediately rather than making the user press a button.
- */
 export function OtpInput({
   value,
   onChange,
@@ -33,16 +24,9 @@ export function OtpInput({
 }: OtpInputProps) {
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
 
-  /**
-   * The digits as last written, read instead of the `value` prop inside
-   * handlers. Typing quickly fires several key events before React re-renders,
-   * so a handler closing over `value` would keep seeing the stale string and
-   * every keystroke after the first would be lost.
-   */
   const digitsRef = useRef<string[]>([]);
   digitsRef.current = value.padEnd(length, " ").slice(0, length).split("");
 
-  // Guards against firing twice when the last digit is set and re-rendered.
   const completed = useRef(false);
 
   useEffect(() => {
@@ -57,7 +41,6 @@ export function OtpInput({
     if (value.length < length) completed.current = false;
   }, [value, length, onComplete]);
 
-  /** Trailing blanks are trimmed; interior ones stay so boxes don't shift. */
   const commit = (digits: string[]) => {
     digitsRef.current = digits;
     onChange(digits.join("").replace(/\s+$/, ""));
@@ -69,7 +52,6 @@ export function OtpInput({
 
     const digits = [...digitsRef.current];
 
-    // More than one character means a paste or the browser autofilling.
     if (typed.length > 1) {
       for (let i = 0; i < typed.length && index + i < length; i++) {
         digits[index + i] = typed[i];
@@ -129,7 +111,6 @@ export function OtpInput({
             }}
             type="text"
             inputMode="numeric"
-            // Only the first box carries this, so iOS fills the whole code once.
             autoComplete={i === 0 ? "one-time-code" : "off"}
             maxLength={1}
             value={digit.trim()}

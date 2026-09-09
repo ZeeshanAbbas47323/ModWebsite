@@ -42,7 +42,7 @@ export function ContactHero() {
           person from the Modfirst studio will get back to you within a few hours.
         </motion.p>
 
-        {/* Floating stamp */}
+
         <div className="hidden lg:block absolute right-12 bottom-10 w-32 h-32 z-20 drop-shadow-2xl">
           <motion.div
             initial={{ opacity: 0, scale: 0, rotate: -45 }}

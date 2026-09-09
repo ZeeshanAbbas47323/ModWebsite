@@ -10,7 +10,6 @@ interface OtpFormProps {
   onVerified: () => void;
 }
 
-/** Seconds before "Resend code" becomes available again. */
 const RESEND_COOLDOWN = 30;
 
 export function OtpForm({ onVerified }: OtpFormProps) {
@@ -23,8 +22,6 @@ export function OtpForm({ onVerified }: OtpFormProps) {
   const [resending, setResending] = useState(false);
   const [cooldown, setCooldown] = useState(RESEND_COOLDOWN);
 
-  // Verification is fired from an effect-driven callback, so guard against a
-  // second run while the first request is still in flight.
   const verifying = useRef(false);
 
   useEffect(() => {
@@ -45,7 +42,6 @@ export function OtpForm({ onVerified }: OtpFormProps) {
         onVerified();
       } catch (err) {
         setError(err instanceof Error ? err.message : "Invalid or expired code");
-        // Clear the boxes so the next attempt starts from an empty field.
         setOtp("");
       } finally {
         verifying.current = false;
@@ -90,7 +86,6 @@ export function OtpForm({ onVerified }: OtpFormProps) {
           invalid={!!error}
         />
 
-        {/* Reserved height so the layout doesn't jump as messages swap. */}
         <div className="mt-5 min-h-6 text-sm" aria-live="polite">
           {busy && (
             <span className="inline-flex items-center gap-2 text-gray-600">

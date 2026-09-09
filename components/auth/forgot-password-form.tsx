@@ -44,14 +44,14 @@ export function ForgotPasswordForm() {
     }
   };
 
-  // Called by OtpInput the moment the sixth digit lands.
+
   const confirmCode = useCallback(
     async (code: string) => {
       setError(null);
       setBusy(true);
       try {
-        // Checked before the password step so a wrong code is caught early,
-        // rather than after someone types a new password twice.
+
+
         await authService.verifyResetOtp(email.trim(), code);
         setNotice(null);
         setStep("password");
@@ -136,7 +136,7 @@ export function ForgotPasswordForm() {
           <div className="flex flex-col gap-4">
             {notice && <p className="text-center text-sm text-gray-600">{notice}</p>}
 
-            {/* Verifies as soon as the sixth digit lands — no button needed. */}
+
             <OtpInput
               value={otp}
               onChange={setOtp}

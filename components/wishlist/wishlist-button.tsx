@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { useWishlist, type WishlistInput } from "@/contexts/wishlist-context";
 
 interface WishlistButtonProps extends WishlistInput {
-  /** `icon` floats over a product card; `inline` sits in the buy box. */
+
   variantStyle?: "icon" | "inline";
   className?: string;
 }
@@ -22,7 +22,7 @@ export function WishlistButton({
   const label = saved ? "Remove from wishlist" : "Save to wishlist";
 
   const onClick = async (e: React.MouseEvent) => {
-    // Product cards wrap this in a link; saving should not navigate.
+
     e.preventDefault();
     e.stopPropagation();
     if (busy) return;
@@ -30,7 +30,6 @@ export function WishlistButton({
     try {
       await toggle(input);
     } catch {
-      // The wishlist page surfaces failures; keep the card quiet.
     } finally {
       setBusy(false);
     }

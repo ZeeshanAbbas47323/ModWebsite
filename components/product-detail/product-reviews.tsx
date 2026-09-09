@@ -19,7 +19,6 @@ import {
 } from "@/hooks/use-reviews";
 import type { Review } from "@/services/review.service";
 
-/** Where review photos/videos are filed on the media CDN. */
 const REVIEW_UPLOAD_FOLDER = "reviews";
 const MAX_REVIEW_IMAGES = 5;
 
@@ -51,7 +50,6 @@ function Stars({
   );
 }
 
-/** Clickable stars for the submit form. */
 function RatingInput({
   value,
   onChange,
@@ -83,9 +81,6 @@ function RatingInput({
   );
 }
 
-/** Reviewers type their own name however they like ("tami huggins",
- * "JOHN SMITH") — title-case it for a consistent, professional look without
- * touching the stored value. */
 function formatDisplayName(name: string): string {
   return name
     .split(" ")
@@ -99,8 +94,6 @@ const REVIEWS_PAGE_SIZE = 5;
 
 export function ProductReviews({ productId }: { productId: number }) {
   const { isAuthenticated } = useAuth();
-  // Paginated (not one big fetch) so the section loads fast even when a
-  // product has 40+ reviews; "Show more" below fetches the next page.
   const [page, setPage] = useState(1);
   const { data, isLoading, isFetching } = useReviews({
     filters: { product_id: productId },
@@ -112,8 +105,6 @@ export function ProductReviews({ productId }: { productId: number }) {
     if (!data) return;
     setLoadedReviews((prev) => (page === 1 ? data.data : [...prev, ...data.data]));
   }, [data, page]);
-  // A different product's reviews shouldn't inherit the previous product's
-  // already-loaded pages.
   useEffect(() => {
     setPage(1);
     setLoadedReviews([]);
@@ -128,8 +119,6 @@ export function ProductReviews({ productId }: { productId: number }) {
   const [formOpen, setFormOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Uploaded immediately on pick — createReview only ever sends the resulting
-  // URLs, same as artwork upload elsewhere in the storefront.
   const [images, setImages] = useState<string[]>([]);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -291,7 +280,6 @@ export function ProductReviews({ productId }: { productId: number }) {
                   <div className="flex flex-wrap gap-3">
                     {images.map((url, i) => (
                       <div key={url} className="relative size-16 shrink-0 overflow-hidden rounded-lg border border-gray-200">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={resolveImageUrl(url)} alt="" className="size-full object-cover" />
                         <button
                           type="button"
@@ -446,7 +434,6 @@ export function ProductReviews({ productId }: { productId: number }) {
                           rel="noreferrer"
                           className="block size-16 shrink-0 overflow-hidden rounded-lg border border-gray-200"
                         >
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={resolveImageUrl(url)} alt="" className="size-full object-cover" />
                         </a>
                       ))}

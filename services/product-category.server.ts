@@ -17,7 +17,7 @@ async function fetchCategories(
   return data.payload ?? data.data ?? [];
 }
 
-/** Server-side category lookup, for collection pages and their metadata. */
+
 export async function getCollectionBySlug(
   slug: string
 ): Promise<ProductCategory | null> {

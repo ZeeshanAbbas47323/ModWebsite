@@ -11,7 +11,7 @@ import type { FaqEntry } from "@/lib/parse-faq-content";
 
 interface FaqAccordionProps {
   entries: FaqEntry[];
-  /** Shown instead of the accordion when the page has no headings to split. */
+
   fallbackHtml?: string;
 }
 

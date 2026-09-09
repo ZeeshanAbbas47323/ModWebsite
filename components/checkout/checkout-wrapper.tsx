@@ -47,8 +47,8 @@ export function CheckoutWrapper() {
   const { lines, subtotal, discount, total, coupon, clearCart, isLoading } = useCart();
   const { user, isAuthenticated, isReady } = useAuth();
 
-  // Contact fields fall back to the signed-in profile until the customer
-  // types something, so no effect is needed to prefill them.
+
+
   const [emailInput, setEmailInput] = useState<string | null>(null);
   const [phoneInput, setPhoneInput] = useState<string | null>(null);
   const [fullNameInput, setFullNameInput] = useState<string | null>(null);
@@ -57,7 +57,7 @@ export function CheckoutWrapper() {
   const [address, setAddress] = useState<CreateAddressInput>(emptyAddress);
   const [pickupLocationIdInput, setPickupLocationIdInput] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("stripe");
-  // Split payments settle part online now and the rest on collection.
+
   const [splitPayment, setSplitPayment] = useState(false);
   const [onlineAmountInput, setOnlineAmountInput] = useState("");
   const [notes, setNotes] = useState("");
@@ -74,7 +74,7 @@ export function CheckoutWrapper() {
   const phone = phoneInput ?? user?.phone ?? "";
   const fullName = fullNameInput ?? user?.full_name ?? "";
 
-  // Default to the customer's saved default address when one exists.
+
   const defaultAddress =
     savedAddresses?.find((a) => a.is_default) ?? savedAddresses?.[0];
   const addressId =
@@ -94,7 +94,7 @@ export function CheckoutWrapper() {
 
   const usingNewAddress = addressId === NEW_ADDRESS;
 
-  // Splitting turns the chosen gateway into its "…_and_cash" variant.
+
   const canSplit = paymentMethod === "stripe" || paymentMethod === "paypal";
   const effectiveMethod: PaymentMethod =
     splitPayment && canSplit
@@ -103,10 +103,7 @@ export function CheckoutWrapper() {
         : "paypal_and_cash"
       : paymentMethod;
 
-  /**
-   * Optional address fields are validated by type, so blank strings are
-   * rejected the same way nulls are. Send only what was filled in.
-   */
+
   const cleanAddress = (input: CreateAddressInput): CreateAddressInput =>
     omitEmpty({
       ...input,
@@ -131,8 +128,8 @@ export function CheckoutWrapper() {
       if (!address.city.trim()) return "City is required.";
     }
     if (isSplitMethod(effectiveMethod)) {
-      // The exact split is checked against the order total once it exists, but
-      // an empty or nonsense amount can be caught before anything is created.
+
+
       const online = Number(onlineAmountInput);
       if (!Number.isFinite(online) || online <= 0) {
         return "Enter how much you want to pay now.";
@@ -188,12 +185,11 @@ export function CheckoutWrapper() {
         payload.billing_address = cleanAddress({ ...billing, email: billing.email || email });
       }
 
-      // Saving is best-effort: a failure here must not block the order.
+
       if (saveAddress && isAuthenticated && usingNewAddress && deliveryType === "home_delivery") {
         try {
           await addressService.create(cleanAddress({ ...address, email: address.email || email }));
         } catch {
-          // ignore
         }
       }
 
@@ -202,15 +198,15 @@ export function CheckoutWrapper() {
 
       if (!orderCode) throw new Error("Order was created but no order number was returned.");
 
-      // Offline methods never leave the site — there is no gateway to visit.
+
       if (isOfflineMethod(effectiveMethod)) {
         await clearCart();
         router.push(`/payment/success?order=${encodeURIComponent(orderCode)}`);
         return;
       }
 
-      // The order's own total is authoritative: the API adds shipping and tax,
-      // so splitting against the cart estimate would not add up.
+
+
       const orderTotal = Number(order.total_amount ?? 0) || total;
       const online = Number(onlineAmountInput);
       if (isSplitMethod(effectiveMethod) && !(online > 0 && online < orderTotal)) {
@@ -235,18 +231,18 @@ export function CheckoutWrapper() {
 
       const redirectUrl = checkoutRedirectUrl(session);
       if (!redirectUrl) {
-        // Never fall through to the confirmation page here: the customer has
-        // not paid, and telling them the order is done would be a lie. The
-        // order exists, so point them at retrying it.
+
+
+
         throw new Error(
           `Your order ${orderCode} was placed, but the payment page could not be opened. ` +
             "Nothing has been charged — please try again or contact us."
         );
       }
 
-      // The cart is deliberately left alone here — it is cleared on the success
-      // page. Clearing before the gateway would leave a shopper who cancels
-      // with an empty cart and nothing to retry.
+
+
+
       window.location.href = redirectUrl;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not place your order.");
@@ -285,9 +281,9 @@ export function CheckoutWrapper() {
       )}
 
       <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start mt-6">
-        {/* Left: form */}
+
         <div className="w-full lg:w-2/3 flex flex-col gap-8">
-          {/* Contact */}
+
           <div className="bg-[#F4F4F5] rounded-[24px] p-6 md:p-8">
             <h2 className="text-xl font-bold text-black mb-5">Contact details</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -306,7 +302,7 @@ export function CheckoutWrapper() {
             </div>
           </div>
 
-          {/* Delivery */}
+
           <div className="bg-[#F4F4F5] rounded-[24px] p-6 md:p-8">
             <h2 className="text-xl font-bold text-black mb-5">Delivery method</h2>
             <div className="flex flex-col sm:flex-row gap-3 mb-6">
@@ -419,7 +415,7 @@ export function CheckoutWrapper() {
                   </div>
                 )}
 
-                {/* Billing */}
+
                 <div className="border-t border-gray-300 pt-6 mt-2">
                   <label className="flex items-center gap-3 text-sm text-gray-700 cursor-pointer mb-4">
                     <input
@@ -468,7 +464,7 @@ export function CheckoutWrapper() {
             )}
           </div>
 
-          {/* Payment */}
+
           <div className="bg-[#F4F4F5] rounded-[24px] p-6 md:p-8">
             <h2 className="text-xl font-bold text-black mb-5">Payment</h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -496,7 +492,7 @@ export function CheckoutWrapper() {
               ))}
             </div>
 
-            {/* Split payment: part online now, the rest on collection. */}
+
             {canSplit && (
               <div className="mt-5">
                 <label className="flex items-center gap-3 text-sm text-gray-700 cursor-pointer">
@@ -546,7 +542,7 @@ export function CheckoutWrapper() {
           </div>
         </div>
 
-        {/* Right: summary */}
+
         <div className="w-full lg:w-1/3 lg:sticky lg:top-24">
           <div className="bg-[#F4F4F5] rounded-[24px] p-6 md:p-8">
             <h2 className="text-xl font-bold text-black mb-6">Your order</h2>

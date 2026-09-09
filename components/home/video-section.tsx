@@ -24,7 +24,7 @@ function hexToRgba(hex: string, opacity: number) {
 
 export function VideoSection() {
   const { data: section, isLoading } = useHomeSection("home_video");
-  // No `home_video` row exists yet, so this fell back to rendering nothing.
+
   const video = mapHomeVideo(section) ?? VIDEO_FALLBACK;
 
   if (isLoading) {

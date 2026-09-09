@@ -1,6 +1,5 @@
 export interface HeroSlide {
   id: string;
-  /** Small line above the headline. */
   eyebrow: string;
   title: string;
   description: string;
@@ -8,17 +7,9 @@ export interface HeroSlide {
   imageAlt: string;
   primary: { label: string; href: string };
   secondary: { label: string; href: string };
-  /** Background wash, so each slide reads as its own thing. */
   gradient: string;
 }
 
-/**
- * Hero slides.
- *
- * Static on purpose — the copy is edited here rather than in the CMS. The
- * `home_hero` API and its mapper are still in the codebase for when this goes
- * back to being content-managed.
- */
 export const HERO_SLIDES: HeroSlide[] = [
   {
     id: "gang-sheets",
@@ -118,5 +109,4 @@ export const HERO_SLIDES: HeroSlide[] = [
   },
 ];
 
-/** How long each slide stays before advancing, in ms. */
 export const SLIDE_DURATION = 7000;

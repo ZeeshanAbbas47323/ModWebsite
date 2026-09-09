@@ -10,7 +10,7 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
   return proxyPut(req, `cart-items/${id}`);
 }
 
-/** Cart items are removed through the shared frontend delete endpoint. */
+
 export async function DELETE(req: NextRequest, { params }: Ctx) {
   const { id } = await params;
   const body = JSON.stringify({ id: Number(id), table: "cartItem" });

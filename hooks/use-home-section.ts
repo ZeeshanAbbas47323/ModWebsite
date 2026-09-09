@@ -4,7 +4,7 @@ import { homeSectionService } from "@/services/home-section.service";
 
 const queryKey = ["home-sections", "all"] as const;
 
-// All calls share the same queryKey → single network request
+
 export function useHomeSection(key: string) {
   return useQuery({
     queryKey,

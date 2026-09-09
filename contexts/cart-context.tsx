@@ -48,9 +48,9 @@ export interface AddToCartInput {
   quantity?: number;
   print_method?: PrintMethod | null;
   custom_text?: string | null;
-  /** Explicit image, when the caller already resolved one. */
+
   image?: string;
-  /** Print files produced by the gang sheet builder. */
+
   design_uploads?: DesignUploadInput[];
 }
 
@@ -101,10 +101,7 @@ function productImage(product: AddToCartInput["product"]): string {
   return resolveImageUrl(primary?.image_url, PLACEHOLDER_IMAGE);
 }
 
-/**
- * Server rows do not always embed the full product, so display details that
- * were captured at add-to-cart time are kept as a fallback.
- */
+
 function mapServerItem(item: ServerCartItem, snapshot?: CartLine): CartLine {
   const product = item.product;
   const variant = item.variant;
@@ -112,8 +109,8 @@ function mapServerItem(item: ServerCartItem, snapshot?: CartLine): CartLine {
     ? unitPrice(product, variant)
     : snapshot?.price ?? 0;
 
-  // Files stored against the row win over the snapshot: the snapshot holds the
-  // pre-signed URL captured at add time, which expires.
+
+
   const serverUploads = designUploadsOf(item);
 
   return {
@@ -141,14 +138,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [coupon, setCoupon] = useState<AppliedCoupon | null>(null);
-  // Display details keyed by lineKey, so server rows can be rendered fully
-  // even when the API returns only ids.
+
+
   const [snapshots, setSnapshots] = useState<Record<string, CartLine>>({});
   useEffect(() => {
-    // Same as the auth session: the guest cart lives in localStorage and can
-    // only be read once the client has mounted.
+
+
     const stored = readLocalCart();
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+
     setLocalLines(stored);
     try {
       const rawSnapshots = window.localStorage.getItem(SNAPSHOT_KEY);
@@ -159,14 +156,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
        
       setSnapshots(restored);
     } catch {
-      // ignore
     }
     try {
       const rawCoupon = window.localStorage.getItem(COUPON_KEY);
        
       if (rawCoupon) setCoupon(JSON.parse(rawCoupon) as AppliedCoupon);
     } catch {
-      // ignore
     }
      
     setHydrated(true);
@@ -189,7 +184,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     [queryClient]
   );
 
-  // On login, push whatever the guest collected into the account cart.
+
   const syncedFor = useRef<boolean>(false);
   useEffect(() => {
     if (!isReady || !isAuthenticated || !hydrated) {
@@ -219,8 +214,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         setLocalLines([]);
         await refetchServer();
       } catch {
-        // Keep the guest cart intact so nothing is lost; it will retry on the
-        // next login.
+
+
         syncedFor.current = false;
       } finally {
         setIsSyncing(false);
@@ -270,7 +265,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         try {
           window.localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(next));
         } catch {
-          // ignore
         }
         return next;
       });
@@ -356,9 +350,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       try {
         await cartService.remove(line.serverId!);
       } catch {
-        // Clearing runs after the order is already placed, so a delete that
-        // fails server-side must never surface as a checkout error. The next
-        // cart fetch will show whatever the server still holds.
       }
     }
     clearLocalCart();
@@ -367,7 +358,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     try {
       window.localStorage.removeItem(COUPON_KEY);
     } catch {
-      // ignore
     }
     if (serverLines.length) await refetchServer();
   }, [lines, refetchServer]);
@@ -384,7 +374,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       try {
         window.localStorage.setItem(COUPON_KEY, JSON.stringify(applied));
       } catch {
-        // ignore
       }
     },
     [subtotalValue, user?.id]
@@ -395,7 +384,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     try {
       window.localStorage.removeItem(COUPON_KEY);
     } catch {
-      // ignore
     }
   }, []);
 
@@ -404,7 +392,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     [lines]
   );
   const subtotal = subtotalValue;
-  // Never let a stale coupon discount more than the cart is worth.
+
   const discount = Math.min(coupon?.discount_amount ?? 0, subtotal);
   const total = Math.max(0, subtotal - discount);
 
