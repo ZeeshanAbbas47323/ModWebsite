@@ -1,11 +1,11 @@
 "use client";
 
-import Image from 'next/image';
 import Link from 'next/link';
 import React, { useState } from 'react'
 import type { Product } from '@/services/product.service';
 import { useCart } from '@/contexts/cart-context';
 import { WishlistButton } from '@/components/wishlist/wishlist-button';
+import { SafeImage } from '@/components/shared/safe-image';
 import { resolveImageUrl } from "@/lib/image-url";
 
 export interface ProductCardData {
@@ -26,7 +26,6 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ data }) => {
     const href = data.href ?? (data.slug ? `/products/${data.slug}` : data.id ? `/product-detail?id=${data.id}` : "/product-detail");
-    const isExternal = data.img_path.startsWith("http");
     const { addItem } = useCart();
     const [adding, setAdding] = useState(false);
     const [added, setAdded] = useState(false);
@@ -61,13 +60,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ data }) => {
                         className="absolute top-4 right-4 z-10"
                     />
                 )}
-                <Image
+                <SafeImage
                     src={resolveImageUrl(data.img_path)}
                     alt={data.title}
                     fill
                     sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                     className="object-cover transition-transform duration-500 ease-out group-hover:scale-110"
-                    {...(isExternal ? { unoptimized: true } : {})}
+                    placeholderClassName="!object-contain p-10 bg-white"
                 />
 
                 <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-6">

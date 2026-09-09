@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -9,6 +8,7 @@ import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { NewsletterSection } from "@/components/home/newsletter-section";
 import { CollectionCard } from "@/components/collections/collection-card";
 import { CollectionProducts } from "@/components/collections/collection-products";
+import { SafeImage } from "@/components/shared/safe-image";
 import { getCollectionBySlug } from "@/services/product-category.server";
 import { resolveImageUrl } from "@/lib/image-url";
 
@@ -57,14 +57,14 @@ export default async function CollectionPage({ params }: Props) {
         <div className="flex flex-col md:flex-row items-center gap-8 bg-[#F4F4F5] rounded-[24px] p-8 md:p-10 mb-10 md:mb-14">
           {image && (
             <div className="relative w-40 h-40 md:w-52 md:h-52 shrink-0 rounded-[20px] overflow-hidden bg-white">
-              <Image
+              <SafeImage
                 src={image}
                 alt={collection.name}
                 fill
                 sizes="208px"
                 className="object-cover"
+                placeholderClassName="!object-contain p-8"
                 priority
-                {...(image.startsWith("http") ? { unoptimized: true } : {})}
               />
             </div>
           )}
