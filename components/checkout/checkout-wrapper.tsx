@@ -474,7 +474,10 @@ export function CheckoutWrapper() {
                   value: "stripe",
                   label: "Credit / Debit Card",
                   sublabel: "Visa, Mastercard, Amex",
-                  icon: "/images/payment-gateways/shop.png",
+                  // No real Stripe mark is bundled (the old icon here was
+                  // Shop Pay's logo, a different brand entirely) — the brand
+                  // wordmark below stands in until a real asset is added.
+                  icon: null,
                 },
                 {
                   value: "paypal",
@@ -504,13 +507,19 @@ export function CheckoutWrapper() {
                       {active && <span className="size-2 rounded-full bg-white" />}
                     </span>
                     <div className="flex h-10 items-center">
-                      <Image
-                        src={resolveImageUrl(option.icon)}
-                        alt=""
-                        width={64}
-                        height={28}
-                        className="object-contain object-left"
-                      />
+                      {option.icon ? (
+                        <Image
+                          src={resolveImageUrl(option.icon)}
+                          alt=""
+                          width={64}
+                          height={28}
+                          className="object-contain object-left"
+                        />
+                      ) : (
+                        <span className="text-2xl font-bold italic tracking-tight" style={{ color: "#635BFF" }}>
+                          stripe
+                        </span>
+                      )}
                     </div>
                     <div>
                       <p className="font-semibold text-black text-sm sm:text-base">{option.label}</p>
