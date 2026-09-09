@@ -28,6 +28,7 @@ const ARTWORK_SLUG_PATTERNS = (
 export function needsArtworkUpload(product?: {
   tags?: string[] | null;
   slug?: string | null;
+  name?: string | null;
 } | null): boolean {
   if (!product) return false;
 
@@ -37,7 +38,14 @@ export function needsArtworkUpload(product?: {
   if (tagged) return true;
 
   const slug = (product.slug ?? "").toLowerCase();
-  return !!slug && ARTWORK_SLUG_PATTERNS.some((pattern) => slug.includes(pattern));
+  if (slug && ARTWORK_SLUG_PATTERNS.some((pattern) => slug.includes(pattern))) return true;
+
+  // Some products carry the same "upload your own" naming in their display
+  // name but a slug that doesn't happen to match (hand-edited, imported,
+  // etc.) — checked the same way as the slug, kept as a separate check so
+  // the slug rule above still catches everything it always has.
+  const name = (product.name ?? "").toLowerCase();
+  return !!name && ARTWORK_SLUG_PATTERNS.some((pattern) => name.includes(pattern.replace(/-/g, " ")));
 }
 
 export const MAX_ARTWORK_FILES = 10;
