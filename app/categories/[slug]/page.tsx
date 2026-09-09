@@ -8,9 +8,7 @@ import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { NewsletterSection } from "@/components/home/newsletter-section";
 import { CollectionCard } from "@/components/collections/collection-card";
 import { CollectionProducts } from "@/components/collections/collection-products";
-import { SafeImage } from "@/components/shared/safe-image";
 import { getCollectionBySlug } from "@/services/product-category.server";
-import { resolveImageUrl } from "@/lib/image-url";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -31,7 +29,6 @@ export default async function CollectionPage({ params }: Props) {
   const collection = await getCollectionBySlug(slug);
   if (!collection) notFound();
 
-  const image = collection.image_url ? resolveImageUrl(collection.image_url) : null;
   const children = collection.children ?? [];
 
   return (
@@ -53,31 +50,16 @@ export default async function CollectionPage({ params }: Props) {
           </BreadcrumbList>
         </Breadcrumb>
 
-        {/* Banner */}
-        <div className="flex flex-col md:flex-row items-center gap-8 bg-[#F4F4F5] rounded-[24px] p-8 md:p-10 mb-10 md:mb-14">
-          {image && (
-            <div className="relative w-40 h-40 md:w-52 md:h-52 shrink-0 rounded-[20px] overflow-hidden bg-white">
-              <SafeImage
-                src={image}
-                alt={collection.name}
-                fill
-                sizes="208px"
-                className="object-cover"
-                placeholderClassName="!object-contain p-8"
-                priority
-              />
-            </div>
+        {/* Title */}
+        <div className="mb-10 md:mb-14">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-black mb-3">
+            {collection.name}
+          </h1>
+          {collection.description && (
+            <p className="text-gray-600 text-base md:text-lg max-w-2xl">
+              {collection.description}
+            </p>
           )}
-          <div className="flex-1 text-center md:text-left">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-black mb-3">
-              {collection.name}
-            </h1>
-            {collection.description && (
-              <p className="text-gray-600 text-base md:text-lg max-w-2xl">
-                {collection.description}
-              </p>
-            )}
-          </div>
         </div>
 
         {/* Sub-collections, when the catalogue is nested */}
