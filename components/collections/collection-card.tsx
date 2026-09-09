@@ -35,6 +35,18 @@ export function CollectionCard({
           className="object-cover transition-transform duration-500 ease-out group-hover:scale-110"
           placeholderClassName="!object-contain p-10 bg-white"
         />
+        {/* The real product photos behind these tiles come from many
+            different supplier mockups, each with its own studio backdrop
+            (gradients, faint watermarks). A soft vignette to the card's own
+            neutral gray fades that backdrop out at the edges so every tile
+            reads as one consistent, clean set regardless of source photo. */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(circle at center, transparent 45%, #F4F4F5 100%)",
+          }}
+        />
       </div>
       <h3
         className={`font-bold text-black text-center mb-0.5 group-hover:text-primary transition-colors duration-300 ${
