@@ -17,11 +17,31 @@ import { useProductCategories } from "@/hooks/use-product-categories";
 import { resolveImageUrl } from "@/lib/image-url";
 
 const fallbackProducts = [
-    { title: "DTF Transfer", count: "50 Products", img_path: "/images/banners-compositions/booklet.png" },
-    { title: "Reflective DTF Transfer", count: "50 Products", img_path: "/images/banners-compositions/book.png" },
-    { title: "UV DTF", count: "50 Products", img_path: "/images/banners-compositions/shirt.png" },
-    { title: "Sublimation", count: "50 Products", img_path: "/images/banners-compositions/launch-box.png" },
-    { title: "Custom Patches", count: "50 Products", img_path: "/images/banners-compositions/stamp.svg" },
+  {
+    title: "DTF Transfer",
+    count: "50 Products",
+    img_path: "/images/banners-compositions/booklet.png",
+  },
+  {
+    title: "Reflective DTF Transfer",
+    count: "50 Products",
+    img_path: "/images/banners-compositions/book.png",
+  },
+  {
+    title: "UV DTF",
+    count: "50 Products",
+    img_path: "/images/banners-compositions/shirt.png",
+  },
+  {
+    title: "Sublimation",
+    count: "50 Products",
+    img_path: "/images/banners-compositions/launch-box.png",
+  },
+  {
+    title: "Custom Patches",
+    count: "50 Products",
+    img_path: "/images/banners-compositions/stamp.svg",
+  },
 ];
 
 /**
@@ -34,130 +54,125 @@ const fallbackProducts = [
  * showing a heading over nothing.
  */
 const HomeWrapper = () => {
-    const { data: categories } = useProductCategories(null);
+  const { data: categories } = useProductCategories(null);
 
-    const categoryCards = categories?.map((cat) => ({
-        id: cat.id,
-        title: cat.name,
-        count: cat._count?.products ? `${cat._count.products} Products` : "",
-        img_path: resolveImageUrl(cat.image_url, "/images/banners-compositions/booklet.png"),
-        // Categories are collections, not products — link them accordingly.
-        href: `/categories/${cat.slug}`,
+  const categoryCards =
+    categories?.map((cat) => ({
+      id: cat.id,
+      title: cat.name,
+      count: cat._count?.products ? `${cat._count.products} Products` : "",
+      img_path: resolveImageUrl(
+        cat.image_url,
+        "/images/banners-compositions/booklet.png",
+      ),
+      // Categories are collections, not products — link them accordingly.
+      href: `/categories/${cat.slug}`,
     })) ?? fallbackProducts;
 
-    return (
-        <>
-            <Hero />
+  return (
+    <>
+      <Hero />
 
-            {/* Categories — scroll/slide, View All -> every category */}
-            <ScrollReveal>
-                <ProductCarousel
-                    data={categoryCards}
-                    title="Our Categories"
-                    description="From small business advertising to big event displays, Modfirst delivers bold."
-                    viewAllHref="/categories"
-                />
-            </ScrollReveal>
+      {/* Categories — scroll/slide, View All -> every category */}
+      <ScrollReveal>
+        <ProductCarousel
+          data={categoryCards}
+          title="Our Categories"
+          description="From small business advertising to big event displays, Modfirst delivers bold."
+          viewAllHref="/categories"
+        />
+      </ScrollReveal>
 
-            {/* DTF Transfers */}
-            <ScrollReveal>
-                <CategoryTreeCarousel
-                    categoryId={66}
-                    title="DTF Transfers"
-                    description="Vibrant, durable transfers ready to press onto almost any fabric."
-                    viewAllHref="/categories/dtf-transfers"
-                />
-            </ScrollReveal>
+      {/* DTF Transfers */}
+      <ScrollReveal>
+        <CategoryTreeCarousel
+          categoryId={66}
+          title="Transfers"
+          description="Vibrant, durable transfers ready to press onto almost any fabric."
+          viewAllHref="/categories/dtf-transfers"
+        />
+      </ScrollReveal>
 
-            <ScrollReveal>
-                <PromotionalBanners />
-            </ScrollReveal>
+      <ScrollReveal>
+        <PromotionalBanners />
+      </ScrollReveal>
 
-            {/* Hat Heat Press */}
-            <ScrollReveal>
-                <CategoryTreeCarousel
-                    categoryId={85}
-                    title="Hat Heat Press"
-                    viewAllHref="/categories/hat-heat-press"
-                />
-            </ScrollReveal>
+      {/* Hat Heat Press */}
+      <ScrollReveal>
+        <CategoryTreeCarousel
+          categoryId={85}
+          title="Hat Heat Press"
+          viewAllHref="/categories/hat-heat-press"
+        />
+      </ScrollReveal>
 
-            <ScrollReveal>
-                <OurOrderProcess />
-            </ScrollReveal>
+      <ScrollReveal>
+        <OurOrderProcess />
+      </ScrollReveal>
 
-            {/* DTF Supplies */}
-            <ScrollReveal>
-                <CategoryTreeCarousel
-                    categoryId={87}
-                    title="DTF Supplies"
-                    viewAllHref="/categories/dtf-supplies-main"
-                />
-            </ScrollReveal>
+      {/* DTF Supplies */}
+      <ScrollReveal>
+        <CategoryTreeCarousel
+          categoryId={87}
+          title="DTF Supplies"
+          viewAllHref="/categories/dtf-supplies-main"
+        />
+      </ScrollReveal>
 
-            <ScrollReveal>
-                <VideoSection />
-            </ScrollReveal>
+      <ScrollReveal>
+        <VideoSection />
+      </ScrollReveal>
 
-            {/* Apparel & Accessories */}
-            <ScrollReveal>
-                <CategoryTreeCarousel
-                    categoryId={72}
-                    title="Apparel & Accessories"
-                    viewAllHref="/categories/apparel"
-                />
-            </ScrollReveal>
+      {/* Apparel & Accessories */}
+      <ScrollReveal>
+        <CategoryTreeCarousel
+          categoryId={72}
+          title="Apparel & Accessories"
+          viewAllHref="/categories/apparel"
+        />
+      </ScrollReveal>
 
-            <ScrollReveal>
-                <WhyModfirst />
-            </ScrollReveal>
+      <ScrollReveal>
+        <WhyModfirst />
+      </ScrollReveal>
 
-            {/* Hat Heat Press again */}
-            <ScrollReveal>
-                <CategoryTreeCarousel
-                    categoryId={85}
-                    title="Hat Heat Press"
-                    viewAllHref="/categories/hat-heat-press"
-                />
-            </ScrollReveal>
+      {/* Best sellers — ranked by real sales, View All -> /shop/best-sellers */}
+      <ScrollReveal>
+        <CollectionCarousel
+          type="BEST_SELLERS"
+          title="Best Sellers"
+          description="Our most-ordered products, ranked by real sales."
+          count={5}
+          viewAllHref="/shop/best-sellers"
+        />
+      </ScrollReveal>
 
-            <ScrollReveal>
-                <FastProduction />
-            </ScrollReveal>
+      <ScrollReveal>
+        <FastProduction />
+      </ScrollReveal>
 
-            {/* Signage & Displays */}
-            <ScrollReveal>
-                <CategoryTreeCarousel
-                    categoryId={79}
-                    title="Signage & Displays"
-                    viewAllHref="/categories/signage-displays"
-                />
-            </ScrollReveal>
+      {/* Signage & Displays */}
+      <ScrollReveal>
+        <CategoryTreeCarousel
+          categoryId={79}
+          title="Signage & Displays"
+          viewAllHref="/categories/signage-displays"
+        />
+      </ScrollReveal>
 
-            <ScrollReveal>
-                <CustomerFeedback />
-            </ScrollReveal>
+      <ScrollReveal>
+        <CustomerFeedback />
+      </ScrollReveal>
 
-            {/* Best sellers — ranked by real sales, View All -> /shop/best-sellers */}
-            <ScrollReveal>
-                <CollectionCarousel
-                    type="BEST_SELLERS"
-                    title="Best Sellers"
-                    description="Our most-ordered products, ranked by real sales."
-                    count={5}
-                    viewAllHref="/shop/best-sellers"
-                />
-            </ScrollReveal>
+      <ScrollReveal>
+        <BlogSection />
+      </ScrollReveal>
 
-            <ScrollReveal>
-                <BlogSection />
-            </ScrollReveal>
+      <ScrollReveal>
+        <NewsletterSection />
+      </ScrollReveal>
+    </>
+  );
+};
 
-            <ScrollReveal>
-                <NewsletterSection />
-            </ScrollReveal>
-        </>
-    )
-}
-
-export default HomeWrapper
+export default HomeWrapper;
