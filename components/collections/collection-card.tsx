@@ -15,13 +15,13 @@ export function CollectionCard({ collection }: { collection: ProductCategory }) 
       href={`/categories/${collection.slug}`}
       className="flex flex-col items-center group cursor-pointer"
     >
-      <div className="w-full bg-[#F4F4F5] h-[280px] md:h-[350px] rounded-[24px] flex items-center justify-center p-8 mb-5 relative overflow-hidden">
+      <div className="w-full bg-[#F4F4F5] h-[280px] md:h-[350px] rounded-[24px] mb-5 relative overflow-hidden">
         <Image
           src={image}
           alt={collection.name}
-          width={300}
-          height={300}
-          className="object-contain w-full h-full drop-shadow-sm transition-transform duration-500 ease-out group-hover:scale-110"
+          fill
+          sizes="(min-width: 768px) 25vw, 50vw"
+          className="object-cover transition-transform duration-500 ease-out group-hover:scale-110"
           {...(isExternal ? { unoptimized: true } : {})}
         />
       </div>
