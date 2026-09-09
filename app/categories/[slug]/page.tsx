@@ -82,7 +82,7 @@ export default async function CollectionPage({ params }: Props) {
 
         {/* Sub-collections, when the catalogue is nested */}
         {children.length > 0 && (
-          <div className="mb-12 md:mb-16">
+          <div className="mb-8 md:mb-10">
             <h2 className="text-2xl font-bold text-black mb-6">Shop by category</h2>
             <div className="grid grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
               {children.map((child) => (

@@ -55,10 +55,16 @@ export function CollectionProducts({
   const products = data?.payload ?? [];
   const pagination = data?.pagination;
   const totalPages = pagination?.totalPages ?? 1;
+  const total = pagination?.total;
 
+  // A small header row (count + sort), not a standalone dropdown floating
+  // below "Shop by category" with a big empty gap above it.
   const sortControl = (
-    <div className="flex justify-end mb-6">
-      <label className="flex items-center gap-2 text-sm text-gray-600">
+    <div className="flex items-center justify-between gap-4 mb-5 pb-3 border-b border-gray-100">
+      <span className="text-sm text-gray-500">
+        {total != null ? `${total} product${total === 1 ? "" : "s"}` : ""}
+      </span>
+      <label className="flex items-center gap-1.5 text-xs text-gray-500">
         Sort by
         <select
           value={sortBy}
@@ -66,7 +72,7 @@ export function CollectionProducts({
             setSortBy(e.target.value);
             setPage(1);
           }}
-          className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-black focus:outline-none focus:ring-2 focus:ring-black/10"
+          className="rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-black focus:outline-none focus:ring-2 focus:ring-black/10"
         >
           {SORT_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
