@@ -4,8 +4,7 @@ import { Hero } from "@/components/home/hero";
 import { PromotionalBanners } from "@/components/home/promotional-banners";
 import { OurOrderProcess } from "@/components/home/our-order-process";
 import ProductCarousel from "../product/product-carousel";
-import { CategoryCarousel } from "@/components/home/category-carousel";
-import { NamedCategoryCarousel } from "@/components/home/named-category-carousel";
+import { CategoryTreeCarousel } from "@/components/home/category-tree-carousel";
 import { CollectionCarousel } from "@/components/home/collection-carousel";
 import { VideoSection } from "@/components/home/video-section";
 import { NewsletterSection } from "@/components/home/newsletter-section";
@@ -26,10 +25,13 @@ const fallbackProducts = [
 ];
 
 /**
- * Fixed section order for the home page. Each entry renders on its own —
- * a category/collection rail that comes back empty hides itself rather than
- * showing a heading over nothing, so the page degrades gracefully if a
- * category or the products/frontend/collection endpoint has nothing to give.
+ * Fixed section order for the home page (owner-specified). Each
+ * category rail comes from a real main category (matched by its real,
+ * live id) and shows every product under it — the parent itself plus all of
+ * its subcategories — capped to a handful with a "View All" link to that
+ * category's own page for the rest, rather than dumping the whole catalogue
+ * into the scroller. A rail that comes back empty hides itself rather than
+ * showing a heading over nothing.
  */
 const HomeWrapper = () => {
     const { data: categories } = useProductCategories(null);
@@ -57,6 +59,85 @@ const HomeWrapper = () => {
                 />
             </ScrollReveal>
 
+            {/* DTF Transfers */}
+            <ScrollReveal>
+                <CategoryTreeCarousel
+                    categoryId={66}
+                    title="DTF Transfers"
+                    description="Vibrant, durable transfers ready to press onto almost any fabric."
+                    viewAllHref="/categories/dtf-transfers"
+                />
+            </ScrollReveal>
+
+            <ScrollReveal>
+                <PromotionalBanners />
+            </ScrollReveal>
+
+            {/* Hat Heat Press */}
+            <ScrollReveal>
+                <CategoryTreeCarousel
+                    categoryId={85}
+                    title="Hat Heat Press"
+                    viewAllHref="/categories/hat-heat-press"
+                />
+            </ScrollReveal>
+
+            <ScrollReveal>
+                <OurOrderProcess />
+            </ScrollReveal>
+
+            {/* DTF Supplies */}
+            <ScrollReveal>
+                <CategoryTreeCarousel
+                    categoryId={87}
+                    title="DTF Supplies"
+                    viewAllHref="/categories/dtf-supplies-main"
+                />
+            </ScrollReveal>
+
+            <ScrollReveal>
+                <VideoSection />
+            </ScrollReveal>
+
+            {/* Apparel & Accessories */}
+            <ScrollReveal>
+                <CategoryTreeCarousel
+                    categoryId={72}
+                    title="Apparel & Accessories"
+                    viewAllHref="/categories/apparel"
+                />
+            </ScrollReveal>
+
+            <ScrollReveal>
+                <WhyModfirst />
+            </ScrollReveal>
+
+            {/* Hat Heat Press again */}
+            <ScrollReveal>
+                <CategoryTreeCarousel
+                    categoryId={85}
+                    title="Hat Heat Press"
+                    viewAllHref="/categories/hat-heat-press"
+                />
+            </ScrollReveal>
+
+            <ScrollReveal>
+                <FastProduction />
+            </ScrollReveal>
+
+            {/* Signage & Displays */}
+            <ScrollReveal>
+                <CategoryTreeCarousel
+                    categoryId={79}
+                    title="Signage & Displays"
+                    viewAllHref="/categories/signage-displays"
+                />
+            </ScrollReveal>
+
+            <ScrollReveal>
+                <CustomerFeedback />
+            </ScrollReveal>
+
             {/* Best sellers — ranked by real sales, View All -> /shop/best-sellers */}
             <ScrollReveal>
                 <CollectionCarousel
@@ -66,60 +147,6 @@ const HomeWrapper = () => {
                     count={5}
                     viewAllHref="/shop/best-sellers"
                 />
-            </ScrollReveal>
-
-            <ScrollReveal>
-                <PromotionalBanners />
-            </ScrollReveal>
-
-            <ScrollReveal>
-                <OurOrderProcess />
-            </ScrollReveal>
-
-            {/* Sublimation (#60) + UV DTF (#62) — one shared rail rather than
-                two separate carousels, since they're presented as one
-                offering on the site. */}
-            <ScrollReveal>
-                <CategoryCarousel
-                    categoryId={[60, 62]}
-                    title="Sublimation & DTF"
-                    description="Vibrant, durable transfers for apparel, signage and more."
-                    limit={12}
-                    viewAllHref="/products"
-                />
-            </ScrollReveal>
-
-            <ScrollReveal>
-                <VideoSection />
-            </ScrollReveal>
-
-            <ScrollReveal>
-                <CollectionCarousel
-                    type="MOST_POPULAR"
-                    title="Most Popular"
-                    description="What everyone's ordering right now."
-                    viewAllHref="/shop/most-popular"
-                />
-            </ScrollReveal>
-
-            <ScrollReveal>
-                <WhyModfirst />
-            </ScrollReveal>
-
-            <ScrollReveal>
-                <NamedCategoryCarousel name="Business & Industrial" />
-            </ScrollReveal>
-
-            <ScrollReveal>
-                <FastProduction />
-            </ScrollReveal>
-
-            <ScrollReveal>
-                <CustomerFeedback />
-            </ScrollReveal>
-
-            <ScrollReveal>
-                <NamedCategoryCarousel name="Arts & Entertainment" />
             </ScrollReveal>
 
             <ScrollReveal>

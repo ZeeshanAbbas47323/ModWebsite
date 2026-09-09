@@ -9,14 +9,31 @@ import { mapProductToCard } from "@/lib/map-product-to-card";
 
 const PAGE_SIZE = 24;
 
-/** Product grid for one collection, with its own pagination. */
-export function CollectionProducts({ categoryId }: { categoryId: number }) {
+/**
+ * Product grid for one collection, with its own pagination.
+ *
+ * A parent category (e.g. "Apparel & Accessories") never holds products
+ * directly — every real product sits on one of its subcategories (T-Shirts,
+ * Hoodies, ...) — so querying by the parent's own id alone always came back
+ * empty even though the page visibly lists non-empty subcategories right
+ * above. Passing the subcategory ids too so the parent's own product grid
+ * shows everything underneath it, not just direct members.
+ */
+export function CollectionProducts({
+  categoryId,
+  childCategoryIds,
+}: {
+  categoryId: number;
+  childCategoryIds?: number[];
+}) {
   const [page, setPage] = useState(1);
+
+  const categoryIds = childCategoryIds?.length ? [categoryId, ...childCategoryIds] : categoryId;
 
   const { data, isLoading, isError } = useProducts({
     page,
     limit: PAGE_SIZE,
-    filters: { category_id: categoryId },
+    filters: { category_id: categoryIds },
   });
 
   const products = data?.payload ?? [];

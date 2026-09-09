@@ -16,29 +16,23 @@ export interface ProductCategory {
 
 export const productCategoryService = {
   /**
-   * `GET /product-categories` never existed (only `POST /product-categories`,
-   * staff-only) — this call 404'd silently on every load, so the home page
-   * always fell back to its hardcoded placeholder categories instead of the
-   * real ones. The only public route is `POST /product-categories/frontend`,
-   * which also enforces `is_active` server-side.
+   * Goes through this app's own `/api/product-categories` route (see
+   * app/api/product-categories/route.ts), which proxies to the real backend's
+   * `product-categories/frontend` with the upstream API key/is_active filter
+   * already applied server-side — a GET so the response is cacheable by URL.
+   * (An earlier attempt to call `product-categories/frontend` directly from
+   * the browser via `apiClient.post` silently 404'd — that path only exists
+   * on the real backend, not as a route on this Next app — which is why the
+   * home page kept showing its hardcoded placeholder categories.)
    */
   list: async (parentId?: number | null): Promise<ProductCategory[]> => {
-    const filters: Record<string, unknown> = {};
-    if (parentId !== undefined) filters.parent_id = parentId;
-    const { data } = await apiClient.post("/product-categories/frontend", {
-      page: 1,
-      limit: 100,
-      filters,
-    });
+    const query = parentId !== undefined ? `?parent_id=${parentId ?? ""}` : "";
+    const { data } = await apiClient.get(`/product-categories${query}`);
     return data.payload ?? data.data ?? [];
   },
 
   bySlug: async (slug: string): Promise<ProductCategory | null> => {
-    const { data } = await apiClient.post("/product-categories/frontend", {
-      page: 1,
-      limit: 1,
-      filters: { slug },
-    });
+    const { data } = await apiClient.get(`/product-categories?slug=${encodeURIComponent(slug)}`);
     const categories: ProductCategory[] = data.payload ?? data.data ?? [];
     return categories[0] ?? null;
   },

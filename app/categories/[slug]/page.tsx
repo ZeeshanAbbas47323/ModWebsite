@@ -92,7 +92,10 @@ export default async function CollectionPage({ params }: Props) {
           </div>
         )}
 
-        <CollectionProducts categoryId={collection.id} />
+        <CollectionProducts
+          categoryId={collection.id}
+          childCategoryIds={children.map((c) => c.id)}
+        />
       </section>
 
       <ScrollReveal>
