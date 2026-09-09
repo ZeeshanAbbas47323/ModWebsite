@@ -90,11 +90,20 @@ const SORT_OPTIONS: { value: string; label: string }[] = [
 const ProductWrapper = () => {
     const [page, setPage] = useState(1);
     const [sortBy, setSortBy] = useState("newest");
+    // null = "All". Filtering happens in place — the pill no longer just
+    // links off to the category's own page, so a shopper can compare
+    // categories without losing their sort choice or scroll position.
+    const [categoryId, setCategoryId] = useState<number | null>(null);
     const searchParams = useSearchParams();
     const query = searchParams.get("q")?.trim();
 
     const { data: categories } = useProductCategories(null);
-    const { data: productsData, isLoading } = useProducts({ page, limit: 24, sortBy });
+    const { data: productsData, isLoading } = useProducts({
+        page,
+        limit: 24,
+        sortBy,
+        filters: categoryId ? { category_id: categoryId } : undefined,
+    });
 
     const productCards = productsData?.payload?.map(mapProductToCard) ?? fallbackProducts;
     const pagination = productsData?.pagination;
@@ -103,41 +112,62 @@ const ProductWrapper = () => {
 
     return (
         <>
-            {/* Filtering lives on the collection pages, so these are links now. */}
             {categories && categories.length > 0 && (
-                <div className="container pt-8 flex flex-wrap items-center justify-between gap-4">
-                    <div className="flex flex-wrap gap-3">
-                        <span className="px-5 py-2 rounded-full text-sm font-medium bg-black text-white">
-                            All
-                        </span>
-                        {categories.map((cat) => (
-                            <Link
-                                key={cat.id}
-                                href={`/categories/${cat.slug}`}
-                                className="px-5 py-2 rounded-full text-sm font-medium transition-colors bg-[#F4F4F5] text-black hover:bg-black/10"
+                <div className="container pt-8">
+                    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 pb-6">
+                        <div className="flex flex-wrap gap-2.5">
+                            <button
+                                type="button"
+                                onClick={() => { setCategoryId(null); setPage(1); }}
+                                className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
+                                    categoryId === null ? "bg-black text-white" : "bg-[#F4F4F5] text-black hover:bg-black/10"
+                                }`}
                             >
-                                {cat.name}
-                            </Link>
-                        ))}
+                                All
+                            </button>
+                            {categories.map((cat) => (
+                                <button
+                                    key={cat.id}
+                                    type="button"
+                                    onClick={() => { setCategoryId(cat.id); setPage(1); }}
+                                    className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
+                                        categoryId === cat.id ? "bg-black text-white" : "bg-[#F4F4F5] text-black hover:bg-black/10"
+                                    }`}
+                                >
+                                    {cat.name}
+                                </button>
+                            ))}
+                        </div>
+
+                        <label className="flex shrink-0 items-center gap-2 text-sm text-gray-600">
+                            Sort by
+                            <select
+                                value={sortBy}
+                                onChange={(e) => {
+                                    setSortBy(e.target.value);
+                                    setPage(1);
+                                }}
+                                className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-black focus:outline-none focus:ring-2 focus:ring-black/10"
+                            >
+                                {SORT_OPTIONS.map((opt) => (
+                                    <option key={opt.value} value={opt.value}>
+                                        {opt.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </label>
                     </div>
 
-                    <label className="flex items-center gap-2 text-sm text-gray-600">
-                        Sort by
-                        <select
-                            value={sortBy}
-                            onChange={(e) => {
-                                setSortBy(e.target.value);
-                                setPage(1);
-                            }}
-                            className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-black focus:outline-none focus:ring-2 focus:ring-black/10"
-                        >
-                            {SORT_OPTIONS.map((opt) => (
-                                <option key={opt.value} value={opt.value}>
-                                    {opt.label}
-                                </option>
-                            ))}
-                        </select>
-                    </label>
+                    {categoryId != null && (
+                        <div className="pt-4">
+                            <Link
+                                href={`/categories/${categories.find((c) => c.id === categoryId)?.slug ?? ""}`}
+                                className="text-sm text-gray-500 hover:text-black underline underline-offset-2"
+                            >
+                                View {categories.find((c) => c.id === categoryId)?.name}&apos;s full category page &rarr;
+                            </Link>
+                        </div>
+                    )}
                 </div>
             )}
 

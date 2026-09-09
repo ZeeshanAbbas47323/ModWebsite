@@ -9,6 +9,20 @@ import { mapProductToCard } from "@/lib/map-product-to-card";
 
 const PAGE_SIZE = 24;
 
+/** Mirrors backend PRODUCT_SORT_OPTIONS (productValidations.ts) — each value
+ * already bakes in its own direction, so no separate order control is needed. */
+const SORT_OPTIONS: { value: string; label: string }[] = [
+  { value: "newest", label: "Newest" },
+  { value: "oldest", label: "Oldest" },
+  { value: "a_z", label: "Name: A to Z" },
+  { value: "z_a", label: "Name: Z to A" },
+  { value: "price_low_high", label: "Price: Low to High" },
+  { value: "price_high_low", label: "Price: High to Low" },
+  { value: "best_selling", label: "Best Selling" },
+  { value: "most_viewed", label: "Most Viewed" },
+  { value: "featured", label: "Featured" },
+];
+
 /**
  * Product grid for one collection, with its own pagination.
  *
@@ -27,12 +41,14 @@ export function CollectionProducts({
   childCategoryIds?: number[];
 }) {
   const [page, setPage] = useState(1);
+  const [sortBy, setSortBy] = useState("newest");
 
   const categoryIds = childCategoryIds?.length ? [categoryId, ...childCategoryIds] : categoryId;
 
   const { data, isLoading, isError } = useProducts({
     page,
     limit: PAGE_SIZE,
+    sortBy,
     filters: { category_id: categoryIds },
   });
 
@@ -40,17 +56,42 @@ export function CollectionProducts({
   const pagination = data?.pagination;
   const totalPages = pagination?.totalPages ?? 1;
 
+  const sortControl = (
+    <div className="flex justify-end mb-6">
+      <label className="flex items-center gap-2 text-sm text-gray-600">
+        Sort by
+        <select
+          value={sortBy}
+          onChange={(e) => {
+            setSortBy(e.target.value);
+            setPage(1);
+          }}
+          className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-black focus:outline-none focus:ring-2 focus:ring-black/10"
+        >
+          {SORT_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </label>
+    </div>
+  );
+
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-        {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className="flex flex-col gap-4 animate-pulse">
-            <div className="w-full h-[280px] md:h-[350px] rounded-[24px] bg-[#F4F4F5]" />
-            <div className="h-5 bg-gray-200 rounded w-3/4 mx-auto" />
-            <div className="h-4 bg-gray-100 rounded w-1/3 mx-auto" />
-          </div>
-        ))}
-      </div>
+      <>
+        {sortControl}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="flex flex-col gap-4 animate-pulse">
+              <div className="w-full h-[280px] md:h-[350px] rounded-[24px] bg-[#F4F4F5]" />
+              <div className="h-5 bg-gray-200 rounded w-3/4 mx-auto" />
+              <div className="h-4 bg-gray-100 rounded w-1/3 mx-auto" />
+            </div>
+          ))}
+        </div>
+      </>
     );
   }
 
@@ -77,6 +118,7 @@ export function CollectionProducts({
 
   return (
     <>
+      {sortControl}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
         {products.map((product) => (
           <ProductCard key={product.id} data={mapProductToCard(product)} />

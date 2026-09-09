@@ -73,16 +73,6 @@ const HomeWrapper = () => {
     <>
       <Hero />
 
-      {/* Categories — scroll/slide, View All -> every category */}
-      {/* <ScrollReveal>
-        <ProductCarousel
-          data={categoryCards}
-          title="Our Categories"
-          description="From small business advertising to big event displays, Modfirst delivers bold."
-          viewAllHref="/categories"
-        />
-      </ScrollReveal> */}
-
       {/* DTF Transfers */}
       <ScrollReveal>
         <CategoryTreeCarousel
@@ -167,7 +157,15 @@ const HomeWrapper = () => {
       <ScrollReveal>
         <BlogSection />
       </ScrollReveal>
-
+      {/* Categories — scroll/slide, View All -> every category */}
+      <ScrollReveal>
+        <ProductCarousel
+          data={categoryCards}
+          title="Our Categories"
+          description="From small business advertising to big event displays, Modfirst delivers bold."
+          viewAllHref="/categories"
+        />
+      </ScrollReveal>
       <ScrollReveal>
         <NewsletterSection />
       </ScrollReveal>
