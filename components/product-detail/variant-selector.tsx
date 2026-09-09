@@ -15,6 +15,9 @@ interface VariantSelectorProps {
   onSelect: (variant: ProductVariant | null) => void;
   /** Product-level stock, used when variants are not tracked individually. */
   pooledStock?: number;
+  /** Only Apparel & Accessories holds real stock — everything else is made
+   * to order, so every option stays pickable regardless of quantity on hand. */
+  enforceStock?: boolean;
 }
 
 /** Smallest-to-largest, so pills read the way a size chart does. */
@@ -45,11 +48,12 @@ export function VariantSelector({
   selected,
   onSelect,
   pooledStock = 0,
+  enforceStock = true,
 }: VariantSelectorProps) {
   // Worked out once for the whole product, not per option.
   const perVariantTracking = tracksVariantStock(variants);
   const isAvailable = (variant: ProductVariant) =>
-    isVariantAvailable(variant, { pooledStock, perVariantTracking });
+    !enforceStock || isVariantAvailable(variant, { pooledStock, perVariantTracking });
 
   const [colorIdInput, setColorIdInput] = useState<number | null>(null);
   const [sizeIdInput, setSizeIdInput] = useState<number | null>(null);
@@ -175,6 +179,7 @@ export function VariantSelector({
         selected={selected}
         onSelect={onSelect}
         isAvailable={isAvailable}
+        enforceStock={enforceStock}
       />
     );
   }
@@ -318,12 +323,12 @@ export function VariantSelector({
         </div>
       )}
 
-      {selected && stock > 0 && stock <= 10 && (
+      {enforceStock && selected && stock > 0 && stock <= 10 && (
         <p className="text-sm font-medium text-orange-600">
           Only {stock} left in stock
         </p>
       )}
-      {selected && stock === 0 && (
+      {enforceStock && selected && stock === 0 && (
         <p className="text-sm font-medium text-red-600">This combination is out of stock</p>
       )}
     </div>
@@ -345,6 +350,7 @@ interface CompositeSizeSelectorProps {
   selected: ProductVariant | null;
   onSelect: (variant: ProductVariant | null) => void;
   isAvailable: (variant: ProductVariant) => boolean;
+  enforceStock?: boolean;
 }
 
 /**
@@ -359,6 +365,7 @@ function CompositeSizeSelector({
   selected,
   onSelect,
   isAvailable,
+  enforceStock = true,
 }: CompositeSizeSelectorProps) {
   const axisCount = parts[0]?.length ?? 0;
 
@@ -453,10 +460,10 @@ function CompositeSizeSelector({
         </div>
       ))}
 
-      {selected && stock > 0 && stock <= 10 && (
+      {enforceStock && selected && stock > 0 && stock <= 10 && (
         <p className="text-sm font-medium text-orange-600">Only {stock} left in stock</p>
       )}
-      {selected && stock === 0 && (
+      {enforceStock && selected && stock === 0 && (
         <p className="text-sm font-medium text-red-600">This combination is out of stock</p>
       )}
     </div>

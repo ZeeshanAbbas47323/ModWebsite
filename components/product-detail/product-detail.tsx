@@ -38,6 +38,15 @@ import {
 import { useGangSheetProducts } from '@/hooks/use-gang-sheet-products';
 import { isVariantAvailable, productStock, tracksVariantStock } from '@/services/product.service';
 import type { ProductVariant } from '@/services/product.service';
+import { useProductCategories } from '@/hooks/use-product-categories';
+
+/**
+ * Only Apparel & Accessories (category 72 and its subcategories — T-Shirts,
+ * Hoodies, ...) is real held stock. Everything else (DTF transfers, signage,
+ * services, ...) is made to order, so blocking checkout on an "out of stock"
+ * variant there stopped orders the business could actually fulfill.
+ */
+const INVENTORY_ENFORCED_CATEGORY_ID = 72;
 
 interface ProductDetailProps {
     product?: Product | null;
@@ -91,6 +100,15 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
     const { data: descriptions } = useProductDescriptions(id);
     const { data: faqs } = useProductFaqs(id);
     const { data: variants } = useProductVariants(id);
+
+    // Real subcategories of Apparel & Accessories, fetched live so this stays
+    // correct if a subcategory is added/removed later — see
+    // INVENTORY_ENFORCED_CATEGORY_ID above.
+    const { data: apparelSubcategories } = useProductCategories(INVENTORY_ENFORCED_CATEGORY_ID);
+    const enforceStock =
+        !!product &&
+        (product.category_id === INVENTORY_ENFORCED_CATEGORY_ID ||
+            !!apparelSubcategories?.some((c) => c.id === product.category_id));
     const { data: reviewsData } = useReviews({ filters: { product_id: id } });
     const { data: builderProducts } = useGangSheetProducts();
 
@@ -133,6 +151,7 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
     const pooledStock = productStock(product);
     const perVariantTracking = tracksVariantStock(variants);
     const variantOutOfStock =
+        enforceStock &&
         !!selectedVariant &&
         !isVariantAvailable(selectedVariant, { pooledStock, perVariantTracking });
 
@@ -410,6 +429,7 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                             selected={selectedVariant}
                             onSelect={setSelectedVariant}
                             pooledStock={pooledStock}
+                            enforceStock={enforceStock}
                         />
                     )}
 
