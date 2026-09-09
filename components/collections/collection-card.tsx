@@ -5,7 +5,15 @@ import type { ProductCategory } from "@/services/product-category.service";
 
 const PLACEHOLDER = "/images/banners-compositions/booklet.png";
 
-export function CollectionCard({ collection }: { collection: ProductCategory }) {
+export function CollectionCard({
+  collection,
+  compact = false,
+}: {
+  collection: ProductCategory;
+  /** Smaller card — used for the "Shop by category" sub-list on a category's
+   * own page, where these are a secondary aid, not the page's main content. */
+  compact?: boolean;
+}) {
   const image = resolveImageUrl(collection.image_url, PLACEHOLDER);
   const count = collection._count?.products;
 
@@ -14,7 +22,11 @@ export function CollectionCard({ collection }: { collection: ProductCategory }) 
       href={`/categories/${collection.slug}`}
       className="flex flex-col items-center group cursor-pointer"
     >
-      <div className="w-full bg-[#F4F4F5] h-[280px] md:h-[350px] rounded-[24px] mb-5 relative overflow-hidden">
+      <div
+        className={`w-full bg-[#F4F4F5] rounded-[24px] mb-5 relative overflow-hidden ${
+          compact ? "h-[160px] md:h-[190px]" : "h-[280px] md:h-[350px]"
+        }`}
+      >
         <SafeImage
           src={image}
           alt={collection.name}
@@ -24,11 +36,15 @@ export function CollectionCard({ collection }: { collection: ProductCategory }) 
           placeholderClassName="!object-contain p-10 bg-white"
         />
       </div>
-      <h3 className="text-xl md:text-[22px] font-bold text-black text-center mb-0.5 group-hover:text-primary transition-colors duration-300">
+      <h3
+        className={`font-bold text-black text-center mb-0.5 group-hover:text-primary transition-colors duration-300 ${
+          compact ? "text-base md:text-lg" : "text-xl md:text-[22px]"
+        }`}
+      >
         {collection.name}
       </h3>
       {count != null && (
-        <p className="text-[#464545] text-center">
+        <p className={`text-[#464545] text-center ${compact ? "text-sm" : ""}`}>
           {count} {count === 1 ? "Product" : "Products"}
         </p>
       )}

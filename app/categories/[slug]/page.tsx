@@ -84,9 +84,9 @@ export default async function CollectionPage({ params }: Props) {
         {children.length > 0 && (
           <div className="mb-12 md:mb-16">
             <h2 className="text-2xl font-bold text-black mb-6">Shop by category</h2>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+            <div className="grid grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
               {children.map((child) => (
-                <CollectionCard key={child.id} collection={child} />
+                <CollectionCard key={child.id} collection={child} compact />
               ))}
             </div>
           </div>

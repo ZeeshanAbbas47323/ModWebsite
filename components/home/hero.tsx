@@ -104,12 +104,21 @@ export function Hero() {
         />
       </AnimatePresence>
 
-      <div
-        className="absolute inset-0 bg-no-repeat bg-contain bg-right opacity-[0.06] pointer-events-none"
-        style={{ backgroundImage: "url('/images/backgrounds/hero-half-frame.svg')" }}
-      />
+      {/* Positioned against the same capped width as the content below it, so
+          on an ultra-wide screen the pattern sits near the visual instead of
+          floating off in empty space near the true (uncapped) edge. */}
+      <div className="absolute inset-0 flex justify-center pointer-events-none">
+        <div
+          className="w-full 2xl:max-w-[1600px] h-full bg-no-repeat bg-contain bg-right opacity-[0.06]"
+          style={{ backgroundImage: "url('/images/backgrounds/hero-half-frame.svg')" }}
+        />
+      </div>
 
-      <div className="container relative z-10 flex flex-col lg:flex-row items-center gap-8 pt-10 pb-24 md:pt-14 md:pb-28 lg:min-h-[calc(100svh-5.05rem)] lg:py-20">
+      {/* `.container` has no max-width (it's meant to hug any viewport), which
+          on a very wide/ultra-wide monitor leaves the hero's copy and product
+          shot stranded in a tiny island inside a huge, empty gradient — this
+          caps it so content stays proportionate to the section instead. */}
+      <div className="container relative z-10 flex flex-col lg:flex-row items-center gap-8 pt-10 pb-24 md:pt-14 md:pb-28 lg:min-h-[calc(100svh-5.05rem)] lg:py-20 2xl:max-w-[1600px]">
         {/* Copy */}
         <div className="flex-1 w-full text-white">
           <AnimatePresence mode="wait" initial={false}>

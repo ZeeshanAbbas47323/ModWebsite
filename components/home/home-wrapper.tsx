@@ -74,14 +74,14 @@ const HomeWrapper = () => {
       <Hero />
 
       {/* Categories — scroll/slide, View All -> every category */}
-      <ScrollReveal>
+      {/* <ScrollReveal>
         <ProductCarousel
           data={categoryCards}
           title="Our Categories"
           description="From small business advertising to big event displays, Modfirst delivers bold."
           viewAllHref="/categories"
         />
-      </ScrollReveal>
+      </ScrollReveal> */}
 
       {/* DTF Transfers */}
       <ScrollReveal>
