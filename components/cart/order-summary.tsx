@@ -16,8 +16,6 @@ export const OrderSummary = () => {
   const [code, setCode] = useState('');
   const [applying, setApplying] = useState(false);
 
-
-
   const estimatedTax = total * TAX_RATE;
   const estimatedTotal = total + estimatedTax;
   const isEmpty = lines.length === 0;

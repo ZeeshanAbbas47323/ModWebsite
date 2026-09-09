@@ -55,7 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const token = getToken();
 
     if (token) setUser(getStoredUser());
-     
+
     setIsReady(true);
   }, []);
 
@@ -67,8 +67,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return "otp_required";
       }
       setToken(result.token);
-
-
 
       let account = result.user;
       if (!account) {

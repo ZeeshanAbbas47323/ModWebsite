@@ -47,8 +47,6 @@ function extractAuth(raw: Record<string, unknown>): AuthResult {
 export const authService = {
   login: async (input: LoginInput): Promise<AuthResult> => {
 
-
-
     const { data } = await apiClient.post("/auth/login", {
       rememberMe: true,
       ...input,
@@ -84,10 +82,6 @@ export const authService = {
   logout: async (): Promise<void> => {
     await apiClient.post("/auth/logout", {});
   },
-
-
-
-
 
 
   forgotPassword: async (email: string): Promise<string> => {

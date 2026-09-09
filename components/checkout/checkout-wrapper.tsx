@@ -47,8 +47,6 @@ export function CheckoutWrapper() {
   const { lines, subtotal, discount, total, coupon, clearCart, isLoading } = useCart();
   const { user, isAuthenticated, isReady } = useAuth();
 
-
-
   const [emailInput, setEmailInput] = useState<string | null>(null);
   const [phoneInput, setPhoneInput] = useState<string | null>(null);
   const [fullNameInput, setFullNameInput] = useState<string | null>(null);
@@ -205,8 +203,6 @@ export function CheckoutWrapper() {
         return;
       }
 
-
-
       const orderTotal = Number(order.total_amount ?? 0) || total;
       const online = Number(onlineAmountInput);
       if (isSplitMethod(effectiveMethod) && !(online > 0 && online < orderTotal)) {
@@ -232,15 +228,11 @@ export function CheckoutWrapper() {
       const redirectUrl = checkoutRedirectUrl(session);
       if (!redirectUrl) {
 
-
-
         throw new Error(
           `Your order ${orderCode} was placed, but the payment page could not be opened. ` +
             "Nothing has been charged — please try again or contact us."
         );
       }
-
-
 
 
       window.location.href = redirectUrl;
@@ -476,7 +468,6 @@ export function CheckoutWrapper() {
                   sublabel: "Visa, Mastercard, Amex",
                   // No real Stripe mark is bundled (the old icon here was
                   // Shop Pay's logo, a different brand entirely) — the brand
-                  // wordmark below stands in until a real asset is added.
                   icon: null,
                 },
                 {

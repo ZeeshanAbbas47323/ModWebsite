@@ -16,14 +16,6 @@ function cacheHeaders(seconds?: number) {
   return {
 
 
-
-
-
-
-
-
-
-
     "Cache-Control": `public, s-maxage=${seconds}, stale-while-revalidate=86400`,
   };
 }

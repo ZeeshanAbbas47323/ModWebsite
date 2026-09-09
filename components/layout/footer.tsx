@@ -117,8 +117,6 @@ export function Footer() {
   const { data: sections = [], isLoading } = useFooterSections();
   const { data: settings } = useWebsiteSettings();
 
-
-
   const socials = [
     { name: "Facebook", url: settings?.facebook_url, icon: "/images/icons/facebook.svg", size: 14 },
     { name: "Instagram", url: settings?.instagram_url, icon: "/images/icons/instagram.svg", size: 18 },

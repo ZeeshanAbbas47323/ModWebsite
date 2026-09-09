@@ -68,10 +68,8 @@ export function GangSheetBuilder({
 
     let cancelled = false;
 
-
-
     setStatus("loading");
-     
+
     setError(null);
 
     loadGangSheetEmbed()

@@ -118,8 +118,6 @@ export const cartService = {
     } catch {
 
 
-
-
       await apiClient.put(`/cart-items/${id}`, { is_active: false });
     }
   },

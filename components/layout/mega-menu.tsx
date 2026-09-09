@@ -212,8 +212,6 @@ function ColumnHeading({ item, onNavigate }: { item: NavItem; onNavigate: () => 
   );
 }
 
-
-
 function useFittedItems(count: number) {
   const barRef = useRef<HTMLUListElement | null>(null);
   const measureRef = useRef<HTMLUListElement | null>(null);

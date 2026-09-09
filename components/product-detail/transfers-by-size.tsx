@@ -108,8 +108,6 @@ export function TransfersBySize({ onAddToCart }: TransfersBySizeProps) {
 
   const active = designs.find((d) => d.id === activeId) ?? null;
 
-
-
   const liveDesigns = useRef<Design[]>([]);
   useEffect(() => {
     liveDesigns.current = designs;

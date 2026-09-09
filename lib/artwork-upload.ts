@@ -30,10 +30,6 @@ export function needsArtworkUpload(product?: {
   const slug = (product.slug ?? "").toLowerCase();
   if (slug && ARTWORK_SLUG_PATTERNS.some((pattern) => slug.includes(pattern))) return true;
 
-
-
-
-
   const name = (product.name ?? "").toLowerCase();
   return !!name && ARTWORK_SLUG_PATTERNS.some((pattern) => name.includes(pattern.replace(/-/g, " ")));
 }

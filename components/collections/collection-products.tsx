@@ -47,8 +47,6 @@ export function CollectionProducts({
   const totalPages = pagination?.totalPages ?? 1;
   const total = pagination?.total;
 
-
-
   const sortControl = (
     <div className="flex items-center justify-between gap-4 mb-5 pb-3 border-b border-gray-100">
       <span className="text-sm text-gray-500">

@@ -15,16 +15,12 @@ export function OrderConfirmation() {
   const { isAuthenticated, isReady } = useAuth();
   const { clearCart, lines } = useCart();
 
-
-
   const cleared = useRef(false);
   useEffect(() => {
     if (cleared.current || lines.length === 0) return;
     cleared.current = true;
     void clearCart();
   }, [lines.length, clearCart]);
-
-
 
   const { data: order, isLoading } = useQuery({
     queryKey: ["order", orderCode],

@@ -23,8 +23,6 @@ export default async function FaqPage() {
   const page = await getContentPage(PAGE_FILTERS);
   const entries = parseFaqContent(page?.content ?? "");
 
-
-
   const heading =
     page?.title && page.title !== page.title.toUpperCase()
       ? page.title

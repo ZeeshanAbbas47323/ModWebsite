@@ -42,10 +42,6 @@ const ProductDetailWrapper = ({ slug }: ProductDetailWrapperProps) => {
     }
 
 
-
-
-
-
     if (!product) {
         return (
             <>

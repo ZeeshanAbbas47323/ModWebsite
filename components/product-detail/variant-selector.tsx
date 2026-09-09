@@ -76,14 +76,6 @@ export function VariantSelector({
   const hasSizes = sizes.length > 0;
 
 
-
-
-
-
-
-
-
-
   const compositeParts = useMemo(() => {
     if (hasColors || !hasSizes) return null;
     const parts = sizes.map((s) => s.name.split(" / ").map((p) => p.trim()));
@@ -153,10 +145,6 @@ export function VariantSelector({
       );
     commit(keepColor ? colorId : null, sId);
   };
-
-
-
-
 
 
   const onlyVariant = variants.length === 1 ? variants[0] : null;
@@ -378,8 +366,6 @@ function CompositeSizeSelector({
       }),
     [parts, axisCount]
   );
-
-
 
   const [chosen, setChosen] = useState<(string | null)[]>(() =>
     axisValues.map((values) => (values.length === 1 ? values[0] : null))

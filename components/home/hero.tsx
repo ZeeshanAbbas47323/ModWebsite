@@ -13,8 +13,6 @@ import { resolveImageUrl } from "@/lib/image-url";
 
 export function Hero() {
 
-
-
   const { data: heroSection } = useHomeSection("home_hero");
   const cmsSlides = useMemo(
     () => mapHomeHeroSlides(heroSection),
@@ -46,8 +44,6 @@ export function Hero() {
 
   const next = useCallback(() => goTo(index + 1, 1), [goTo, index]);
   const prev = useCallback(() => goTo(index - 1, -1), [goTo, index]);
-
-
 
   const [hidden, setHidden] = useState(false);
   useEffect(() => {

@@ -106,11 +106,11 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
       const raw = window.localStorage.getItem(SNAPSHOT_KEY);
       const restored = raw ? (JSON.parse(raw) as Record<string, WishlistLine>) : {};
       for (const line of stored) restored[line.key] = line;
-       
+
       setSnapshots(restored);
     } catch {
     }
-     
+
     setHydrated(true);
   }, []);
 

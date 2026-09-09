@@ -99,10 +99,6 @@ function Carousel({
     setApi(api)
   }, [api, setApi])
 
-
-
-
-
   React.useEffect(() => {
     if (!api || !autoplay || paused) return
     const id = setInterval(() => {

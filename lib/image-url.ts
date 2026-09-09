@@ -11,8 +11,6 @@ export const MEDIA_BASE_URL = (process.env.NEXT_PUBLIC_MEDIA_BASE_URL ?? "").rep
   ""
 );
 
-
-
 export const DEAD_DOMAINS: string[] = ["storage.modfirstapparel.com"];
 
 
@@ -47,10 +45,6 @@ export function resolveImageUrl(url: string | null | undefined, fallback = ""): 
   if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("/images/")) {
     return url;
   }
-
-
-
-
 
   if (IMAGE_BASE_URL) {
     const key = url.replace(/^\/+/, "").replace(/^(uploads?\/)+/, "");

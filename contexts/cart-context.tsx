@@ -109,8 +109,6 @@ function mapServerItem(item: ServerCartItem, snapshot?: CartLine): CartLine {
     ? unitPrice(product, variant)
     : snapshot?.price ?? 0;
 
-
-
   const serverUploads = designUploadsOf(item);
 
   return {
@@ -153,17 +151,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         ? (JSON.parse(rawSnapshots) as Record<string, CartLine>)
         : {};
       for (const line of stored) restored[line.key] = line;
-       
+
       setSnapshots(restored);
     } catch {
     }
     try {
       const rawCoupon = window.localStorage.getItem(COUPON_KEY);
-       
+
       if (rawCoupon) setCoupon(JSON.parse(rawCoupon) as AppliedCoupon);
     } catch {
     }
-     
+
     setHydrated(true);
   }, []);
 

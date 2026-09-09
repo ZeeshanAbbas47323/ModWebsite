@@ -30,8 +30,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ data }) => {
     const [adding, setAdding] = useState(false);
     const [added, setAdded] = useState(false);
 
-
-
     const canQuickAdd = !!data.product && !data.product.variants?.length;
 
     const handleQuickAdd = async (e: React.MouseEvent) => {
