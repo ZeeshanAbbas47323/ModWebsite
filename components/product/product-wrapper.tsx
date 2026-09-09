@@ -73,13 +73,28 @@ function SearchResults({ query }: { query: string }) {
     );
 }
 
+/** Mirrors backend PRODUCT_SORT_OPTIONS (productValidations.ts) — each value
+ * already bakes in its own direction, so no separate order control is needed. */
+const SORT_OPTIONS: { value: string; label: string }[] = [
+    { value: "newest", label: "Newest" },
+    { value: "oldest", label: "Oldest" },
+    { value: "a_z", label: "Name: A to Z" },
+    { value: "z_a", label: "Name: Z to A" },
+    { value: "price_low_high", label: "Price: Low to High" },
+    { value: "price_high_low", label: "Price: High to Low" },
+    { value: "best_selling", label: "Best Selling" },
+    { value: "most_viewed", label: "Most Viewed" },
+    { value: "featured", label: "Featured" },
+];
+
 const ProductWrapper = () => {
     const [page, setPage] = useState(1);
+    const [sortBy, setSortBy] = useState("newest");
     const searchParams = useSearchParams();
     const query = searchParams.get("q")?.trim();
 
     const { data: categories } = useProductCategories(null);
-    const { data: productsData, isLoading } = useProducts({ page, limit: 24 });
+    const { data: productsData, isLoading } = useProducts({ page, limit: 24, sortBy });
 
     const productCards = productsData?.payload?.map(mapProductToCard) ?? fallbackProducts;
     const pagination = productsData?.pagination;
@@ -90,7 +105,7 @@ const ProductWrapper = () => {
         <>
             {/* Filtering lives on the collection pages, so these are links now. */}
             {categories && categories.length > 0 && (
-                <div className="container pt-8">
+                <div className="container pt-8 flex flex-wrap items-center justify-between gap-4">
                     <div className="flex flex-wrap gap-3">
                         <span className="px-5 py-2 rounded-full text-sm font-medium bg-black text-white">
                             All
@@ -105,6 +120,24 @@ const ProductWrapper = () => {
                             </Link>
                         ))}
                     </div>
+
+                    <label className="flex items-center gap-2 text-sm text-gray-600">
+                        Sort by
+                        <select
+                            value={sortBy}
+                            onChange={(e) => {
+                                setSortBy(e.target.value);
+                                setPage(1);
+                            }}
+                            className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-black focus:outline-none focus:ring-2 focus:ring-black/10"
+                        >
+                            {SORT_OPTIONS.map((opt) => (
+                                <option key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                </option>
+                            ))}
+                        </select>
+                    </label>
                 </div>
             )}
 

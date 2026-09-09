@@ -18,6 +18,10 @@ type CarouselProps = {
   plugins?: CarouselPlugin
   orientation?: "horizontal" | "vertical"
   setApi?: (api: CarouselApi) => void
+  /** Auto-advance one slide on an interval; pauses on hover/focus/touch. */
+  autoplay?: boolean
+  /** Milliseconds between auto-advances. */
+  autoplayDelay?: number
 }
 
 type CarouselContextProps = {
@@ -48,6 +52,8 @@ function Carousel({
   plugins,
   className,
   children,
+  autoplay = false,
+  autoplayDelay = 3500,
   ...props
 }: React.ComponentProps<"div"> & CarouselProps) {
   const [carouselRef, api] = useEmblaCarousel(
@@ -59,6 +65,7 @@ function Carousel({
   )
   const [canScrollPrev, setCanScrollPrev] = React.useState(false)
   const [canScrollNext, setCanScrollNext] = React.useState(false)
+  const [paused, setPaused] = React.useState(false)
 
   const onSelect = React.useCallback((api: CarouselApi) => {
     if (!api) return
@@ -92,6 +99,19 @@ function Carousel({
     setApi(api)
   }, [api, setApi])
 
+  // Auto-advance on a timer, held while the shopper is hovering/touching so
+  // the rail doesn't jump under their cursor mid-browse. `loop: true` (set on
+  // every rail using this) means scrollNext() wraps forever without special-
+  // casing the last slide.
+  React.useEffect(() => {
+    if (!api || !autoplay || paused) return
+    const id = setInterval(() => {
+      if (api.canScrollNext()) api.scrollNext()
+      else api.scrollTo(0)
+    }, autoplayDelay)
+    return () => clearInterval(id)
+  }, [api, autoplay, autoplayDelay, paused])
+
   React.useEffect(() => {
     if (!api) return
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -120,6 +140,10 @@ function Carousel({
     >
       <div
         onKeyDownCapture={handleKeyDown}
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+        onTouchStart={() => setPaused(true)}
+        onTouchEnd={() => setPaused(false)}
         className={cn("relative", className)}
         role="region"
         aria-roledescription="carousel"

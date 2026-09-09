@@ -32,6 +32,8 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ data, title, descript
             align: "start",
             loop: true,
           }}
+          autoplay
+          autoplayDelay={3500}
           className="w-full"
         >
           <CarouselContent className="md:-ml-6">
