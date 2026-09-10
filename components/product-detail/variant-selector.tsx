@@ -30,6 +30,24 @@ function sizeRank(name: string) {
   return index === -1 ? Number.MAX_SAFE_INTEGER : index;
 }
 
+/**
+ * Numeric-aware comparison, so "22x24" sorts before "22x108" instead of after
+ * it. Plain string ordering compares digit by digit, which puts every size
+ * beginning "1" ahead of every size beginning "2".
+ */
+const naturalCompare = new Intl.Collator(undefined, {
+  numeric: true,
+  sensitivity: "base",
+}).compare;
+
+/** Named apparel sizes keep their own order; everything else sorts naturally. */
+function compareSizes(a: string, b: string) {
+  const rankA = sizeRank(a);
+  const rankB = sizeRank(b);
+  if (rankA !== rankB) return rankA - rankB;
+  return naturalCompare(a, b);
+}
+
 
 function isLightHex(hex?: string) {
   if (!hex) return false;
@@ -67,9 +85,7 @@ export function VariantSelector({
   const sizes = useMemo(() => {
     const map = new Map<number, { id: number; name: string; display_name?: string }>();
     for (const v of variants) if (v.size) map.set(v.size.id, v.size);
-    return [...map.values()].sort(
-      (a, b) => sizeRank(a.name) - sizeRank(b.name) || a.name.localeCompare(b.name)
-    );
+    return [...map.values()].sort((a, b) => compareSizes(a.name, b.name));
   }, [variants]);
 
   const hasColors = colors.length > 0;
@@ -309,11 +325,6 @@ export function VariantSelector({
         </div>
       )}
 
-      {enforceStock && selected && stock > 0 && stock <= 10 && (
-        <p className="text-sm font-medium text-orange-600">
-          Only {stock} left in stock
-        </p>
-      )}
       {enforceStock && selected && stock === 0 && (
         <p className="text-sm font-medium text-red-600">This combination is out of stock</p>
       )}
@@ -362,7 +373,8 @@ function CompositeSizeSelector({
             values.push(p[axis]);
           }
         }
-        return values;
+        // Each axis is a size dimension, so it sorts numerically too.
+        return values.sort(compareSizes);
       }),
     [parts, axisCount]
   );
@@ -438,9 +450,6 @@ function CompositeSizeSelector({
         </div>
       ))}
 
-      {enforceStock && selected && stock > 0 && stock <= 10 && (
-        <p className="text-sm font-medium text-orange-600">Only {stock} left in stock</p>
-      )}
       {enforceStock && selected && stock === 0 && (
         <p className="text-sm font-medium text-red-600">This combination is out of stock</p>
       )}

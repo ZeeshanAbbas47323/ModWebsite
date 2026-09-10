@@ -21,7 +21,6 @@ import { useReviews } from '@/hooks/use-reviews';
 import { ProductReviews } from '@/components/product-detail/product-reviews';
 import type { Product } from '@/services/product.service';
 import {
-    LOW_STOCK_THRESHOLD,
     isInventoryEnforced,
     useInventoryEnforcedCategoryIds,
 } from "@/lib/inventory";
@@ -140,11 +139,6 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
         enforceStock && !variants?.length && pooledStock <= 0;
 
     const outOfStock = variantOutOfStock || productOutOfStock;
-    const lowPooledStock =
-        enforceStock &&
-        !variants?.length &&
-        pooledStock > 0 &&
-        pooledStock <= LOW_STOCK_THRESHOLD;
 
     const builderProductSlug = matchBuilderProduct(product, builderProducts)?.slug;
     const usesGangSheetBuilder = !!builderProductSlug;
@@ -469,11 +463,6 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                     {productOutOfStock && !usesGangSheetBuilder && (
                         <p className="-mt-3 mb-6 text-sm font-medium text-red-600">
                             This product is out of stock.
-                        </p>
-                    )}
-                    {lowPooledStock && (
-                        <p className="-mt-3 mb-6 text-sm font-medium text-orange-600">
-                            Only {pooledStock} left in stock
                         </p>
                     )}
 

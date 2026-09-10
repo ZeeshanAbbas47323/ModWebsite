@@ -8,7 +8,6 @@ import { WishlistButton } from '@/components/wishlist/wishlist-button';
 import { SafeImage } from '@/components/shared/safe-image';
 import { resolveImageUrl } from "@/lib/image-url";
 import {
-    isLowStock,
     isOutOfStock,
     useInventoryEnforcedCategoryIds,
 } from "@/lib/inventory";
@@ -37,7 +36,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ data }) => {
 
     const enforcedCategoryIds = useInventoryEnforcedCategoryIds();
     const outOfStock = isOutOfStock(data.product, enforcedCategoryIds);
-    const lowStock = isLowStock(data.product, enforcedCategoryIds);
 
     const canQuickAdd =
         !!data.product && !data.product.variants?.length && !outOfStock;
@@ -63,11 +61,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ data }) => {
                 {outOfStock && (
                     <span className="absolute top-4 left-4 z-10 rounded-full bg-black/80 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">
                         Out of stock
-                    </span>
-                )}
-                {!outOfStock && lowStock && (
-                    <span className="absolute top-4 left-4 z-10 rounded-full bg-amber-500 px-3 py-1 text-xs font-semibold text-white">
-                        Low stock
                     </span>
                 )}
                 {data.product && (
@@ -113,11 +106,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ data }) => {
             </div>
             <h3 className="text-[22px] font-bold text-black text-center mb-0.5 group-hover:text-primary transition-colors duration-300">{data.title}</h3>
             <p className="text-[#464545] text-center text-lg">{data.count}</p>
-            {outOfStock && (
-                <p className="text-center text-sm font-semibold text-red-600">
-                    Out of stock
-                </p>
-            )}
         </Link>
     )
 }

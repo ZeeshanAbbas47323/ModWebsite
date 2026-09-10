@@ -88,15 +88,3 @@ export function isOutOfStock(
   if (!isInventoryEnforced(product, enforcedIds)) return false;
   return availableStock(product) <= 0;
 }
-
-/** Low-stock threshold used for the "Only N left" nudge. */
-export const LOW_STOCK_THRESHOLD = 10;
-
-export function isLowStock(
-  product: Product | null | undefined,
-  enforcedIds: Set<number>
-): boolean {
-  if (!isInventoryEnforced(product, enforcedIds)) return false;
-  const stock = availableStock(product);
-  return stock > 0 && stock <= LOW_STOCK_THRESHOLD;
-}
