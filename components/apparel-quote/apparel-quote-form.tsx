@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DocumentField } from "@/components/net30/document-field";
 import { apparelQuoteService } from "@/services/apparel-quote.service";
+import { useScrollIntoView } from "@/hooks/use-scroll-into-view";
 
 const ORDER_TYPES = [
   "Business or Staff Apparel",
@@ -143,6 +144,7 @@ export function ApparelQuoteForm() {
   });
   const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
   const [error, setError] = useState<string | null>(null);
+  const sentRef = useScrollIntoView<HTMLDivElement>(status === "sent");
 
   const field =
     (name: keyof typeof EMPTY) =>
@@ -232,7 +234,10 @@ export function ApparelQuoteForm() {
 
   if (status === "sent") {
     return (
-      <div className="bg-[#F4F4F5] rounded-[24px] p-10 md:p-16 text-center">
+      <div
+        ref={sentRef}
+        className="bg-[#F4F4F5] rounded-[24px] p-10 md:p-16 text-center"
+      >
         <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center mx-auto mb-6">
           <svg
             width="32"

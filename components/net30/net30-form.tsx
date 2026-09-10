@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DocumentField } from "@/components/net30/document-field";
 import { net30Service } from "@/services/net30.service";
+import { useScrollIntoView } from "@/hooks/use-scroll-into-view";
 
 const EMPTY = {
   company_name: "",
@@ -26,6 +27,7 @@ export function Net30Form() {
   const [form, setForm] = useState(EMPTY);
   const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
   const [error, setError] = useState<string | null>(null);
+  const sentRef = useScrollIntoView<HTMLDivElement>(status === "sent");
 
   const field = (name: keyof typeof EMPTY) =>
     (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -77,7 +79,10 @@ export function Net30Form() {
 
   if (status === "sent") {
     return (
-      <div className="bg-[#F4F4F5] rounded-[24px] p-10 md:p-16 text-center">
+      <div
+        ref={sentRef}
+        className="bg-[#F4F4F5] rounded-[24px] p-10 md:p-16 text-center"
+      >
         <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center mx-auto mb-6">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-black">
             <path d="M20 6 9 17l-5-5" />

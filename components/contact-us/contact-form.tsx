@@ -9,6 +9,7 @@ import {
   HELP_TOPICS,
   type HelpTopic,
 } from "@/services/contact.service";
+import { useScrollIntoView } from "@/hooks/use-scroll-into-view";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -33,6 +34,7 @@ export function ContactForm() {
   const [topic, setTopic] = useState<HelpTopic>(HELP_TOPICS[0].value);
   const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
   const [error, setError] = useState<string | null>(null);
+  const sentRef = useScrollIntoView<HTMLParagraphElement>(status === "sent");
 
   const field = (name: keyof typeof EMPTY_FORM) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
@@ -211,7 +213,7 @@ export function ContactForm() {
 
           {error && <p className="text-sm text-red-600">{error}</p>}
           {status === "sent" && (
-            <p className="text-sm text-green-700" role="status">
+            <p ref={sentRef} className="text-sm text-green-700" role="status">
               Thanks — your message is with us. We reply within a few hours.
             </p>
           )}
