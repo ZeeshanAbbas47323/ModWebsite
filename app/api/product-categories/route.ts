@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { proxyCachedQuery, proxyPost } from "@/lib/api-proxy";
+import { CACHE_TAGS } from "@/lib/cache-tags";
 
 
 export async function GET(req: NextRequest) {
@@ -15,7 +16,7 @@ export async function GET(req: NextRequest) {
       ...(parentId !== null ? { parent_id: parentId === "" ? null : Number(parentId) } : {}),
       ...(slug ? { slug } : {}),
     },
-  });
+  }, { tags: [CACHE_TAGS.productCategories] });
 }
 
 

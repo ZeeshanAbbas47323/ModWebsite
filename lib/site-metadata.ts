@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { isDeadDomain, resolveImageUrl } from "@/lib/image-url";
 import { API_BASE, API_HEADERS } from "@/lib/upstream";
 import type { WebsiteSettings } from "@/services/website-settings.service";
+import { CACHE_TAGS } from "@/lib/cache-tags";
 
 const FALLBACK = {
   name: "ModFirst",
@@ -16,7 +17,7 @@ export async function getSiteSettings(): Promise<WebsiteSettings | null> {
   try {
     const res = await fetch(`${API_BASE}/website-settings/current`, {
       headers: API_HEADERS,
-      next: { revalidate: 3600 },
+      next: { revalidate: 3600, tags: [CACHE_TAGS.websiteSettings] },
     });
     if (!res.ok) return null;
     const data = await res.json();
@@ -43,7 +44,7 @@ async function assetExists(url: string | null): Promise<string | null> {
     const res = await fetch(url, {
       method: "HEAD",
       signal: AbortSignal.timeout(3000),
-      next: { revalidate: 3600 },
+      next: { revalidate: 3600, tags: [CACHE_TAGS.websiteSettings] },
     });
     return res.ok ? url : null;
   } catch {

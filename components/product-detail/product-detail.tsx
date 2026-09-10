@@ -20,6 +20,11 @@ import { useCart } from '@/contexts/cart-context';
 import { useReviews } from '@/hooks/use-reviews';
 import { ProductReviews } from '@/components/product-detail/product-reviews';
 import type { Product } from '@/services/product.service';
+import {
+    LOW_STOCK_THRESHOLD,
+    isInventoryEnforced,
+    useInventoryEnforcedCategoryIds,
+} from "@/lib/inventory";
 import { resolveImageUrl } from '@/lib/image-url';
 import { VariantSelector } from '@/components/product-detail/variant-selector';
 import { GangSheetBuilder } from '@/components/product-detail/gang-sheet-builder';
@@ -39,9 +44,7 @@ import {
 import { useGangSheetProducts } from '@/hooks/use-gang-sheet-products';
 import { isVariantAvailable, productStock, tracksVariantStock } from '@/services/product.service';
 import type { ProductVariant } from '@/services/product.service';
-import { useProductCategories } from '@/hooks/use-product-categories';
 
-const INVENTORY_ENFORCED_CATEGORY_ID = 72;
 
 interface ProductDetailProps {
     product?: Product | null;
@@ -90,11 +93,8 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
     const { data: faqs } = useProductFaqs(id);
     const { data: variants } = useProductVariants(id);
 
-    const { data: apparelSubcategories } = useProductCategories(INVENTORY_ENFORCED_CATEGORY_ID);
-    const enforceStock =
-        !!product &&
-        (product.category_id === INVENTORY_ENFORCED_CATEGORY_ID ||
-            !!apparelSubcategories?.some((c) => c.id === product.category_id));
+    const enforcedCategoryIds = useInventoryEnforcedCategoryIds();
+    const enforceStock = isInventoryEnforced(product, enforcedCategoryIds);
     const { data: reviewsData } = useReviews({ filters: { product_id: id } });
     const { data: builderProducts } = useGangSheetProducts();
 
@@ -131,6 +131,20 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
         enforceStock &&
         !!selectedVariant &&
         !isVariantAvailable(selectedVariant, { pooledStock, perVariantTracking });
+
+    /**
+     * A product with no variants has only the pooled count to go on, so it
+     * needs its own check - the variant guard above never fires for it.
+     */
+    const productOutOfStock =
+        enforceStock && !variants?.length && pooledStock <= 0;
+
+    const outOfStock = variantOutOfStock || productOutOfStock;
+    const lowPooledStock =
+        enforceStock &&
+        !variants?.length &&
+        pooledStock > 0 &&
+        pooledStock <= LOW_STOCK_THRESHOLD;
 
     const builderProductSlug = matchBuilderProduct(product, builderProducts)?.slug;
     const usesGangSheetBuilder = !!builderProductSlug;
@@ -198,7 +212,7 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
             );
             return;
         }
-        if (variantOutOfStock) {
+        if (outOfStock) {
             setAddError("That combination is out of stock.");
             return;
         }
@@ -428,16 +442,18 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                         </div>
                         )}
 
-                        <Button size="xxl" className="flex-1 min-w-[200px]" onClick={handleAddToCart} disabled={adding || !product || (!usesGangSheetBuilder && variantOutOfStock) || artworkUploading}>
+                        <Button size="xxl" className="flex-1 min-w-[200px]" onClick={handleAddToCart} disabled={adding || !product || (!usesGangSheetBuilder && outOfStock) || artworkUploading}>
                             {adding
                                 ? "Adding\u2026"
                                 : added
                                     ? "Added to Cart"
-                                    : usesGangSheetBuilder
-                                        ? "Build your own Gang Sheet"
-                                        : usesTransfersBySize
-                                            ? "Build your Transfer"
-                                            : "Add to Cart"}
+                                    : !usesGangSheetBuilder && outOfStock
+                                        ? "Out of stock"
+                                        : usesGangSheetBuilder
+                                            ? "Build your own Gang Sheet"
+                                            : usesTransfersBySize
+                                                ? "Build your Transfer"
+                                                : "Add to Cart"}
                         </Button>
 
                         {product && (
@@ -449,6 +465,17 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                             />
                         )}
                     </div>
+
+                    {productOutOfStock && !usesGangSheetBuilder && (
+                        <p className="-mt-3 mb-6 text-sm font-medium text-red-600">
+                            This product is out of stock.
+                        </p>
+                    )}
+                    {lowPooledStock && (
+                        <p className="-mt-3 mb-6 text-sm font-medium text-orange-600">
+                            Only {pooledStock} left in stock
+                        </p>
+                    )}
 
                     {addError && <p className="text-sm text-red-600 -mt-3 mb-6">{addError}</p>}
 

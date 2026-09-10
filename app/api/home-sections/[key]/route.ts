@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { API_BASE, API_HEADERS } from "@/lib/upstream";
+import { CACHE_TAGS } from "@/lib/cache-tags";
 
 export async function GET(
   _req: NextRequest,
@@ -12,7 +13,7 @@ export async function GET(
     const res = await fetch(url, {
       method: "GET",
       headers: API_HEADERS,
-      next: { revalidate: 60 },
+      next: { revalidate: 3600, tags: [CACHE_TAGS.homeSections] },
     });
     console.log(url);
 

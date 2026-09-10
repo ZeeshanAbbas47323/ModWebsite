@@ -1,5 +1,6 @@
 import { API_BASE, API_HEADERS } from "@/lib/upstream";
 import type { Product } from "./product.service";
+import { CACHE_TAGS } from "@/lib/cache-tags";
 
 export async function getProductById(id: number): Promise<Product | null> {
   if (!API_BASE || !id) return null;
@@ -8,7 +9,7 @@ export async function getProductById(id: number): Promise<Product | null> {
       method: "POST",
       headers: API_HEADERS,
       body: JSON.stringify({ page: 1, limit: 1, filters: { id } }),
-      next: { revalidate: 300 },
+      next: { revalidate: 3600, tags: [CACHE_TAGS.products] },
     });
     if (!res.ok) return null;
     const data = await res.json();
@@ -26,7 +27,7 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
       method: "POST",
       headers: API_HEADERS,
       body: JSON.stringify({ page: 1, limit: 1, filters: { slug } }),
-      next: { revalidate: 300 },
+      next: { revalidate: 3600, tags: [CACHE_TAGS.products] },
     });
     if (!res.ok) return null;
     const data = await res.json();

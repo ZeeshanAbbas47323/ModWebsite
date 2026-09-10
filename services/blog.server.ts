@@ -1,4 +1,5 @@
 import type { Blog } from "./blog.service";
+import { CACHE_TAGS } from "@/lib/cache-tags";
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "").replace(/\/$/, "");
 const API_HEADERS = {
@@ -10,7 +11,7 @@ const API_HEADERS = {
 export async function getBlogBySlug(slug: string): Promise<Blog> {
   const res = await fetch(`${API_BASE}/blogs/frontend/${slug}`, {
     headers: API_HEADERS,
-    next: { revalidate: 60 },
+    next: { revalidate: 3600, tags: [CACHE_TAGS.blogs] },
   });
   if (!res.ok) throw new Error(`Blog not found: ${slug}`);
   const data = await res.json();

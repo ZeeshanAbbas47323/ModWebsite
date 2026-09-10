@@ -1,5 +1,6 @@
 import { API_BASE, API_HEADERS } from "@/lib/upstream";
 import type { ContentPage, ContentPageFilters } from "./content-page.service";
+import { CACHE_TAGS } from "@/lib/cache-tags";
 
 
 const REQUEST_TIMEOUT_MS = 10_000;
@@ -21,7 +22,7 @@ export async function getContentPage(
       method: "POST",
       headers: API_HEADERS,
       body: JSON.stringify({ page: 1, limit: 1, filters: { is_active: true, ...filters } }),
-      next: { revalidate: 300 },
+      next: { revalidate: 3600, tags: [CACHE_TAGS.contentPages] },
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
 
