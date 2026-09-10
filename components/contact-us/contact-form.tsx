@@ -10,6 +10,7 @@ import {
   type HelpTopic,
 } from "@/services/contact.service";
 import { useScrollIntoView } from "@/hooks/use-scroll-into-view";
+import { useWebsiteSettings } from "@/hooks/use-website-settings";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -35,6 +36,12 @@ export function ContactForm() {
   const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
   const [error, setError] = useState<string | null>(null);
   const sentRef = useScrollIntoView<HTMLParagraphElement>(status === "sent");
+
+  const { data: settings } = useWebsiteSettings();
+  const whatsapp =
+    settings?.whatsapp_number?.trim() || settings?.contact_phone?.trim();
+  const contactEmail =
+    settings?.contact_email?.trim() || settings?.support_email?.trim();
 
   const field = (name: keyof typeof EMPTY_FORM) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
@@ -95,21 +102,28 @@ export function ContactForm() {
               />
             </div>
 
-            <div className="flex items-center gap-4">
-              <a
-                href="https://wa.me/922112345678"
-                className="flex items-center gap-2 text-black hover:text-primary transition-colors"
-              >
-                <Image src="/images/icons/phone.svg" alt="Phone" width={20} height={20} />
-                <span className="font-medium">+92 21 12345678</span>
-              </a>
-              <a
-                href="mailto:hello@modfirst.com"
-                className="flex items-center gap-2 text-black hover:text-primary transition-colors"
-              >
-                <Image src="/images/icons/mail.svg" alt="Email" width={20} height={20} />
-                <span className="font-medium">hello@modfirst.com</span>
-              </a>
+            {/* Same source as the cards above and the footer: Website Settings. */}
+            <div className="flex flex-wrap items-center gap-4">
+              {whatsapp && (
+                <a
+                  href={`https://wa.me/${whatsapp.replace(/[^\d]/g, "")}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-2 text-black hover:text-primary transition-colors"
+                >
+                  <Image src="/images/icons/phone.svg" alt="" width={20} height={20} />
+                  <span className="font-medium">{whatsapp}</span>
+                </a>
+              )}
+              {contactEmail && (
+                <a
+                  href={`mailto:${contactEmail}`}
+                  className="flex items-center gap-2 text-black hover:text-primary transition-colors"
+                >
+                  <Image src="/images/icons/mail.svg" alt="" width={20} height={20} />
+                  <span className="font-medium">{contactEmail}</span>
+                </a>
+              )}
             </div>
           </div>
         </div>
