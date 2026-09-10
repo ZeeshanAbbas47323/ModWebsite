@@ -9,6 +9,7 @@ import {
   type Product,
 } from "@/services/product.service";
 import { SHARED_CONTENT_STALE_TIME } from "@/lib/query-client";
+import { ARTWORK_CATEGORY_IDS } from "@/lib/artwork-upload";
 
 /**
  * Categories whose products are sold from real stock, so the storefront shows
@@ -87,4 +88,27 @@ export function isOutOfStock(
 ): boolean {
   if (!isInventoryEnforced(product, enforcedIds)) return false;
   return availableStock(product) <= 0;
+}
+
+/**
+ * Artwork categories expanded to include their sub-categories, so a product
+ * filed under a child of 79 still asks for an upload.
+ */
+export function useArtworkCategoryIds(): Set<number> {
+  const results = useQueries({
+    queries: ARTWORK_CATEGORY_IDS.map((parentId) => ({
+      queryKey: ["product-categories", parentId],
+      queryFn: () => productCategoryService.list(parentId),
+      staleTime: SHARED_CONTENT_STALE_TIME,
+      gcTime: SHARED_CONTENT_STALE_TIME,
+    })),
+  });
+
+  const ids = new Set<number>(ARTWORK_CATEGORY_IDS);
+  for (const result of results) {
+    for (const category of result.data ?? []) {
+      if (typeof category.id === "number") ids.add(category.id);
+    }
+  }
+  return ids;
 }

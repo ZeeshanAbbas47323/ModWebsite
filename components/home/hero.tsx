@@ -13,12 +13,19 @@ import { resolveImageUrl } from "@/lib/image-url";
 
 export function Hero() {
 
-  const { data: heroSection } = useHomeSection("home_hero");
+  const { data: heroSection, isPending, isError } = useHomeSection("home_hero");
   const cmsSlides = useMemo(
     () => mapHomeHeroSlides(heroSection),
     [heroSection]
   );
-  const slides = cmsSlides.length > 0 ? cmsSlides : HERO_SLIDES;
+
+  /**
+   * The bundled slides are a safety net for an unreachable API, not something
+   * to show while the real ones are still in flight - rendering them first made
+   * the banner visibly jump from 8 slides to the 7 that are actually managed.
+   */
+  const slides = cmsSlides.length > 0 ? cmsSlides : isError ? HERO_SLIDES : [];
+  const awaitingSlides = isPending || (!slides.length && !isError);
 
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -75,6 +82,20 @@ export function Hero() {
         animate: { opacity: 1, x: 0 },
         exit: { opacity: 0, x: direction * -40 },
       };
+
+  // Reserve the banner's space while the managed slides load, so the page does
+  // not reflow when they arrive.
+  if (awaitingSlides || !slide) {
+    return (
+      <section
+        aria-label="Featured products"
+        aria-busy="true"
+        className="relative w-full overflow-hidden bg-black lg:min-h-[calc(100svh-5.05rem)]"
+      >
+        <div className="min-h-[26rem] w-full animate-pulse bg-gradient-to-b from-neutral-900 to-black lg:min-h-[calc(100svh-5.05rem)]" />
+      </section>
+    );
+  }
 
   return (
     <section
@@ -201,9 +222,6 @@ export function Hero() {
                 />
               </button>
             ))}
-            <span className="ml-1 md:ml-2 text-xs md:text-sm text-white/60 tabular-nums">
-              {String(index + 1).padStart(2, "0")} / {String(count).padStart(2, "0")}
-            </span>
           </div>
 
           <div className="hidden sm:flex items-center gap-2">

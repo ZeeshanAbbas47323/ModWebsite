@@ -4,6 +4,7 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { useMenuTree } from "@/hooks/use-menus";
 import { useNavItems, type NavItem } from "@/lib/menu-nav";
+import { cn } from "@/lib/utils";
 
 
 const CLOSE_DELAY = 140;
@@ -116,6 +117,34 @@ export function MegaMenu() {
   );
 }
 
+/**
+ * Column count for a flat list of links.
+ *
+ * A fixed 4-across grid left five links as a row of four plus a lone orphan,
+ * spread over the full container width. Choosing the count from the number of
+ * links keeps the rows balanced and the items near each other.
+ */
+function balancedColumns(count: number): number {
+  if (count <= 4) return Math.max(count, 1);
+  if (count <= 6) return 3;
+  return 4;
+}
+
+const FLAT_GRID_COLUMNS: Record<number, string> = {
+  1: "sm:grid-cols-1",
+  2: "sm:grid-cols-2",
+  3: "sm:grid-cols-2 lg:grid-cols-3",
+  4: "sm:grid-cols-2 lg:grid-cols-4",
+};
+
+const NESTED_GRID_COLUMNS: Record<number, string> = {
+  1: "sm:grid-cols-1",
+  2: "sm:grid-cols-2",
+  3: "sm:grid-cols-2 lg:grid-cols-3",
+  4: "sm:grid-cols-2 lg:grid-cols-4",
+  5: "sm:grid-cols-3 lg:grid-cols-5",
+};
+
 function MegaPanel({ item, onNavigate }: { item: NavItem; onNavigate: () => void }) {
   const columns = item.children ?? [];
 
@@ -123,9 +152,18 @@ function MegaPanel({ item, onNavigate }: { item: NavItem; onNavigate: () => void
   const flat = columns.every((column) => !column.children?.length);
 
   if (flat) {
+    const cols = balancedColumns(columns.length);
+
     return (
       <div className="container py-8">
-        <ul className="grid gap-x-8 gap-y-1 grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+        <ul
+          className={cn(
+            // Width-limited so a handful of links group together instead of
+            // stretching across the whole header.
+            "grid max-w-5xl gap-x-6 gap-y-1 grid-cols-1",
+            FLAT_GRID_COLUMNS[cols] ?? "sm:grid-cols-2 lg:grid-cols-4"
+          )}
+        >
           {columns.map((column) => (
             <li key={column.id}>
               <Link
@@ -151,9 +189,13 @@ function MegaPanel({ item, onNavigate }: { item: NavItem; onNavigate: () => void
 
   return (
     <div className="container py-8">
+      {/* Responsive classes rather than an inline template: the fixed column
+          count forced the same N columns onto narrow screens. */}
       <div
-        className="grid gap-x-10 gap-y-8"
-        style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
+        className={cn(
+          "grid gap-x-10 gap-y-8 grid-cols-1",
+          NESTED_GRID_COLUMNS[cols] ?? "sm:grid-cols-3 lg:grid-cols-5"
+        )}
       >
         {columns.map((column) => (
           <div key={column.id} className="min-w-0">

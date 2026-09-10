@@ -22,6 +22,7 @@ import { ProductReviews } from '@/components/product-detail/product-reviews';
 import type { Product } from '@/services/product.service';
 import {
     isInventoryEnforced,
+    useArtworkCategoryIds,
     useInventoryEnforcedCategoryIds,
 } from "@/lib/inventory";
 import { resolveImageUrl } from '@/lib/image-url';
@@ -93,6 +94,7 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
     const { data: variants } = useProductVariants(id);
 
     const enforcedCategoryIds = useInventoryEnforcedCategoryIds();
+    const artworkCategoryIds = useArtworkCategoryIds();
     const enforceStock = isInventoryEnforced(product, enforcedCategoryIds);
     const { data: reviewsData } = useReviews({ filters: { product_id: id } });
     const { data: builderProducts } = useGangSheetProducts();
@@ -144,7 +146,7 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
     const usesGangSheetBuilder = !!builderProductSlug;
     const usesTransfersBySize = isTransfersBySizeProduct(product?.vendor_id);
     const wantsArtwork =
-        !usesTransfersBySize && !usesGangSheetBuilder && needsArtworkUpload(product);
+        !usesTransfersBySize && !usesGangSheetBuilder && needsArtworkUpload(product, artworkCategoryIds);
     const artworkUploading = artwork.some((f) => !f.stored && !f.error);
 
     const handleTransferAdd = async (selection: TransferSelection) => {

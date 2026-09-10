@@ -15,12 +15,35 @@ const ARTWORK_SLUG_PATTERNS = (
   .map((pattern) => pattern.trim().toLowerCase())
   .filter(Boolean);
 
-export function needsArtworkUpload(product?: {
-  tags?: string[] | null;
-  slug?: string | null;
-  name?: string | null;
-} | null): boolean {
+/**
+ * Categories whose products always take a customer artwork upload, on top of
+ * the tag and slug rules below. Sub-categories are included at the call site.
+ */
+export const ARTWORK_CATEGORY_IDS = (
+  process.env.NEXT_PUBLIC_ARTWORK_UPLOAD_CATEGORIES ?? "79"
+)
+  .split(",")
+  .map((id) => Number(id.trim()))
+  .filter((id) => Number.isFinite(id));
+
+export function needsArtworkUpload(
+  product?: {
+    tags?: string[] | null;
+    slug?: string | null;
+    name?: string | null;
+    category_id?: number | null;
+    category?: { id?: number } | null;
+  } | null,
+  /** Enforced category ids, expanded to include sub-categories. */
+  artworkCategoryIds?: Set<number>
+): boolean {
   if (!product) return false;
+
+  const categoryId = product.category_id ?? product.category?.id ?? null;
+  if (categoryId != null) {
+    const ids = artworkCategoryIds ?? new Set(ARTWORK_CATEGORY_IDS);
+    if (ids.has(categoryId)) return true;
+  }
 
   const tagged = (product.tags ?? []).some((tag) =>
     ARTWORK_TAGS.includes(String(tag).trim().toLowerCase())
