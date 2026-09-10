@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { NewsletterSection } from "@/components/home/newsletter-section";
@@ -21,6 +22,10 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function FaqPage() {
   const page = await getContentPage(PAGE_FILTERS);
+
+  // Inactive or missing in the dashboard means the page is gone, not
+  // broken - without this it rendered a "could not load" panel on a live URL.
+  if (!page) notFound();
   const entries = parseFaqContent(page?.content ?? "");
 
   const heading =

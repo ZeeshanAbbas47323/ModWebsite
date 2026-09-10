@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { ContentPageView } from "@/components/content/content-page-view";
 import { getContentPage } from "@/services/content-page.server";
 
@@ -19,6 +20,10 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function DtfArtworkGuidelinesPage() {
   const page = await getContentPage(PAGE_FILTERS);
+
+  // Inactive or missing in the dashboard means the page is gone, not
+  // broken - without this it rendered a "could not load" panel on a live URL.
+  if (!page) notFound();
   return (
     <ContentPageView
       page={page}
