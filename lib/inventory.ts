@@ -79,14 +79,28 @@ export function availableStock(product: Product | null | undefined): number {
 }
 
 /**
+ * Whether the payload carries any stock information at all.
+ *
+ * Some endpoints return products without their variants or inventory - the
+ * "you may also like" carousel did - and a missing count is not the same as a
+ * count of zero. Treating it as zero labelled every card out of stock.
+ */
+function hasStockData(product: Product | null | undefined): boolean {
+  if (!product) return false;
+  return Array.isArray(product.variants) || Array.isArray(product.inventory);
+}
+
+/**
  * Whether to show an out-of-stock state. Only ever true for enforced
- * categories - a made-to-order product has no stock to run out of.
+ * categories - a made-to-order product has no stock to run out of - and only
+ * when we actually know the stock.
  */
 export function isOutOfStock(
   product: Product | null | undefined,
   enforcedIds: Set<number>
 ): boolean {
   if (!isInventoryEnforced(product, enforcedIds)) return false;
+  if (!hasStockData(product)) return false;
   return availableStock(product) <= 0;
 }
 
