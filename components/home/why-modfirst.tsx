@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ShowcaseMosaic } from "@/components/home/showcase-mosaic";
+import { ShowcaseMosaic, toShowcaseImages } from "@/components/home/showcase-mosaic";
 import { WHY_MODFIRST_IMAGES } from "@/lib/home-showcase-images";
 import { useHomeSection } from "@/hooks/use-home-section";
 import { mapHomeWhyModfirst } from "@/lib/map-home-why-modfirst";
@@ -13,6 +13,12 @@ export const WhyModfirst = () => {
 
 
   const why = mapHomeWhyModfirst(section) ?? WHY_MODFIRST_FALLBACK;
+
+  // Managed images win; the bundled set is only a safety net for a section
+  // that has no image items yet.
+  const mosaic = why.images.length
+    ? toShowcaseImages(why.images)
+    : WHY_MODFIRST_IMAGES;
 
   if (isLoading) {
     return (
@@ -88,7 +94,7 @@ export const WhyModfirst = () => {
         </div>
 
         <div className="w-full lg:w-1/2">
-            <ShowcaseMosaic images={WHY_MODFIRST_IMAGES} />
+            <ShowcaseMosaic images={mosaic} />
           </div>
       </div>
     </section>

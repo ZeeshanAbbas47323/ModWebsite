@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ShowcaseMosaic } from "@/components/home/showcase-mosaic";
+import { ShowcaseMosaic, toShowcaseImages } from "@/components/home/showcase-mosaic";
 import { FAST_PRODUCTION_IMAGES } from "@/lib/home-showcase-images";
 import { useHomeSection } from "@/hooks/use-home-section";
 import { mapHomeFastProduction } from "@/lib/map-home-fast-production";
@@ -13,6 +13,12 @@ export const FastProduction = () => {
 
 
   const data = mapHomeFastProduction(section) ?? FAST_PRODUCTION_FALLBACK;
+
+  // Managed images win; the bundled set is only a safety net for a section
+  // that has no image items yet.
+  const mosaic = data.images.length
+    ? toShowcaseImages(data.images)
+    : FAST_PRODUCTION_IMAGES;
 
   if (isLoading) {
     return (
@@ -49,7 +55,7 @@ export const FastProduction = () => {
 
       <div className="container flex flex-col-reverse lg:flex-row items-center gap-12 lg:gap-20 relative z-10">
         <div className="w-full lg:w-1/2">
-            <ShowcaseMosaic images={FAST_PRODUCTION_IMAGES} />
+            <ShowcaseMosaic images={mosaic} />
           </div>
 
         <div className="w-full lg:w-1/2 flex flex-col gap-6">

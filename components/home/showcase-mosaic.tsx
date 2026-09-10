@@ -1,7 +1,20 @@
 import Image from "next/image";
 import type { ShowcaseImage } from "@/lib/home-showcase-images";
 import { resolveImageUrl } from "@/lib/image-url";
+import type { WhyModfirstImage } from "@/lib/map-home-why-modfirst";
 
+/**
+ * Adapts a section item from the API to what the mosaic draws. Items mark a
+ * full-width tile through `span`, which is stored as a grid class such as
+ * "col-span-2".
+ */
+export function toShowcaseImages(items: WhyModfirstImage[]): ShowcaseImage[] {
+  return items.map((item) => ({
+    src: item.imageUrl,
+    alt: item.alt,
+    wide: /col-span-2|full|wide/i.test(item.span || item.role || ""),
+  }));
+}
 
 export function ShowcaseMosaic({ images }: { images: ShowcaseImage[] }) {
   const squares = images.filter((image) => !image.wide);
