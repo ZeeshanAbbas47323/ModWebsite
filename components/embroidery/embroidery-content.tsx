@@ -10,32 +10,30 @@ import {
 import { Button } from "@/components/ui/button";
 import { SafeImage } from "@/components/shared/safe-image";
 
-/**
- * Placeholder art from the existing showcase set. Swap the `image` values for
- * the real embroidery photography when it is uploaded - nothing else needs to
- * change.
- */
+/** Brand embroidery photography, served from the CDN. */
+const IMG = "https://storage.modfirst.com/pages/embroidery";
+
 const SERVICES = [
   {
     title: "Digitizing Service",
     body: "Convert your logo or artwork into a production-ready embroidery file.",
     cta: "Digitize my logo",
     href: "/custom-apparel-quote",
-    image: "/images/showcase/brand-flatlay.png",
+    image: `${IMG}/digitizing-service.webp`,
   },
   {
     title: "Embroidery Services",
     body: "Order professional embroidery for hats, polos, jackets, hoodies and more.",
     cta: "Start an embroidery order",
     href: "/custom-apparel-quote",
-    image: "/images/showcase/embroidered-cap.png",
+    image: `${IMG}/embroidery-machine.webp`,
   },
   {
     title: "Bulk Embroidery",
     body: "Order embroidered apparel in larger quantities for businesses, teams and events.",
     cta: "Request bulk pricing",
     href: "/custom-apparel-quote",
-    image: "/images/showcase/embroidered-hoodie.png",
+    image: `${IMG}/bulk-embroidery.webp`,
   },
 ];
 
@@ -43,22 +41,22 @@ const STEPS = [
   {
     title: "Send your artwork",
     body: "Upload your logo and provide your garment, placement, colour and quantity details.",
-    image: "/images/showcase/branded-notebook.png",
+    image: `${IMG}/upload-artwork.webp`,
   },
   {
     title: "We prepare a proof",
     body: "We'll prepare a digital proof for your approval before production begins.",
-    image: "/images/showcase/stationery-set.png",
+    image: `${IMG}/digital-proof.webp`,
   },
   {
     title: "We embroider",
     body: "Your approved design is professionally stitched onto your selected items.",
-    image: "/images/showcase/embroidered-cap.png",
+    image: `${IMG}/embroidery-machine.webp`,
   },
   {
     title: "Pickup or shipping",
     body: "We'll notify you when your order is ready for pickup or has shipped.",
-    image: "/images/showcase/tote-and-mug.png",
+    image: `${IMG}/pickup-shipping.webp`,
   },
 ];
 
@@ -189,7 +187,7 @@ export function EmbroideryContent() {
           <div className="w-full lg:w-1/2">
             <div className="relative w-full h-64 sm:h-80 lg:h-full lg:min-h-[26rem]">
               <SafeImage
-                src="/images/showcase/branded-tees-pair.png"
+                src={`${IMG}/digital-proof.webp`}
                 alt=""
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
