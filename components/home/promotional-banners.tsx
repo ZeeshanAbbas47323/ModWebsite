@@ -9,6 +9,7 @@ import {
 } from "@/lib/map-home-promo-banners";
 import { resolveImageUrl } from "@/lib/image-url";
 import { PROMO_BANNERS_FALLBACK } from "@/lib/home-fallback-content";
+import { resolveSection } from "@/lib/section-visibility";
 
 const cardContainer: Variants = {
   hidden: { opacity: 0 },
@@ -180,10 +181,11 @@ function RightPromoCard({ card }: { card: PromoCardViewModel }) {
 }
 
 export function PromotionalBanners() {
-  const { data: section, isLoading } = useHomeSection("home_promo_banners");
+  const sectionQuery = useHomeSection("home_promo_banners");
+  const { data: section, isLoading } = sectionQuery;
 
 
-  const promo = mapHomePromoBanners(section) ?? PROMO_BANNERS_FALLBACK;
+  const promo = resolveSection(sectionQuery, mapHomePromoBanners(section), PROMO_BANNERS_FALLBACK);
 
   const leftCard =
     promo?.cards.find((c) => c.role === "left_card") ?? promo?.cards[0];
@@ -201,6 +203,10 @@ export function PromotionalBanners() {
       </section>
     );
   }
+
+  // Deactivated or deleted upstream: render nothing rather than the
+  // bundled copy, so hiding a section in the dashboard actually hides it.
+  if (!promo) return null;
 
   if (!leftCard && !rightCard && !promo.bottomBanner) {
     return null;

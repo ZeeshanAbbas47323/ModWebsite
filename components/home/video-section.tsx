@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useHomeSection } from "@/hooks/use-home-section";
 import { mapHomeVideo } from "@/lib/map-home-video";
 import { VIDEO_FALLBACK } from "@/lib/home-fallback-content";
+import { resolveSection } from "@/lib/section-visibility";
 
 function hexToRgba(hex: string, opacity: number) {
   const cleaned = hex.replace("#", "");
@@ -23,9 +24,10 @@ function hexToRgba(hex: string, opacity: number) {
 }
 
 export function VideoSection() {
-  const { data: section, isLoading } = useHomeSection("home_video");
+  const sectionQuery = useHomeSection("home_video");
+  const { data: section, isLoading } = sectionQuery;
 
-  const video = mapHomeVideo(section) ?? VIDEO_FALLBACK;
+  const video = resolveSection(sectionQuery, mapHomeVideo(section), VIDEO_FALLBACK);
 
   if (isLoading) {
     return (
@@ -34,6 +36,10 @@ export function VideoSection() {
       </section>
     );
   }
+
+  // Deactivated or deleted upstream: render nothing rather than the
+  // bundled copy, so hiding a section in the dashboard actually hides it.
+  if (!video) return null;
 
   return (
     <section className="container pt-10 md:pt-12 lg:pt-16">

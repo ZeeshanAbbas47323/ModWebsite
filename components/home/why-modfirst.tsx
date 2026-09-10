@@ -7,16 +7,18 @@ import { useHomeSection } from "@/hooks/use-home-section";
 import { mapHomeWhyModfirst } from "@/lib/map-home-why-modfirst";
 import { resolveImageUrl } from "@/lib/image-url";
 import { WHY_MODFIRST_FALLBACK } from "@/lib/home-fallback-content";
+import { resolveSection } from "@/lib/section-visibility";
 
 export const WhyModfirst = () => {
-  const { data: section, isLoading } = useHomeSection("home_why_modfirst");
+  const sectionQuery = useHomeSection("home_why_modfirst");
+  const { data: section, isLoading } = sectionQuery;
 
 
-  const why = mapHomeWhyModfirst(section) ?? WHY_MODFIRST_FALLBACK;
+  const why = resolveSection(sectionQuery, mapHomeWhyModfirst(section), WHY_MODFIRST_FALLBACK);
 
   // Managed images win; the bundled set is only a safety net for a section
   // that has no image items yet.
-  const mosaic = why.images.length
+  const mosaic = why?.images.length
     ? toShowcaseImages(why.images)
     : WHY_MODFIRST_IMAGES;
 
@@ -40,6 +42,10 @@ export const WhyModfirst = () => {
       </section>
     );
   }
+
+  // Deactivated or deleted upstream: render nothing rather than the
+  // bundled copy, so hiding a section in the dashboard actually hides it.
+  if (!why) return null;
 
   return (
     <section className="relative w-full pt-10 md:pt-12 lg:pt-16 overflow-hidden">

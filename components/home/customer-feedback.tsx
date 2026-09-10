@@ -12,12 +12,14 @@ import { useHomeSection } from "@/hooks/use-home-section";
 import { mapHomeCustomerFeedback } from "@/lib/map-home-customer-feedback";
 import { resolveImageUrl } from "@/lib/image-url";
 import { CUSTOMER_FEEDBACK_FALLBACK } from "@/lib/home-fallback-content";
+import { resolveSection } from "@/lib/section-visibility";
 
 export function CustomerFeedback() {
-  const { data: section, isLoading } = useHomeSection("home_customer_feedback");
+  const sectionQuery = useHomeSection("home_customer_feedback");
+  const { data: section, isLoading } = sectionQuery;
 
 
-  const feedback = mapHomeCustomerFeedback(section) ?? CUSTOMER_FEEDBACK_FALLBACK;
+  const feedback = resolveSection(sectionQuery, mapHomeCustomerFeedback(section), CUSTOMER_FEEDBACK_FALLBACK);
 
   if (isLoading) {
     return (
@@ -31,6 +33,10 @@ export function CustomerFeedback() {
       </section>
     );
   }
+
+  // Deactivated or deleted upstream: render nothing rather than the
+  // bundled copy, so hiding a section in the dashboard actually hides it.
+  if (!feedback) return null;
 
   if (!feedback.title && feedback.reviews.length === 0) {
     return null;

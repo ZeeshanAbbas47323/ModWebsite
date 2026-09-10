@@ -6,6 +6,7 @@ import { useHomeSection } from "@/hooks/use-home-section";
 import { mapHomeOrderProcess } from "@/lib/map-home-order-process";
 import { resolveImageUrl } from "@/lib/image-url";
 import { ORDER_PROCESS_FALLBACK } from "@/lib/home-fallback-content";
+import { resolveSection } from "@/lib/section-visibility";
 
 const headerVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -44,10 +45,11 @@ const cardItemVariants: Variants = {
 };
 
 export function OurOrderProcess() {
-  const { data: section, isLoading } = useHomeSection("home_order_process");
+  const sectionQuery = useHomeSection("home_order_process");
+  const { data: section, isLoading } = sectionQuery;
 
 
-  const process = mapHomeOrderProcess(section) ?? ORDER_PROCESS_FALLBACK;
+  const process = resolveSection(sectionQuery, mapHomeOrderProcess(section), ORDER_PROCESS_FALLBACK);
 
   if (isLoading) {
     return (
@@ -69,6 +71,10 @@ export function OurOrderProcess() {
       </section>
     );
   }
+
+  // Deactivated or deleted upstream: render nothing rather than the
+  // bundled copy, so hiding a section in the dashboard actually hides it.
+  if (!process) return null;
 
   return (
     <section className="relative w-full pt-10 md:pt-12 lg:pt-16 overflow-hidden">

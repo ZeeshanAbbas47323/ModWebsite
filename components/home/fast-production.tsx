@@ -7,16 +7,18 @@ import { useHomeSection } from "@/hooks/use-home-section";
 import { mapHomeFastProduction } from "@/lib/map-home-fast-production";
 import { resolveImageUrl } from "@/lib/image-url";
 import { FAST_PRODUCTION_FALLBACK } from "@/lib/home-fallback-content";
+import { resolveSection } from "@/lib/section-visibility";
 
 export const FastProduction = () => {
-  const { data: section, isLoading } = useHomeSection("home_fast_production");
+  const sectionQuery = useHomeSection("home_fast_production");
+  const { data: section, isLoading } = sectionQuery;
 
 
-  const data = mapHomeFastProduction(section) ?? FAST_PRODUCTION_FALLBACK;
+  const data = resolveSection(sectionQuery, mapHomeFastProduction(section), FAST_PRODUCTION_FALLBACK);
 
   // Managed images win; the bundled set is only a safety net for a section
   // that has no image items yet.
-  const mosaic = data.images.length
+  const mosaic = data?.images.length
     ? toShowcaseImages(data.images)
     : FAST_PRODUCTION_IMAGES;
 
@@ -39,6 +41,10 @@ export const FastProduction = () => {
       </section>
     );
   }
+
+  // Deactivated or deleted upstream: render nothing rather than the
+  // bundled copy, so hiding a section in the dashboard actually hides it.
+  if (!data) return null;
 
   return (
     <section className="relative w-full pt-10 md:pt-12 lg:pt-16 overflow-hidden">
