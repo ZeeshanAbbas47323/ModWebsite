@@ -103,30 +103,43 @@ export function EmbroideryContent() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
           {SERVICES.map((service) => (
-            <div
+            <Link
               key={service.title}
-              className="bg-[#F4F4F5] rounded-[24px] p-6 md:p-8 h-full flex flex-col"
+              href={service.href}
+              // The image runs to the card edge rather than sitting inside the
+              // padding, so the photography reads as the card rather than as a
+              // thumbnail dropped into it.
+              className="group bg-[#F4F4F5] rounded-[24px] overflow-hidden h-full flex flex-col transition-shadow hover:shadow-lg"
             >
-              <div className="relative w-full aspect-4/3 rounded-[16px] overflow-hidden mb-6">
+              <div className="relative w-full aspect-4/3 overflow-hidden">
                 <SafeImage
                   src={service.image}
                   alt=""
                   fill
                   sizes="(max-width: 768px) 100vw, 33vw"
-                  className="object-cover"
+                  className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                 />
               </div>
-              <h3 className="text-lg font-bold text-black mb-2">
-                {service.title}
-              </h3>
-              <p className="text-[#464545] leading-relaxed mb-6">{service.body}</p>
-              <Link
-                href={service.href}
-                className="mt-auto font-bold text-black underline underline-offset-4 hover:text-primary transition-colors"
-              >
-                {service.cta}
-              </Link>
-            </div>
+              <div className="flex flex-1 flex-col p-6 md:p-8">
+                <h3 className="text-xl font-bold text-black mb-2">
+                  {service.title}
+                </h3>
+                <p className="text-[#464545] leading-relaxed mb-6">
+                  {service.body}
+                </p>
+                <span className="mt-auto inline-flex items-center gap-2 font-bold text-black">
+                  <span className="underline underline-offset-4 group-hover:text-primary transition-colors">
+                    {service.cta}
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    className="transition-transform group-hover:translate-x-1"
+                  >
+                    →
+                  </span>
+                </span>
+              </div>
+            </Link>
           ))}
         </div>
       </section>
@@ -142,26 +155,27 @@ export function EmbroideryContent() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
           {STEPS.map((step, index) => (
-            <div key={step.title} className="flex flex-col">
-              <div className="relative w-full aspect-16/10 rounded-[24px] overflow-hidden mb-5">
+            <div
+              key={step.title}
+              className="group bg-[#F4F4F5] rounded-[24px] overflow-hidden flex flex-col"
+            >
+              <div className="relative w-full aspect-16/10 overflow-hidden">
                 <SafeImage
                   src={step.image}
                   alt=""
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
-                  className="object-cover"
+                  className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                 />
-              </div>
-              <div className="flex gap-4">
-                <span className="shrink-0 w-8 h-8 rounded-full bg-black text-white text-sm font-bold flex items-center justify-center">
+                <span className="absolute left-4 top-4 w-9 h-9 rounded-full bg-black text-white text-sm font-bold flex items-center justify-center shadow-lg">
                   {index + 1}
                 </span>
-                <div>
-                  <h3 className="text-lg font-bold text-black mb-1">
-                    {step.title}
-                  </h3>
-                  <p className="text-[#464545] leading-relaxed">{step.body}</p>
-                </div>
+              </div>
+              <div className="p-6 md:p-8">
+                <h3 className="text-xl font-bold text-black mb-2">
+                  {step.title}
+                </h3>
+                <p className="text-[#464545] leading-relaxed">{step.body}</p>
               </div>
             </div>
           ))}
@@ -170,9 +184,10 @@ export function EmbroideryContent() {
 
       {/* --------------------------------------- before you order ---- */}
       <section className="container pt-10 md:pt-16">
-        <div className="bg-[#F4F4F5] rounded-[24px] p-6 md:p-10 flex flex-col lg:flex-row gap-8 lg:gap-14 items-center">
+        {/* The image fills its half of the panel edge to edge. */}
+        <div className="bg-[#F4F4F5] rounded-[24px] overflow-hidden flex flex-col lg:flex-row items-stretch">
           <div className="w-full lg:w-1/2">
-            <div className="relative w-full aspect-square rounded-[20px] overflow-hidden">
+            <div className="relative w-full h-64 sm:h-80 lg:h-full lg:min-h-[26rem]">
               <SafeImage
                 src="/images/showcase/branded-tees-pair.png"
                 alt=""
@@ -183,7 +198,7 @@ export function EmbroideryContent() {
             </div>
           </div>
 
-          <div className="w-full lg:w-1/2">
+          <div className="w-full lg:w-1/2 p-6 md:p-10 lg:py-14 flex flex-col justify-center">
             <h2 className="text-3xl md:text-4xl font-bold text-black tracking-tight mb-5">
               Before you place your order
             </h2>
@@ -256,7 +271,12 @@ export function EmbroideryContent() {
                 <Button size="xl">Start an embroidery order</Button>
               </Link>
               <Link href="/custom-apparel-quote">
-                <Button size="xl" variant="outline" className="bg-transparent text-white border-white/30 hover:bg-white/10">
+                {/* A dim grey outline on black was almost invisible; a solid
+                    white button reads as the clear second choice. */}
+                <Button
+                  size="xl"
+                  className="bg-white text-black hover:bg-white/90"
+                >
                   Request bulk embroidery
                 </Button>
               </Link>
