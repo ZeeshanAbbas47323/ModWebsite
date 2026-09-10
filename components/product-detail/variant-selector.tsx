@@ -151,6 +151,9 @@ export function VariantSelector({
 
   const handleSize = (sId: number) => {
     if (sId === sizeId) {
+      // With a single size there is nothing to fall back to - `sizeId` derives
+      // straight back to it - so toggling off would just strand the selection.
+      if (sizes.length === 1) return;
       commit(colorId, null);
       return;
     }
@@ -168,6 +171,23 @@ export function VariantSelector({
   useEffect(() => {
     if (autoSelect && selected?.id !== onlyVariant!.id) onSelect(onlyVariant);
   }, [autoSelect, onlyVariant?.id]);
+
+  /**
+   * A single colour or size resolves on its own, and the chip renders as
+   * chosen - but nothing told the parent, so "Add to cart" still asked the
+   * customer to pick an option they could see was already picked.
+   *
+   * Whenever every axis in play has a value, push the resolved variant up.
+   */
+  const axesResolved =
+    (!hasColors || colorId != null) && (!hasSizes || sizeId != null);
+  const resolvedVariant = axesResolved ? findVariant(colorId, sizeId) : null;
+
+  useEffect(() => {
+    if (!axesResolved) return;
+    if (resolvedVariant?.id !== selected?.id) onSelect(resolvedVariant);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [axesResolved, resolvedVariant?.id, selected?.id]);
 
   if (variants.length === 0) return null;
   if (autoSelect) return null;

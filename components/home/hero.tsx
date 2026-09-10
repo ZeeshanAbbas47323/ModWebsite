@@ -102,8 +102,10 @@ export function Hero() {
       aria-roledescription="carousel"
       aria-label="Featured products"
       onKeyDown={onKeyDown}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
+      // Focus still pauses everywhere, so a keyboard user reading a slide is
+      // not moved on. Hover pause is scoped to the controls below: this
+      // section fills the viewport, so pausing on any cursor position over it
+      // meant the banner simply stopped for anyone whose mouse was resting.
       onFocusCapture={() => setPaused(true)}
       onBlurCapture={() => setPaused(false)}
       className="relative w-full overflow-hidden bg-black lg:min-h-[calc(100svh-5.05rem)]"
@@ -200,7 +202,11 @@ export function Hero() {
       </div>
 
 
-      <div className="absolute bottom-6 md:bottom-8 left-0 right-0 z-20">
+      <div
+        className="absolute bottom-6 md:bottom-8 left-0 right-0 z-20"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+      >
         <div className="container flex items-center justify-between gap-4">
           <div className="flex items-center gap-2 md:gap-3 flex-wrap">
             {slides.map((item, i) => (
