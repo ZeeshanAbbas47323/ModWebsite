@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { proxyCachedQuery, proxyPost } from "@/lib/api-proxy";
+import { CACHE_TAGS } from "@/lib/cache-tags";
 
 
 const FRONTEND_MENUS = {
@@ -9,7 +10,9 @@ const FRONTEND_MENUS = {
 };
 
 export async function GET() {
-  return proxyCachedQuery("menus/frontend", FRONTEND_MENUS);
+  return proxyCachedQuery("menus/frontend", FRONTEND_MENUS, {
+    tags: [CACHE_TAGS.menus],
+  });
 }
 
 
