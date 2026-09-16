@@ -8,14 +8,6 @@ import { Button } from "../ui/button";
 import { useProductBySlug, useProductCollection } from "@/hooks/use-products";
 import { mapProductToCard } from "@/lib/map-product-to-card";
 
-const fallbackRelated = [
-    { title: "DTF Transfer", count: "50 Products", img_path: "/images/banners-compositions/booklet.png" },
-    { title: "Reflective DTF Transfer", count: "50 Products", img_path: "/images/banners-compositions/book.png" },
-    { title: "UV DTF", count: "50 Products", img_path: "/images/banners-compositions/shirt.png" },
-    { title: "Sublimation", count: "50 Products", img_path: "/images/banners-compositions/launch-box.png" },
-    { title: "Custom Patches", count: "50 Products", img_path: "/images/banners-compositions/stamp.svg" },
-];
-
 interface ProductDetailWrapperProps {
     slug: string;
 }
@@ -24,7 +16,10 @@ const ProductDetailWrapper = ({ slug }: ProductDetailWrapperProps) => {
     const { data: product, isLoading } = useProductBySlug(slug);
     const { data: related } = useProductCollection("BEST_SELLERS", 8, product?.category_id ?? undefined);
 
-    const relatedCards = related?.filter((p) => p.id !== product?.id).map(mapProductToCard) ?? fallbackRelated;
+    // No placeholder fallback: a placeholder card with no real id/slug falls
+    // through to a bare, broken link in ProductCard, so this just shows no
+    // carousel until real related products load.
+    const relatedCards = related?.filter((p) => p.id !== product?.id).map(mapProductToCard) ?? [];
 
     if (isLoading) {
         return (
@@ -62,7 +57,9 @@ const ProductDetailWrapper = ({ slug }: ProductDetailWrapperProps) => {
                         </Button>
                     </div>
                 </section>
-                <ProductCarousel data={relatedCards} title="Popular right now" description="From small business advertising to big event displays, Modfirst delivers bold." />
+                {relatedCards.length > 0 && (
+                    <ProductCarousel data={relatedCards} title="Popular right now" description="From small business advertising to big event displays, Modfirst delivers bold." />
+                )}
                 <NewsletterSection />
             </>
         );
@@ -71,7 +68,9 @@ const ProductDetailWrapper = ({ slug }: ProductDetailWrapperProps) => {
     return (
         <>
             <ProductDetail product={product} />
-            <ProductCarousel data={relatedCards} title="You may also like" description="From small business advertising to big event displays, Modfirst delivers bold." />
+            {relatedCards.length > 0 && (
+                <ProductCarousel data={relatedCards} title="You may also like" description="From small business advertising to big event displays, Modfirst delivers bold." />
+            )}
             <NewsletterSection />
         </>
     );

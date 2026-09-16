@@ -16,37 +16,12 @@ import { FastProduction } from "@/components/home/fast-production";
 import { useProductCategories } from "@/hooks/use-product-categories";
 import { resolveImageUrl } from "@/lib/image-url";
 
-const fallbackProducts = [
-  {
-    title: "DTF Transfer",
-    count: "50 Products",
-    img_path: "/images/banners-compositions/booklet.png",
-  },
-  {
-    title: "Reflective DTF Transfer",
-    count: "50 Products",
-    img_path: "/images/banners-compositions/book.png",
-  },
-  {
-    title: "UV DTF",
-    count: "50 Products",
-    img_path: "/images/banners-compositions/shirt.png",
-  },
-  {
-    title: "Sublimation",
-    count: "50 Products",
-    img_path: "/images/banners-compositions/launch-box.png",
-  },
-  {
-    title: "Custom Patches",
-    count: "50 Products",
-    img_path: "/images/banners-compositions/stamp.svg",
-  },
-];
-
 const HomeWrapper = () => {
   const { data: categories } = useProductCategories(null);
 
+  // No placeholder fallback here on purpose: a placeholder card with no real
+  // id/slug falls through to a bare, brokenlink in ProductCard, so until real
+  // categories load the section is simply hidden (see the guard below).
   const categoryCards =
     categories?.map((cat) => ({
       id: cat.id,
@@ -57,7 +32,7 @@ const HomeWrapper = () => {
         "/images/banners-compositions/booklet.png",
       ),
       href: `/categories/${cat.slug}`,
-    })) ?? fallbackProducts;
+    })) ?? [];
 
   return (
     <>
@@ -141,14 +116,16 @@ const HomeWrapper = () => {
       <ScrollReveal>
         <BlogSection />
       </ScrollReveal>
-      <ScrollReveal>
-        <ProductCarousel
-          data={categoryCards}
-          title="Our Categories"
-          description="From small business advertising to big event displays, Modfirst delivers bold."
-          viewAllHref="/categories"
-        />
-      </ScrollReveal>
+      {categoryCards.length > 0 && (
+        <ScrollReveal>
+          <ProductCarousel
+            data={categoryCards}
+            title="Our Categories"
+            description="From small business advertising to big event displays, Modfirst delivers bold."
+            viewAllHref="/categories"
+          />
+        </ScrollReveal>
+      )}
       <ScrollReveal>
         <NewsletterSection />
       </ScrollReveal>

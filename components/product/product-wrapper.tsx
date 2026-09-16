@@ -11,14 +11,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
-const fallbackProducts = [
-    { title: "DTF Transfer", count: "50 Products", img_path: "/images/banners-compositions/booklet.png" },
-    { title: "Reflective DTF Transfer", count: "50 Products", img_path: "/images/banners-compositions/book.png" },
-    { title: "UV DTF", count: "50 Products", img_path: "/images/banners-compositions/shirt.png" },
-    { title: "Sublimation", count: "50 Products", img_path: "/images/banners-compositions/launch-box.png" },
-    { title: "Custom Patches", count: "50 Products", img_path: "/images/banners-compositions/stamp.svg" },
-];
-
 function SearchResults({ query }: { query: string }) {
     const { data, isLoading } = useSearch(query, ["products"], 20);
     const products = data?.products ?? [];
@@ -91,7 +83,10 @@ const ProductWrapper = () => {
         filters: categoryId ? { category_id: categoryId } : undefined,
     });
 
-    const productCards = productsData?.payload?.map(mapProductToCard) ?? fallbackProducts;
+    // No placeholder fallback: a placeholder card with no real id/slug falls
+    // through to a bare, broken link in ProductCard, so an empty/errored
+    // response just shows no products rather than fake ones.
+    const productCards = productsData?.payload?.map(mapProductToCard) ?? [];
     const pagination = productsData?.pagination;
 
     if (query) return <SearchResults query={query} />;
