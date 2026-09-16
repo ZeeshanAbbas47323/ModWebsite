@@ -186,6 +186,8 @@ export function CheckoutWrapper() {
             quantity: line.quantity,
             print_method: line.print_method,
             custom_text: line.custom_text,
+            width: line.width_in,
+            height: line.height_in,
             design_uploads: line.design_uploads?.length ? line.design_uploads : null,
           })
         ) as CreateOrderInput["items"],

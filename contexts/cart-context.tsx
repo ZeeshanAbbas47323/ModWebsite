@@ -51,6 +51,12 @@ export interface AddToCartInput {
 
   image?: string;
 
+  // Overrides the catalogue price for arbitrary-size items — see CartLine's
+  // width_in/height_in for why this exists.
+  unit_price?: number;
+  width_in?: number | null;
+  height_in?: number | null;
+
   design_uploads?: DesignUploadInput[];
 }
 
@@ -124,6 +130,8 @@ function mapServerItem(item: ServerCartItem, snapshot?: CartLine): CartLine {
     image: product ? productImage(product) : snapshot?.image ?? PLACEHOLDER_IMAGE,
     price,
     variant_label: variantLabel(variant) ?? snapshot?.variant_label,
+    width_in: snapshot?.width_in ?? null,
+    height_in: snapshot?.height_in ?? null,
     design_uploads: serverUploads.length ? serverUploads : snapshot?.design_uploads,
   };
 }
@@ -254,8 +262,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         name: input.product.name,
         slug: input.product.slug,
         image: input.image ?? productImage(input.product),
-        price: unitPrice(input.product, variant),
+        price: input.unit_price ?? unitPrice(input.product, variant),
         variant_label: variantLabel(variant),
+        width_in: input.width_in ?? null,
+        height_in: input.height_in ?? null,
         design_uploads: input.design_uploads,
       };
       setSnapshots((prev) => {

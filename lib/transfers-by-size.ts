@@ -34,8 +34,6 @@ export const QUANTITY_BREAKS = [
   { minQty: 100, maxQty: Infinity, discountPct: 20 },
 ] as const;
 
-export const RUSH_ORDER_FEE = 5;
-
 export const SIZE_PRESETS = [
   { label: "Cap / Hat", w: 2.5, h: 2.5 },
   { label: "Left Chest", w: 4, h: 4 },
@@ -60,7 +58,6 @@ export interface TransferPricing {
   discountPct: number;
   discountedUnit: number;
   subtotal: number;
-  rushAmount: number;
   total: number;
 }
 
@@ -72,8 +69,7 @@ export function clamp(value: number, min: number, max: number): number {
 export function priceTransfer(
   widthIn: number,
   heightIn: number,
-  quantity: number,
-  rushOrder: boolean
+  quantity: number
 ): TransferPricing {
   const areaSqIn = widthIn * heightIn;
   const discountPct =
@@ -83,7 +79,6 @@ export function priceTransfer(
   const unitPrice = areaSqIn * PRICE_PER_SQ_IN;
   const discountedUnit = unitPrice * (1 - discountPct / 100);
   const subtotal = discountedUnit * quantity;
-  const rushAmount = rushOrder ? RUSH_ORDER_FEE : 0;
 
   return {
     areaSqIn,
@@ -92,8 +87,7 @@ export function priceTransfer(
     discountPct,
     discountedUnit,
     subtotal,
-    rushAmount,
-    total: subtotal + rushAmount,
+    total: subtotal,
   };
 }
 

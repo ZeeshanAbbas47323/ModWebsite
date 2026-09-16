@@ -10,6 +10,8 @@ export interface OrderItemInput {
   quantity: number;
   print_method?: PrintMethod | null;
   custom_text?: string | null;
+  width?: number | null;
+  height?: number | null;
   design_uploads?: DesignUploadInput[];
 }
 

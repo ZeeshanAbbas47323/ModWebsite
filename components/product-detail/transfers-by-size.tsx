@@ -20,7 +20,6 @@ import {
   MAX_WIDTH_IN,
   MIN_SIDE_IN,
   PREVIEW_BACKGROUNDS,
-  RUSH_ORDER_FEE,
   SIZE_PRESETS,
   clamp,
   nextQuantityBreak,
@@ -34,7 +33,6 @@ export interface TransferSelection {
   widthIn: number;
   heightIn: number;
   quantity: number;
-  rushOrder: boolean;
   notes: string;
   unitPrice: number;
   totalPrice: number;
@@ -49,7 +47,6 @@ interface Design {
   keepRatio: boolean;
   ratio: number;
   quantity: number;
-  rushOrder: boolean;
   notes: string;
   naturalWidth: number | null;
 
@@ -75,7 +72,6 @@ function newDesign(file: File): Design {
     keepRatio: true,
     ratio: 4 / 3,
     quantity: 1,
-    rushOrder: false,
     notes: "",
     naturalWidth: null,
     history: [],
@@ -292,12 +288,12 @@ export function TransfersBySize({ onAddToCart }: TransfersBySizeProps) {
 
   const lines = designs.map((design) => ({
     design,
-    pricing: priceTransfer(design.widthIn, design.heightIn, design.quantity, design.rushOrder),
+    pricing: priceTransfer(design.widthIn, design.heightIn, design.quantity),
   }));
   const grandTotal = lines.reduce((sum, line) => sum + line.pricing.total, 0);
 
   const pricing = active
-    ? priceTransfer(active.widthIn, active.heightIn, active.quantity, active.rushOrder)
+    ? priceTransfer(active.widthIn, active.heightIn, active.quantity)
     : null;
 
   const dpi =
@@ -335,7 +331,6 @@ export function TransfersBySize({ onAddToCart }: TransfersBySizeProps) {
           widthIn: design.widthIn,
           heightIn: design.heightIn,
           quantity: design.quantity,
-          rushOrder: design.rushOrder,
           notes: design.notes.trim(),
           unitPrice: linePricing.discountedUnit,
           totalPrice: linePricing.total,
@@ -732,12 +727,6 @@ export function TransfersBySize({ onAddToCart }: TransfersBySizeProps) {
                 <span className="text-gray-600">Subtotal</span>
                 <span className="font-bold">{money(pricing.subtotal)}</span>
               </div>
-              {pricing.rushAmount > 0 && (
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Rush order</span>
-                  <span className="font-bold">+{money(pricing.rushAmount)}</span>
-                </div>
-              )}
               <div className="border-t border-gray-300 pt-3 flex justify-between items-center">
                 <span className="font-bold text-black">
                   {designs.length > 1 ? "This design" : "Total"}
@@ -754,20 +743,6 @@ export function TransfersBySize({ onAddToCart }: TransfersBySizeProps) {
                 {pricing.areaSqIn.toFixed(2)} in² × {active.quantity} × {money(pricing.ratePerSqIn)}/in² = {money(pricing.subtotal)}
               </p>
             </div>
-
-
-            <label className="flex items-center justify-between gap-4 bg-[#F4F4F5] rounded-[20px] px-5 py-4 cursor-pointer">
-              <span className="flex items-center gap-3">
-                <input
-                  type="checkbox"
-                  checked={active.rushOrder}
-                  onChange={(e) => patchActive({ rushOrder: e.target.checked })}
-                  className="w-4 h-4 accent-black"
-                />
-                <span className="text-sm font-medium text-black">Rush order</span>
-              </span>
-              <span className="text-sm font-bold text-primary">+{money(RUSH_ORDER_FEE)}</span>
-            </label>
 
 
             <div>

@@ -162,7 +162,6 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
 
         const details = [
             `${selection.widthIn.toFixed(2)}in x ${selection.heightIn.toFixed(2)}in`,
-            selection.rushOrder ? "Rush order" : null,
             selection.notes || null,
         ].filter(Boolean).join(" | ");
 
@@ -172,6 +171,9 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
             image: images[0],
             print_method: "dtf",
             custom_text: details,
+            unit_price: selection.unitPrice,
+            width_in: selection.widthIn,
+            height_in: selection.heightIn,
             design_uploads: [{
                 file_url: uploaded.url,
                 file_name: uploaded.originalName || selection.file.name,

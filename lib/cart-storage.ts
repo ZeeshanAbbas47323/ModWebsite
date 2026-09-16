@@ -22,6 +22,12 @@ export interface CartLine {
   price: number;
   variant_label?: string;
 
+  // Set for arbitrary-size items (e.g. "transfers by size") where price is
+  // area × rate rather than a catalogue price — carried through to checkout
+  // so the backend can recompute the same trusted price server-side.
+  width_in?: number | null;
+  height_in?: number | null;
+
   design_uploads?: DesignUploadInput[];
 }
 
