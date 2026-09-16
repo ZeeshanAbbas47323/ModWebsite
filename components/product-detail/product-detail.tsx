@@ -91,7 +91,10 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
     const { data: apiImages } = useProductImages(id);
     const { data: descriptions } = useProductDescriptions(id);
     const { data: faqs } = useProductFaqs(id);
-    const { data: variants } = useProductVariants(id);
+    // The product payload already carries every active variant; the separate
+    // endpoint is paginated (limit 50), so only fall back to it when needed.
+    const { data: fetchedVariants } = useProductVariants(product?.variants ? 0 : id);
+    const variants = product?.variants ?? fetchedVariants;
 
     const enforcedCategoryIds = useInventoryEnforcedCategoryIds();
     const artworkCategoryIds = useArtworkCategoryIds();

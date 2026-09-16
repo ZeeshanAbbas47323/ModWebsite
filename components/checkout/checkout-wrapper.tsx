@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -16,6 +16,7 @@ import { useAddresses } from "@/hooks/use-addresses";
 import { usePickupLocations } from "@/hooks/use-pickup-locations";
 import { orderService, orderReference, type CreateOrderInput, type DeliveryType } from "@/services/order.service";
 import { addressService } from "@/services/address.service";
+import { promotionService } from "@/services/promotion.service";
 import {
   checkoutRedirectUrl,
   isOfflineMethod,
@@ -64,9 +65,30 @@ export function CheckoutWrapper() {
   const [saveAddress, setSaveAddress] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [placing, setPlacing] = useState(false);
+  const [shippingFee, setShippingFee] = useState(0);
+  const [shippingLoading, setShippingLoading] = useState(true);
 
   const { data: savedAddresses } = useAddresses(isReady && isAuthenticated);
   const { data: pickupLocations } = usePickupLocations(deliveryType === "store_pickup");
+
+  useEffect(() => {
+    let cancelled = false;
+    setShippingLoading(true);
+    promotionService
+      .getCheckoutPromotions(deliveryType)
+      .then((promo) => {
+        if (!cancelled) setShippingFee(promo.shipping_fee);
+      })
+      .catch(() => {
+        if (!cancelled) setShippingFee(0);
+      })
+      .finally(() => {
+        if (!cancelled) setShippingLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [deliveryType]);
 
   const email = emailInput ?? user?.email ?? "";
   const phone = phoneInput ?? user?.phone ?? "";
@@ -611,14 +633,24 @@ export function CheckoutWrapper() {
                 </div>
               )}
               <div className="flex justify-between">
-                <span className="text-gray-600">Shipping &amp; tax</span>
-                <span className="font-bold">Confirmed at payment</span>
+                <span className="text-gray-600">Shipping</span>
+                <span className="font-bold">
+                  {deliveryType === "store_pickup"
+                    ? "Free (store pickup)"
+                    : shippingLoading
+                      ? "Calculating…"
+                      : shippingFee > 0
+                        ? `$${shippingFee.toFixed(2)}`
+                        : "Free"}
+                </span>
               </div>
             </div>
 
             <div className="border-t border-gray-300 mt-5 pt-5 flex justify-between items-center mb-6">
               <span className="font-bold text-black text-lg">Total</span>
-              <span className="font-bold text-black text-xl">${total.toFixed(2)}</span>
+              <span className="font-bold text-black text-xl">
+                ${(total + (deliveryType === "home_delivery" ? shippingFee : 0)).toFixed(2)}
+              </span>
             </div>
 
             {error && <p className="text-sm text-red-600 mb-4">{error}</p>}
