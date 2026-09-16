@@ -38,6 +38,21 @@ const HomeWrapper = () => {
     <>
       <Hero />
 
+      {categoryCards.length > 0 && (
+        <ScrollReveal>
+          <ProductCarousel
+            data={categoryCards}
+            title="Our Categories"
+            description="From small business advertising to big event displays, Modfirst delivers bold."
+            viewAllHref="/categories"
+          />
+        </ScrollReveal>
+      )}
+
+      <ScrollReveal>
+        <PromotionalBanners />
+      </ScrollReveal>
+
       <ScrollReveal>
         <CategoryTreeCarousel
           categoryId={66}
@@ -48,19 +63,21 @@ const HomeWrapper = () => {
       </ScrollReveal>
 
       <ScrollReveal>
-        <PromotionalBanners />
+        <OurOrderProcess />
       </ScrollReveal>
 
       <ScrollReveal>
-        <CategoryTreeCarousel
-          categoryId={85}
-          title="Hat Heat Press"
-          viewAllHref="/categories/hat-heat-press"
+        <CollectionCarousel
+          type="BEST_SELLERS"
+          title="Best Sellers"
+          description="Our most-ordered products, ranked by real sales."
+          count={5}
+          viewAllHref="/shop/best-sellers"
         />
       </ScrollReveal>
 
       <ScrollReveal>
-        <OurOrderProcess />
+        <VideoSection />
       </ScrollReveal>
 
       <ScrollReveal>
@@ -72,7 +89,7 @@ const HomeWrapper = () => {
       </ScrollReveal>
 
       <ScrollReveal>
-        <VideoSection />
+        <WhyModfirst />
       </ScrollReveal>
 
       <ScrollReveal>
@@ -80,20 +97,6 @@ const HomeWrapper = () => {
           categoryId={72}
           title="Apparel & Accessories"
           viewAllHref="/categories/apparel"
-        />
-      </ScrollReveal>
-
-      <ScrollReveal>
-        <WhyModfirst />
-      </ScrollReveal>
-
-      <ScrollReveal>
-        <CollectionCarousel
-          type="BEST_SELLERS"
-          title="Best Sellers"
-          description="Our most-ordered products, ranked by real sales."
-          count={5}
-          viewAllHref="/shop/best-sellers"
         />
       </ScrollReveal>
 
@@ -114,18 +117,17 @@ const HomeWrapper = () => {
       </ScrollReveal>
 
       <ScrollReveal>
+        <CategoryTreeCarousel
+          categoryId={85}
+          title="Hat Heat Press"
+          viewAllHref="/categories/hat-heat-press"
+        />
+      </ScrollReveal>
+
+      <ScrollReveal>
         <BlogSection />
       </ScrollReveal>
-      {categoryCards.length > 0 && (
-        <ScrollReveal>
-          <ProductCarousel
-            data={categoryCards}
-            title="Our Categories"
-            description="From small business advertising to big event displays, Modfirst delivers bold."
-            viewAllHref="/categories"
-          />
-        </ScrollReveal>
-      )}
+
       <ScrollReveal>
         <NewsletterSection />
       </ScrollReveal>
