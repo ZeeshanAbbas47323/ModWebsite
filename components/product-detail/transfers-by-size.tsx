@@ -751,7 +751,7 @@ export function TransfersBySize({ onAddToCart }: TransfersBySizeProps) {
                 </div>
               )}
               <p className="text-[11px] text-gray-500">
-                {pricing.areaSqIn.toFixed(2)} sq in per transfer
+                {pricing.areaSqIn.toFixed(2)} in² × {active.quantity} × {money(pricing.ratePerSqIn)}/in² = {money(pricing.subtotal)}
               </p>
             </div>
 

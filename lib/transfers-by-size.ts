@@ -22,14 +22,8 @@ export const ACCEPTED_UPLOAD =
   ".png,.jpg,.jpeg,.webp,.ai,.eps,.pdf,image/png,image/jpeg,image/webp,application/pdf,application/postscript";
 
 
-export const PRICE_TIERS = [
-  { maxSqIn: 12, pricePerUnit: 0.5 },
-  { maxSqIn: 25, pricePerUnit: 0.75 },
-  { maxSqIn: 50, pricePerUnit: 1.2 },
-  { maxSqIn: 100, pricePerUnit: 2 },
-  { maxSqIn: 200, pricePerUnit: 3.5 },
-  { maxSqIn: Infinity, pricePerUnit: 5 },
-] as const;
+/** Flat rate — price is simply area × this, same style as the gang sheet builder. */
+export const PRICE_PER_SQ_IN = 0.4;
 
 
 export const QUANTITY_BREAKS = [
@@ -61,6 +55,7 @@ export const PREVIEW_BACKGROUNDS = [
 
 export interface TransferPricing {
   areaSqIn: number;
+  ratePerSqIn: number;
   unitPrice: number;
   discountPct: number;
   discountedUnit: number;
@@ -81,20 +76,18 @@ export function priceTransfer(
   rushOrder: boolean
 ): TransferPricing {
   const areaSqIn = widthIn * heightIn;
-  const tier =
-    PRICE_TIERS.find((t) => areaSqIn <= t.maxSqIn) ??
-    PRICE_TIERS[PRICE_TIERS.length - 1];
   const discountPct =
     QUANTITY_BREAKS.find((b) => quantity >= b.minQty && quantity <= b.maxQty)
       ?.discountPct ?? 0;
 
-  const unitPrice = tier.pricePerUnit;
+  const unitPrice = areaSqIn * PRICE_PER_SQ_IN;
   const discountedUnit = unitPrice * (1 - discountPct / 100);
   const subtotal = discountedUnit * quantity;
   const rushAmount = rushOrder ? RUSH_ORDER_FEE : 0;
 
   return {
     areaSqIn,
+    ratePerSqIn: PRICE_PER_SQ_IN,
     unitPrice,
     discountPct,
     discountedUnit,
