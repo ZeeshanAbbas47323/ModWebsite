@@ -12,6 +12,7 @@ export interface OrderItemInput {
   custom_text?: string | null;
   width?: number | null;
   height?: number | null;
+  unit_price?: number;
   design_uploads?: DesignUploadInput[];
 }
 

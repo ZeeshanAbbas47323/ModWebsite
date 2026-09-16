@@ -392,21 +392,23 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                         </div>
                     )}
 
-                    <div className="flex items-center gap-3 mb-6">
-                        <span className="text-2xl sm:text-3xl font-bold text-black">
-                            {price ? `$${price.toFixed(2)}` : ""}
-                        </span>
-                        {originalPrice && (
-                            <span className="text-lg text-gray-400 line-through">
-                                ${originalPrice.toFixed(2)}
+                    {!usesTransfersBySize && (
+                        <div className="flex items-center gap-3 mb-6">
+                            <span className="text-2xl sm:text-3xl font-bold text-black">
+                                {price ? `$${price.toFixed(2)}` : ""}
                             </span>
-                        )}
-                        {product?.discount_percent ? (
-                            <span className="bg-red-100 text-red-700 text-xs font-semibold px-2 py-1 rounded-full">
-                                -{product.discount_percent}%
-                            </span>
-                        ) : null}
-                    </div>
+                            {originalPrice && (
+                                <span className="text-lg text-gray-400 line-through">
+                                    ${originalPrice.toFixed(2)}
+                                </span>
+                            )}
+                            {product?.discount_percent ? (
+                                <span className="bg-red-100 text-red-700 text-xs font-semibold px-2 py-1 rounded-full">
+                                    -{product.discount_percent}%
+                                </span>
+                            ) : null}
+                        </div>
+                    )}
 
                     {product?.short_desc && (
                         <p className="text-sm text-gray-600 mb-6">{product.short_desc}</p>

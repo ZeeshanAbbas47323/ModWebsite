@@ -188,6 +188,9 @@ export function CheckoutWrapper() {
             custom_text: line.custom_text,
             width: line.width_in,
             height: line.height_in,
+            // Only for custom-sized items (width_in/height_in set) — the
+            // server trusts this price for those instead of recomputing it.
+            unit_price: line.width_in && line.height_in ? line.price : undefined,
             design_uploads: line.design_uploads?.length ? line.design_uploads : null,
           })
         ) as CreateOrderInput["items"],
