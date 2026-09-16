@@ -39,6 +39,7 @@ import {
     gangSheetDesignUploads,
     gangSheetPrintMethod,
     matchBuilderProduct,
+    matchGangSheetVariant,
     type GangSheetCartItem,
 } from '@/lib/gang-sheet';
 import { useGangSheetProducts } from '@/hooks/use-gang-sheet-products';
@@ -182,8 +183,12 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
 
     const handleGangSheetAdd = async (item: GangSheetCartItem) => {
         if (!product) return;
+        // The builder prices what it built with its own (currently wrong) config —
+        // re-price from our own catalogue's per-size variants instead of trusting it.
+        const variant = matchGangSheetVariant(variants, item);
         await addItem({
             product,
+            variant,
             quantity: item.quantity,
             image: images[0],
             custom_text: item.orderId,

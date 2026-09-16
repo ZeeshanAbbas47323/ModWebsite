@@ -1,4 +1,5 @@
 import type { DesignUploadInput, PrintMethod } from "@/services/cart.service";
+import type { ProductVariant } from "@/services/product.service";
 
 
 export const BUILDER_ORIGIN = (
@@ -38,6 +39,40 @@ export function gangSheetDesignUploads(item: GangSheetCartItem): DesignUploadInp
     ...(item.editUrl ? { edit_url: item.editUrl } : {}),
     print_method,
   }));
+}
+
+/** Last number in a size label ("22.5x60", "22.5x 180", "22 in X 24 in") is the height. */
+function sizeHeightIn(label: string | null | undefined): number | null {
+  const numbers = String(label ?? "").match(/\d+(?:\.\d+)?/g);
+  if (!numbers?.length) return null;
+  return Number(numbers[numbers.length - 1]);
+}
+
+/**
+ * The gang sheet builder (an external tool) prices what it builds using its
+ * own — currently wrong — config, and hands that price back in `item`. Our
+ * own catalogue already has the correct price per size as real
+ * `ProductVariant` rows (imported straight from the live store), so instead
+ * of trusting the builder's number we work out which size was actually built
+ * from its `metrics.printLengthIn` and use our own variant's price for it.
+ * Ties go to the next size up, never down, so a design that's slightly over
+ * a size never gets undercharged.
+ */
+export function matchGangSheetVariant(
+  variants: ProductVariant[] | undefined,
+  item: GangSheetCartItem
+): ProductVariant | null {
+  if (!variants?.length) return null;
+  const builtHeight = item.metrics?.printLengthIn;
+  if (!builtHeight || !Number.isFinite(builtHeight)) return null;
+
+  const withHeight = variants
+    .map((v) => ({ variant: v, height: sizeHeightIn(v.size?.name ?? v.size?.display_name) }))
+    .filter((v): v is { variant: ProductVariant; height: number } => v.height != null)
+    .sort((a, b) => a.height - b.height);
+
+  const fit = withHeight.find((v) => v.height >= builtHeight - 0.01);
+  return (fit ?? withHeight[withHeight.length - 1])?.variant ?? null;
 }
 
 
