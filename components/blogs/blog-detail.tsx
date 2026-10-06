@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import type { Blog } from "@/services/blog.service";
 import { resolveImageUrl } from "@/lib/image-url";
+import { cleanHtml } from "@/lib/sanitize-html";
 
 export function BlogDetail({ blog }: { blog: Blog }) {
   const date = new Date(blog.published_at).toLocaleDateString("en-US", {
@@ -76,7 +77,7 @@ export function BlogDetail({ blog }: { blog: Blog }) {
 
       <div
         className="cms-prose min-w-0"
-        dangerouslySetInnerHTML={{ __html: blog.content }}
+        dangerouslySetInnerHTML={{ __html: cleanHtml(blog.content) }}
       />
 
       {tagList.length > 0 && (

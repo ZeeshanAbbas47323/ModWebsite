@@ -4,6 +4,7 @@ import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { NewsletterSection } from "@/components/home/newsletter-section";
 import { promoteStrongHeadings, withHeadingIds } from "@/lib/parse-faq-content";
 import type { ContentPage } from "@/services/content-page.service";
+import { cleanHtml } from "@/lib/sanitize-html";
 
 interface ContentPageViewProps {
   page: ContentPage | null;
@@ -75,7 +76,7 @@ export function ContentPageView({
 
             <article
               className="cms-prose flex-1 max-w-3xl"
-              dangerouslySetInnerHTML={{ __html: html }}
+              dangerouslySetInnerHTML={{ __html: cleanHtml(html) }}
             />
           </div>
         ) : (

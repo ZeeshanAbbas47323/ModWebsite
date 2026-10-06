@@ -8,6 +8,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import type { FaqEntry } from "@/lib/parse-faq-content";
+import { cleanHtml } from "@/lib/sanitize-html";
 
 interface FaqAccordionProps {
   entries: FaqEntry[];
@@ -30,7 +31,7 @@ export function FaqAccordion({ entries, fallbackHtml }: FaqAccordionProps) {
 
   if (entries.length === 0) {
     return fallbackHtml ? (
-      <div className="cms-prose max-w-3xl" dangerouslySetInnerHTML={{ __html: fallbackHtml }} />
+      <div className="cms-prose max-w-3xl" dangerouslySetInnerHTML={{ __html: cleanHtml(fallbackHtml) }} />
     ) : (
       <p className="text-gray-500">No questions have been published yet.</p>
     );
@@ -79,7 +80,7 @@ export function FaqAccordion({ entries, fallbackHtml }: FaqAccordionProps) {
               <AccordionContent className="pb-6">
                 <div
                   className="cms-prose pl-0 md:pl-10"
-                  dangerouslySetInnerHTML={{ __html: entry.answer }}
+                  dangerouslySetInnerHTML={{ __html: cleanHtml(entry.answer) }}
                 />
               </AccordionContent>
             </AccordionItem>

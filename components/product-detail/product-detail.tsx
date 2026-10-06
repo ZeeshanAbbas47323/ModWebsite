@@ -45,6 +45,7 @@ import {
 import { useGangSheetProducts } from '@/hooks/use-gang-sheet-products';
 import { isVariantAvailable, productStock, tracksVariantStock } from '@/services/product.service';
 import type { ProductVariant } from '@/services/product.service';
+import { cleanHtml } from "@/lib/sanitize-html";
 
 
 interface ProductDetailProps {
@@ -492,7 +493,7 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                                     <AccordionContent>
                                         <div
                                             className={cn("text-gray-600 text-base min-w-0", richTextClasses)}
-                                            dangerouslySetInnerHTML={{ __html: product.description }}
+                                            dangerouslySetInnerHTML={{ __html: cleanHtml(product.description) }}
                                         />
                                     </AccordionContent>
                                 </AccordionItem>
@@ -505,7 +506,7 @@ const ProductDetail = ({ product: productProp, productId }: ProductDetailProps) 
                                     <AccordionContent>
                                         <div
                                             className={cn("text-gray-600 text-base min-w-0", richTextClasses)}
-                                            dangerouslySetInnerHTML={{ __html: desc.content }}
+                                            dangerouslySetInnerHTML={{ __html: cleanHtml(desc.content) }}
                                         />
                                     </AccordionContent>
                                 </AccordionItem>
